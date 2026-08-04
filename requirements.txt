@@ -1,6 +1,6 @@
 packaging
-PIL
 Pillow
+numpy
 requests
 aiohttp
 typing_extensions

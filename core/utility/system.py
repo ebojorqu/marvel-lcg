@@ -8,7 +8,11 @@ class System:
 
     @staticmethod
     def SetTitle(title: str):
-        System.Run(f'title {title}')
+        if os.name == 'nt':
+            System.Run(f'title {title}')
+        else:
+            # ANSI escape sequence for terminal title on Unix-like systems.
+            print(f'\33]0;{title}\a', end='')
 
     @staticmethod
     def Pause():

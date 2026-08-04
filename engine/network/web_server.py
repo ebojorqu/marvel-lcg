@@ -9,6 +9,7 @@ from engine.lib import MimeType, Json, Ver
 from engine.log import Log
 from engine.file import FileManager
 import hashlib
+import asyncio
 
 CATEGORY_NAME = "WEB"
 
@@ -34,6 +35,8 @@ class WebServer:
     def __init__(self) -> None:
         self.web_app = web.Application()
         self.runner = web.AppRunner(self.web_app)
+        self.task = None
+        self.site: web.TCPSite|None = None
 
         if PASSWORD.value:
             self.hash_password = hashlib.md5(PASSWORD.value.encode()).hexdigest()
@@ -176,8 +179,8 @@ class WebServer:
         async def start_server() -> None:
             try:
                 await self.runner.setup()
-                site = web.TCPSite(self.runner, ip, port)
-                await site.start()
+                self.site = web.TCPSite(self.runner, ip, port)
+                await self.site.start()
                 Log.Print(f"{name}:\thttp://{ip}:{port}")
             except Exception as exc:
                 Log.Print(f"{name}:\thttp://{ip}:{port} failed")
@@ -185,10 +188,18 @@ class WebServer:
 
         self.ip = ip
         self.port = port
-        TaskManager.AddTask(start_server, name="WebServer", run_forever=True)
+        self.task = TaskManager.AddTask(start_server, name="WebServer", run_forever=True)
 
     def Shutdown(self) -> None:
-        pass
+        if not self.task:
+            return
+
+        if self.task.loop.is_running():
+            future = asyncio.run_coroutine_threadsafe(self.runner.cleanup(), self.task.loop)
+            try:
+                future.result(timeout=3)
+            except Exception as exc:
+                Log.FailedTrace(CATEGORY_NAME, exc, no_take_as_error=True)
 
     ################################################################################
     #

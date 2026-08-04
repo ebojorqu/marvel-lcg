@@ -52,18 +52,14 @@ class NetLib:
     @staticmethod
     def IsPortAvailable(address: str, port: int) -> bool:
         import socket
-        port_available = True
+        family = socket.AF_INET6 if ':' in address else socket.AF_INET
 
-        if ':' in address:
-            family = socket.AF_INET6
-        else:
-            family = socket.AF_INET
-
-        s = socket.socket(family, socket.SOCK_STREAM)
-        try:
-            s.bind((address, port))
-        except:
-            port_available = False
-        s.close()
-        return port_available
+        # Probe by connecting instead of binding. Binding can fail under some
+        # macOS sandbox contexts even when the port is actually usable by the server.
+        with socket.socket(family, socket.SOCK_STREAM) as s:
+            s.settimeout(0.2)
+            try:
+                return s.connect_ex((address, port)) != 0
+            except OSError:
+                return False
 

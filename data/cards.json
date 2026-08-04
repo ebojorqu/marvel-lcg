@@ -58640,6 +58640,23 @@
             "text": "Play under any player's control. Max 1 per player.\nYou get +3 hit points and your hero gets +1 THW."
         },
         {
+            "card_id": "58024",
+            "type": "Support",
+            "name": "Jarvis",
+            "subtitle": "",
+            "desc": {
+                "Cost": "2",
+                "RES": "B",
+                "Class": "Basic"
+            },
+            "traits": [
+                "AVENGER",
+                "PERSONA"
+            ],
+            "set_name": "",
+            "text": "<b>Response</b>: After an [[Avenger]] hero changes into alter-ego form, exhaust Jarvis \u2192 choose one: that identity gets +2 REC until the end of the phase, or discard a status card from that identity."
+        },
+        {
             "card_id": "58030",
             "type": "Upgrade",
             "name": "Caught in the Crossfire",
@@ -58685,6 +58702,24 @@
             ],
             "set_name": "",
             "text": "<b>Hero Interrupt</b> <i>(defense)</i>: When your hero defends against an attack, it gets +2 DEF for that attack. If you take no damage from that attack, discard an attachment on the attacking enemy with the text \"<b>Hero Action</b>\" or \"<b>Hero Response</b>\"."
+        },
+        {
+            "card_id": "58034",
+            "type": "Support",
+            "name": "Avengers Compound",
+            "subtitle": "",
+            "desc": {
+                "Cost": "0",
+                "RES": "B",
+                "MaxPerDeck": "1",
+                "Class": "Basic"
+            },
+            "traits": [
+                "AVENGER",
+                "LOCATION"
+            ],
+            "set_name": "",
+            "text": "Play only if your identity has the [[Avenger]] trait. Max 1 per deck.\n<b>Action</b>: Exhaust Avengers Compound \u2192 choose: tuck 1 ally from your hand here if there is no ally tucked here, or play the ally tucked here as if it were in your hand."
         }
     ],
     "hercules": [
@@ -58797,7 +58832,27 @@
             ],
             "set_name": "",
             "text": "Play only if your identity has the [[Avenger]] trait.\nAttach to an ally. Max 1 per ally.\n<b>Interrupt</b>: When attached ally is defeated, draw 2 cards."
+        },
+        {
+            "card_id": "59028",
+            "type": "PlayerSideScheme",
+            "name": "* Evaluate Threat",
+            "subtitle": "",
+            "desc": {
+                "Cost": "1",
+                "RES": "B",
+                "StartingThreat": "2*",
+                "Class": "Basic",
+                "Victory": "0"
+            },
+            "traits": [],
+            "set_name": "",
+            "text": "Victory 0.\nPlay only if your identity has the [[Avenger]] or [[S.H.I.E.L.D.]] trait.\n<b>When Defeated</b>: Each player may search their deck and discard pile for an [[Avenger]] or [[S.H.I.E.L.D.]] card and add it to their hand. <i>(Shuffle.)</i> Reduce the cost to play each of those cards by 2 until the end of the phase."
+        },
+        {
+            "card_id": "59032",
+            "full_link": "58034"
         }
     ],
-    "checksum": "e898a69d8d91ea98ecc8d2b55e241f55e0e790016a6c6ed9c9169611f5c11fe5"
+    "checksum": "0fc9776f0057312f1f40f24e19332f6189c46473fe51507122408623d1297fdc"
 }

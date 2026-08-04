@@ -157,7 +157,7 @@ class Engine:
     #
     @staticmethod
     def SaveCrash():
-        if not Engine.has_crashed:
+        if not Engine.has_crashed and hasattr(Engine, "game"):
             Engine.game.session.SaveScene(f'./crash.json', delete_old=False)
             Engine.has_crashed = True
         if Engine.in_unit_test:
