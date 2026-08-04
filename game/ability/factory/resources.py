@@ -100,7 +100,11 @@ class AbilityFactoryResources:
         def check_for_card(effect: 'Effect', message: 'Message.CheckPlayerCanPayCost') -> bool:
             if for_card == None:
                 return True
-            return for_card.Check(message.paying_for_effect.this)
+            # `for_card` restrictions apply only when paying for an actual card.
+            paying_for_card = message.paying_for_card
+            if paying_for_card == None:
+                return False
+            return for_card.Check(paying_for_card)
 
         def check_for_ability(effect: 'Effect', message: 'Message.CheckPlayerCanPayCost') -> bool:
             if for_ability == None:
