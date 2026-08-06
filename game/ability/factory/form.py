@@ -28,12 +28,14 @@ class AbilityFactoryForm:
                                 # to_trait: "CardFace.TRAITS|None"=None,
                                 to_this_additional_form: bool|None=None,
                                 is_change_additional_form: bool|None=None,
+                                use_would_change_trigger: bool=False,
                                 conditions: ConditionsType[Message.AfterUnitChangeForm]=[],
                                 ) -> 'Ability':
 
         def check_which_unit(effect: 'Effect', message: 'Message.AfterUnitChangeForm') -> bool:
             rule = Condition.GetYouRule(which_unit, identity=True)
-            return Condition.CheckWhichCard(rule, message.trigger, effect)
+            trigger = message.would_change_message.trigger if use_would_change_trigger else message.trigger
+            return Condition.CheckWhichCard(rule, trigger, effect)
             # if which_unit == "Attached":
             #     return effect.this.GetBindFace() == message.trigger
             # Is you, 12016
@@ -101,6 +103,7 @@ class AbilityFactoryForm:
                 to_form=to_form,
                 to_this_additional_form=to_this_additional_form,
                 is_change_additional_form=is_change_additional_form,
+                use_would_change_trigger=True,
                 conditions=conditions,
             )
             ability.CopyFromDelayEffect(effect)

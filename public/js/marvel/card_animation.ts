@@ -356,7 +356,8 @@ export class CardAnimation
             const card_div0 = Cards.getDiv(active_card_object_ids[0])!
             const card_div1 = Cards.getDiv(active_card_object_ids[1])!
             if( card_div0 != card_div1 ) {
-                animation_attack_thwart(card_div1, card_div0, CardAnimation.animation_name)
+                // Keep cards anchored in their areas; show intent with a target line only.
+                animation_target(card_div1, card_div0, CardAnimation.animation_name)
             }
         }
         else

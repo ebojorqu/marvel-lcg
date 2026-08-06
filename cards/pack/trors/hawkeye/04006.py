@@ -6,8 +6,12 @@ def GetAbilities() -> Sequence['Ability']:
 
     def explosive(effect: 'Effect', message: 'Message.WhenPlayerInTurn') -> None:
         this = effect.this.CastTo(Event)
+        Unused(message)
 
-        this.DealDamage(effect.targets, 3, effect)
+        chosen_player = effect.targets[0].GetControlByPlayer()
+        targets = Worlds.GetVillains(effect) + chosen_player.GetEngagedMinions()
+
+        this.DealDamage(targets, 3, effect)
 
 
     return [
@@ -15,7 +19,7 @@ def GetAbilities() -> Sequence['Ability']:
             AbilityType.HeroAction,
             explosive,
         ).SetPlay()
-        .SetTarget("VillainAndEngagedSamePlayerMinion")
+        .SetTarget("Players")
         .SetCostFunc(CostFunc.Exhaust(
             card_type=Upgrade,
             name=HAWKEYE_BOW_NAME,
