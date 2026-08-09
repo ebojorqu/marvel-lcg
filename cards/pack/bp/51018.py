@@ -28,8 +28,12 @@ def GetAbilities() -> Sequence['Ability']:
         AbilityFactory.AfterCardLeavePlay(
             AbilityType.Response,
             Minion,
-            the_raft
+            the_raft,
+            conditions=[
+                lambda effect, message:
+                    message.into_area.flags.is_encounter_discard_pile,
+            ]
         ).SetCostFunc(CostFunc.TuckCardHere("Trigger", must_from_encounter_discard_pile=True))
-        .SetTarget(Scheme2),
+        .SetTarget(Scheme2, can_place_threat=True),
     ]
 
