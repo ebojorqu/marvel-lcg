@@ -8,5 +8,6 @@
 /crash.log
 /statistics.json
 /deck/*.json
+/.venv/
 .DS_Store
 public/.DS_Store
