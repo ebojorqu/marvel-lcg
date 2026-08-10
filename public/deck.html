@@ -85,6 +85,7 @@ var cardPreview
     cardStatistics = new CardStatistics();
     await cardStatistics.loadAllCards(false, true);
     window.cardStatistics = cardStatistics
+    const setImageVersion = "20260809"
     
     cardPreview = new CardPreview(cardStatistics.const_card_dict);
     window.cardPreview = cardPreview
@@ -143,7 +144,7 @@ var cardPreview
         let summary = document.createElement("div");
         let img = document.createElement("img");
         img.style.pointerEvents = "none"
-        img.src = "/sets/" + key.replaceAll("/", "")
+        img.src = "/sets/" + key.replaceAll("/", "") + `?v=${setImageVersion}`
 
         summary.dataset.total = cardStatistics.sets_json[key].heroes.length
         summary.dataset.total_implemented = 0
