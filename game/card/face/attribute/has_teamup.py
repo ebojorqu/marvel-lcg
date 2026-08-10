@@ -13,9 +13,16 @@ class HasTeamUp(HasAttribute):
         # Additionally, a card with the team-up keyword cannot be played unless
         # both of the named characters (identity or ally) are in play.
         def parse(value: str):
-            team_up = value.split(";")
-            self.team_up[0] = team_up[0].split("/") # "51025"
-            self.team_up[1] = team_up[1].split("/")
+            raw_pair = value.split(";", 1)
+            if len(raw_pair) == 1:
+                raw_pair = value.split(",", 1)
+
+            if len(raw_pair) < 2:
+                self.team_up = [[], []]
+                return
+
+            self.team_up[0] = [x.strip() for x in raw_pair[0].split("/") if x.strip()]  # "51025"
+            self.team_up[1] = [x.strip() for x in raw_pair[1].split("/") if x.strip()]
         self.RegisterAttribute("TeamUp", parse)
 
     def GetTeamUpUnits(self) -> List['Ally|Identity']:
