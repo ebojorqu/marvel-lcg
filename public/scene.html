@@ -470,7 +470,16 @@ async function createScenarios() {
         }
 
         summary.onclick = (e0) =>{
-            let details = e0.target.querySelector(".details")
+            const summary_el = e0.currentTarget
+            if( !(summary_el instanceof Element) ) {
+                return
+            }
+
+            const details = summary_el.querySelector('.details')
+            if( !(details instanceof Element) ) {
+                return
+            }
+
             let details2 = details.cloneNode(true)
             details2.style.display = "flex"
             details2.querySelectorAll("button").forEach(e => {
@@ -479,14 +488,14 @@ async function createScenarios() {
                         e2.classList.remove('click')
                     })
                     loadScenario(e.value)
-                    generateInputs(e0.target.dataset.package)
+                    generateInputs(summary_el.dataset.package)
                     e.classList.add('click')
                 }
             })
             document.querySelectorAll('#set-images>div').forEach(e => {
                 e.classList.remove('click')
             })
-            e0.target.classList.add('click')
+            summary_el.classList.add('click')
 
             document.querySelector("#set-content").replaceChildren()
             document.querySelector("#set-content").appendChild(details2)

@@ -10,10 +10,16 @@ class HasUses(CanPlaceCounter, HasAttribute):
 
         def parse(value: str):
             from game.element.utility import IsCounter
-            values = value.split(',')
+            values = [x.strip() for x in value.split(',')]
             self.uses_counters = self.FormatPlayerNumValue(values[0])
-            assert IsCounter(values[1])
-            self.uses_counter_name = values[1]
+
+            if len(values) >= 2 and values[1]:
+                counter_name = values[1]
+            else:
+                counter_name = str(self.paper.desc.get("Counter", "counter")).strip()
+
+            assert IsCounter(counter_name), f"Unknown counter '{counter_name}' for {self.paper.card_id}"
+            self.uses_counter_name = counter_name
         self.RegisterAttribute("Uses", parse)
 
     @override

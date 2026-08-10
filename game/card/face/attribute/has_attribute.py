@@ -29,6 +29,8 @@ class HasAttribute(CardFace):
         if key == "Linked":
             # We process this in `create_linked_faces`
             return
+        if key not in self.attributes:
+            raise KeyError(f"Unknown printed key '{key}' for card {self.paper.card_id} ({type(self).__name__})")
         attr = self.attributes[key]
         name, t = attr
         if name == None:

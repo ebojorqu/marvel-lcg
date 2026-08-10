@@ -58788,8 +58788,7 @@
             "name": "Protect Humanity",
             "subtitle": "",
             "desc": {
-                "Uses": "3",
-                "Counter": "labor"
+                "Uses": "3,labor"
             },
             "traits": [
                 "LABOR"
@@ -59220,9 +59219,7 @@
             "type": "Obligation",
             "name": "Appeal to Athena",
             "subtitle": "",
-            "desc": {
-                "Class": "Encounter"
-            },
+            "desc": {},
             "traits": [],
             "set_name": "Hercules Nemesis",
             "text": "Give to the Hercules player.\nWhen counting [[Gift]] cards you control, you are considered to control none.\n<b>Alter-Ego Action</b>: Exhaust Hercules or spend [mental][mental] \u2192 remove this obligation from the game."
@@ -59235,8 +59232,7 @@
             "desc": {
                 "ATK": "3",
                 "SCH": "0*",
-                "HP": "5",
-                "Class": "Encounter"
+                "HP": "5"
             },
             "traits": [
                 "ELITE",
@@ -59253,8 +59249,7 @@
             "desc": {
                 "ATK": "2",
                 "SCH": "0",
-                "HP": "6",
-                "Class": "Encounter"
+                "HP": "6"
             },
             "traits": [
                 "CREATURE",
@@ -59269,8 +59264,7 @@
             "name": "Olympic Feud",
             "subtitle": "",
             "desc": {
-                "StartingThreat": "2",
-                "Class": "Encounter"
+                "StartingThreat": "2"
             },
             "traits": [],
             "set_name": "Hercules Nemesis",
@@ -59282,8 +59276,7 @@
             "name": "Ares's Axe",
             "subtitle": "",
             "desc": {
-                "Class": "Encounter",
-                "ATK": "+2*"
+                "ATK+": "+2*"
             },
             "traits": [
                 "WEAPON"
@@ -59296,9 +59289,7 @@
             "type": "Treachery",
             "name": "God of War",
             "subtitle": "",
-            "desc": {
-                "Class": "Encounter"
-            },
+            "desc": {},
             "traits": [],
             "set_name": "Hercules Nemesis",
             "text": "Each minion attacks the player it is engaged with (even if that player is in alter-ego form). If no minion activates this way, discard cards from the top of the encounter deck until a minion is discarded and reveal that minion."
@@ -59310,8 +59301,7 @@
             "subtitle": "",
             "desc": {
                 "StartingThreat": "2",
-                "Hinder": "2*",
-                "Class": "Encounter"
+                "Hinder": "2*"
             },
             "traits": [],
             "set_name": "All Versus All",
@@ -59325,8 +59315,7 @@
             "desc": {
                 "ATK": "0*",
                 "SCH": "2*",
-                "HP": "4",
-                "Class": "Encounter"
+                "HP": "4"
             },
             "traits": [
                 "OLYMPUS"
@@ -59343,7 +59332,6 @@
                 "ATK": "3*",
                 "SCH": "0*",
                 "HP": "7",
-                "Class": "Encounter",
                 "Victory": "0"
             },
             "traits": [
@@ -59361,8 +59349,7 @@
             "desc": {
                 "ATK": "3*",
                 "SCH": "1",
-                "HP": "5",
-                "Class": "Encounter"
+                "HP": "5"
             },
             "traits": [
                 "AERIAL",
@@ -59379,7 +59366,6 @@
             "subtitle": "",
             "desc": {
                 "StartingThreat": "3",
-                "Class": "Encounter",
                 "Victory": "0"
             },
             "traits": [],
@@ -59403,5 +59389,5 @@
             "text": "[star] Increase the cost to play this card by 1 for each ally you control.\n<b>Hero Action</b>: Ready your hero."
         }
     ],
-    "checksum": "06a1374049f119a8df216b4dfd31db187d4ba96e901a266a6b781346e41fa657"
+    "checksum": "84dea3e3380411dd892461bb0e58e3e11b5b7384ec12e99a1f2770e3ae1614b9"
 }
