@@ -59387,5 +59387,21 @@
             "text": "Victory 0.\n<b>When Defeated</b>: Find the All Versus All side scheme and reveal it."
         }
     ],
-    "checksum": "756c0e0bab342bd0134c124cb7aa1c02a9dee1303593fbd29b623248de206353"
+    "fne": [
+        {
+            "card_id": "60048",
+            "type": "Event",
+            "name": "Army of One",
+            "subtitle": "",
+            "desc": {
+                "Cost": "1",
+                "RES": "Y",
+                "Class": "Protection"
+            },
+            "traits": [],
+            "set_name": "Fear No Evil",
+            "text": "[star] Increase the cost to play this card by 1 for each ally you control.\n<b>Hero Action</b>: Ready your hero."
+        }
+    ],
+    "checksum": "06a1374049f119a8df216b4dfd31db187d4ba96e901a266a6b781346e41fa657"
 }
