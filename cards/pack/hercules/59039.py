@@ -15,7 +15,7 @@ def GetAbilities() -> Sequence['Ability']:
         this.AttachTo2(villain, effect)
 
     def discard_if_no_friendly_took_damage(effect: 'Effect', message: 'Message.AfterUnitAttackEnd') -> None:
-        attached = effect.this.GetAttached()
+        attached = effect.this.bind_face
         if attached != message.attacker:
             return
 

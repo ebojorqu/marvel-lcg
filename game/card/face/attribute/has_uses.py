@@ -1,5 +1,7 @@
 from . import *
 
+CATEGORY_NAME = "LABOR"
+
 class HasUses(CanPlaceCounter, HasAttribute):
     @override
     def __init__(self, paper: 'Paper') -> None:
@@ -58,7 +60,11 @@ class HasUses(CanPlaceCounter, HasAttribute):
             if self.GetAllCounters() <= 0 and self.uses_counters != 0:
                 effect = GameRule(self)
                 # Hack
-                if isinstance(self, HasVictory) and self.victory: # "51031"
+                if self.HasTrait("LABOR"):
+                    from engine.log import Log
+                    Log.Info(CATEGORY_NAME, f"Completed labor moved to victory display: {self}")
+                    Faces.AddToVictoryDisplay([self], effect)
+                elif isinstance(self, HasVictory) and self.victory: # "51031"
                     Faces.AddToVictoryDisplay([self], effect)
                 else:
                     Faces.DiscardAll([self], effect)

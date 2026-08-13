@@ -21,6 +21,8 @@ def GetAbilities() -> Sequence['Ability']:
         AbilityFactory.WhenInYourPlayTurn(
             AbilityType.HeroAction,
             army_of_one,
-        ).SetPlay().SetLabel()
-        .SetTarget("YourHero", canbe_ready=True),
+            conditions=[
+                lambda effect, message: not effect.GetInitiator().GetHero().IsReady(),
+            ],
+        ).SetPlay().SetLabel(),
     ]

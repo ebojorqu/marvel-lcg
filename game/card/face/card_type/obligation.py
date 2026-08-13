@@ -48,7 +48,6 @@ class Obligation(Asset2, CanHinder, HasHazard, HasAccelerationIcon, HasUses, Enc
 
     @override
     def CheckPrintedValue(self):
-        assert self.printed_give_to != None, self.paper.card_id
         return super().CheckPrintedValue()
 
     @override
@@ -111,8 +110,7 @@ class Obligation(Asset2, CanHinder, HasHazard, HasAccelerationIcon, HasUses, Enc
 
     @property
     def give_to(self) -> str:
-        assert self.printed_give_to != None
-        return self.printed_give_to
+        return self.printed_give_to or ""
 
     @property
     @override

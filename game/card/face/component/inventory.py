@@ -14,7 +14,17 @@ class Inventory(Component):
         from game.operate.faces import Faces
 
         super().OnParentLeavePlay(by_effect)
-        Faces.DiscardAll(self.GetDeck().GetAll(), by_effect)
+        attached_cards = list(self.GetDeck().GetAll())
+        victory_cards = [
+            face for face in attached_cards
+            if bool(getattr(face, "victory", False)) and face.IsFaceUp()
+        ]
+        non_victory_cards = [face for face in attached_cards if face not in victory_cards]
+
+        if victory_cards:
+            Faces.AddToVictoryDisplay(victory_cards, by_effect)
+        if non_victory_cards:
+            Faces.DiscardAll(non_victory_cards, by_effect)
 
     @override
     def OnBeforeParentFlip(self, by_effect: 'Effect', no_detach: bool=False):

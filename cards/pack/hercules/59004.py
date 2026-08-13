@@ -5,9 +5,10 @@ from . import *
 def GetAbilities() -> Sequence['Ability']:
 
     def protect_humanity_revealed(effect: 'Effect', message: 'Message.WhenCardRevealed') -> None:
+        player = message.GetToPlayer()
         cho = Search.PlayerCard(
             effect,
-            effect.GetInitiator(),
+            player,
             include_player_deck=True,
             include_discard_pile=True,
             include_player_hand_cards=True,
@@ -17,13 +18,13 @@ def GetAbilities() -> Sequence['Ability']:
             not_move=True,
         )
         if cho:
-            cho.PutIntoPlay(effect.GetInitiator(), effect)
+            cho.PutIntoPlay(player, effect)
 
     def redirect_attack(effect: 'Effect', message: 'Message.WhenUnitWouldAttackUnit') -> None:
         this = effect.this.CastTo(Obligation)
         Unused(this)
 
-        player = effect.GetInitiator()
+        player = message.target.GetControlByPlayer()
         allies = player.GetControlAllies()
         if not allies:
             return
@@ -36,7 +37,7 @@ def GetAbilities() -> Sequence['Ability']:
             if message.would_atk_message.defender and message.would_atk_message.defender.IsName("Hercules"):
                 Faces.RemoveCountersOn([this], 1, "labor", effect)
 
-        message.AfterThisAttack(after_attack)
+        RunAt.AfterEventEnd(effect, message, after_attack)
 
     return [
         AbilityFactory.WhenCardRevealed(
@@ -51,7 +52,8 @@ def GetAbilities() -> Sequence['Ability']:
             redirect_attack,
             conditions=[
                 lambda effect, message: effect.this.IsInPlay(),
-                lambda effect, message: message.attacked[0].IsName("Hercules"),
+                lambda effect, message: message.target.IsName("Hercules"),
+                lambda effect, message: bool(message.target.GetControlByPlayer().GetControlAllies()),
             ],
         ).NoOutOfPlayLimit(),
     ]

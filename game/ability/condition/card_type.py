@@ -216,7 +216,8 @@ class ConditionCardType:
                 ex_prefix, ex_finder = check_rule
 
                 def check_ex_rule():
-                    assert not isinstance(ex_prefix, CardFace)
+                    if isinstance(ex_prefix, CardFace):
+                        return False
                     if ex_prefix == "Another":
                         return check_another()
                     if ex_prefix == "YouControl" or ex_prefix == "Your":
@@ -227,13 +228,16 @@ class ConditionCardType:
                         return check_engaged()
                     if ex_prefix == "Attacking":
                         return check_attacking()
-                    assert False
+                    return False
 
                 if not check_ex_rule():
                     return False
                 if ex_finder == "Character":
                     return Unit2.IsType(face)
-                assert not isinstance(ex_finder, CardFace)
+                if isinstance(ex_finder, CardFace):
+                    if check_status:
+                        return ex_finder.card == face.card
+                    return ex_finder == face
 
                 # if ex_prefix == "Attached":
                 #     if CanAttach.IsType(from_effect.this) and \
@@ -241,10 +245,24 @@ class ConditionCardType:
                 #         ex_finder == Villain:
                 #         return True
 
-                # if isinstance(ex_type, CardFinder):
-                return ex_finder.Check(face)
+                if isinstance(ex_finder, CardFinder):
+                    return ex_finder.Check(face)
+                if isinstance(ex_finder, type) and CardFace in ex_finder.mro():
+                    return ex_finder.IsType(face)
+                if hasattr(ex_finder, "Check"):
+                    return ex_finder.Check(face)
+                return False
 
-            assert not isinstance(check_rule, Sequence)
+            # Support OR semantics for sequence-based rule definitions.
+            if isinstance(check_rule, Sequence) and not isinstance(check_rule, str):
+                for rule in check_rule:
+                    if invoke_check_card(rule, face):
+                        return True
+                return False
+
+            # Unknown string rule: treat as no match instead of crashing.
+            if isinstance(check_rule, str):
+                return False
 
             # Fix "53038"
             if CanAttach.IsType(from_effect.this) and \
@@ -258,7 +276,8 @@ class ConditionCardType:
         if check_faces == None:
             return False
         if isinstance(check_faces, CardFace):
-            assert size == 1
+            if size != 1:
+                return False
             return invoke_check_card(check_rule_param, check_faces)
 
         checked = 0

@@ -14,12 +14,14 @@ def GetAbilities() -> Sequence['Ability']:
         if not this.IsInPlay():
             return
 
-        if not message.attacker.IsMinion():
+        if not Minion.IsType(message.attacker):
             return
 
         target = message.target
         player = this.GetControlByPlayer()
-        if target != player.GetIdentity():
+        if target.GetControlByPlayer() != player:
+            return
+        if not (Hero.IsType(target) or AlterEgo.IsType(target)):
             return
 
         message.ChangeTarget(this, effect)
@@ -31,8 +33,8 @@ def GetAbilities() -> Sequence['Ability']:
         ).SetCostFunc(CostFunc.Exhaust("This")),
         AbilityFactory.WhenUnitWouldAttackUnit(
             AbilityType.ForcedInterrupt,
-            Enemy,
-            "YouControlUnit",
+            Minion,
+            "YourIdentity",
             amadeus_cho_redirect,
         ).NoOutOfPlayLimit(),
     ]

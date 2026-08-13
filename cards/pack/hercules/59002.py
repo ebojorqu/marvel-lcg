@@ -6,10 +6,11 @@ def GetAbilities() -> Sequence['Ability']:
 
     def defeat_the_hydra_revealed(effect: 'Effect', message: 'Message.WhenCardRevealed') -> None:
         this = effect.this.CastTo(Attachment)
+        player = message.GetToPlayer()
 
         minion = Search.EncounterCard(
             effect,
-            effect.GetInitiator(),
+            player,
             include_discard_pile=True,
             include_set_aside=True,
             card_type=Minion,
@@ -17,24 +18,20 @@ def GetAbilities() -> Sequence['Ability']:
             check_effect_fn=lambda check_effect, face: face.printed_health >= 6,
         )
         if minion:
-            minion.Reveal(effect.GetInitiator(), effect)
+            minion.Reveal(player, effect)
             minion.SetHealth(minion.starting_health, effect)
             this.AttachTo2(minion, effect)
 
     def only_hercules_can_damage(effect: 'Effect', message: 'Message.WhenFaceWouldDealDamage') -> bool:
-        this = effect.this.CastTo(Attachment)
-        if this.GetAttached() != message.target:
-            return False
         if not message.would_attack_unit_message:
             return True
         attacker = message.would_attack_unit_message.attacker
         if not attacker:
             return True
-        owner_name = this.GetOwnerPlayer().GetIdentity().name
-        return attacker.GetControlByPlayer().GetIdentity().name != owner_name
+        return not attacker.IsName("Hercules")
 
     def prevent_damage(effect: 'Effect', message: 'Message.WhenFaceWouldDealDamage') -> None:
-        message.CancelDamage(effect)
+        message.PreventDamage("All", effect)
 
     return [
         *AbilityFactory.GiveKeywordToAttached(
@@ -49,8 +46,9 @@ def GetAbilities() -> Sequence['Ability']:
         ),
         AbilityFactory.WhenFaceWouldDealDamage(
             AbilityType.NonKeyword,
-            "AnyCard",
+            None,
             prevent_damage,
+            who_take_damage="AttachedCharacter",
             conditions=[only_hercules_can_damage],
         ).NoOutOfPlayLimit(),
     ]

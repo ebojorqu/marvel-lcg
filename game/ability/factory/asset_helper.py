@@ -166,8 +166,11 @@ def GiveKeywordToAttachWhenApplyThisInternal(
 
     from game.card.face.base import Unit2
 
+    new_card_finder: CardFinder|None = None
+    card_rule: CardType|None = None
+
     if card_finder == None:
-        new_card_finder = None
+        pass
     elif isinstance(card_finder, CardFinder):
         new_card_finder = card_finder
     elif not isinstance(card_finder, str):
@@ -175,7 +178,9 @@ def GiveKeywordToAttachWhenApplyThisInternal(
     elif card_finder == "Character":
         new_card_finder = CardFinder(card_type=Unit2)
     elif card_finder == "You":
-        new_card_finder = None
+        pass
+    else:
+        card_rule = card_finder
 
     def new_filter(effect: 'Effect', face: 'CardFace') -> int:
         # this = effect.this
@@ -192,6 +197,54 @@ def GiveKeywordToAttachWhenApplyThisInternal(
 
         if new_card_finder:
             if not new_card_finder.Check(face):
+                return 0
+        elif card_rule is not None:
+            from game.card.face.card_face import CardFace
+            from game.card.face.card_type import Hero
+            from game.card.face.card_type import Ally
+            from game.card.face.card_type import Identity
+            from game.card.face.card_type import Minion
+            from game.card.face.card_type import Leader
+            from game.card.face.base import Villain
+            from game.card.face.base import Enemy
+            from game.card.face.base import Unit2
+            from game.card.face.base import Scheme2
+            from game.card.face.base import SchemeSide2
+
+            if card_rule == "AttachedCharacter":
+                if not Unit2.IsType(face):
+                    return 0
+            elif card_rule == "AttachedEnemy":
+                if not Enemy.IsType(face):
+                    return 0
+            elif card_rule == "AttachedMinion":
+                if not Minion.IsType(face):
+                    return 0
+            elif card_rule == "AttachedVillain":
+                if not Villain.IsType(face):
+                    return 0
+            elif card_rule == "AttachedHero":
+                if not Hero.IsType(face):
+                    return 0
+            elif card_rule == "AttachedAlly":
+                if not Ally.IsType(face):
+                    return 0
+            elif card_rule == "AttachedIdentity":
+                if not Identity.IsType(face):
+                    return 0
+            elif card_rule == "AttachedLeader":
+                if not Leader.IsType(face):
+                    return 0
+            elif card_rule == "AttachedScheme":
+                if not Scheme2.IsType(face):
+                    return 0
+            elif card_rule == "AttachedSideScheme":
+                if not SchemeSide2.IsType(face):
+                    return 0
+            elif card_rule == "AttachedCard":
+                if not CardFace.IsType(face):
+                    return 0
+            elif not Condition.CheckWhichCard(card_rule, face, effect):
                 return 0
 
         if expert_mode_only:

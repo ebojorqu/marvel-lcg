@@ -6,26 +6,26 @@ def GetAbilities() -> Sequence['Ability']:
 
     def embody_pathos_revealed(effect: 'Effect', message: 'Message.WhenCardRevealed') -> None:
         this = effect.this.CastTo(Attachment)
+        player = message.GetToPlayer()
 
         scheme = Search.EncounterCard(
             effect,
-            effect.GetInitiator(),
+            player,
             include_discard_pile=True,
             include_set_aside=True,
             card_type=SchemeSide2,
             check_effect_fn=lambda check_effect, face: not face.IsInPlay(),
         )
         if scheme:
-            scheme.Reveal(effect.GetInitiator(), effect)
+            scheme.Reveal(player, effect)
             this.AttachTo2(scheme, effect)
-            scheme.PlaceThreat(6, effect)
+            this.PlaceThreatOnSchemes([scheme], 6, effect)
 
     def only_hercules_can_remove_threat(effect: 'Effect', message: 'Message.WhenUnitWouldThwart') -> bool:
         this = effect.this.CastTo(Attachment)
-        if this.GetAttached() not in message.schemes:
+        if this.bind_face not in message.schemes:
             return False
-        owner_name = this.GetOwnerPlayer().GetIdentity().name
-        return message.attacker.GetControlByPlayer().GetIdentity().name != owner_name
+        return not message.attacker.IsName("Hercules")
 
     def cancel_thwart(effect: 'Effect', message: 'Message.WhenUnitWouldThwart') -> None:
         message.GainValue(-message.will_remove_threat, effect)

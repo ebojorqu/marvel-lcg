@@ -10,6 +10,7 @@ from engine.log import Log
 from engine.file import FileManager
 import hashlib
 import asyncio
+import concurrent.futures
 
 CATEGORY_NAME = "WEB"
 
@@ -198,6 +199,13 @@ class WebServer:
             future = asyncio.run_coroutine_threadsafe(self.runner.cleanup(), self.task.loop)
             try:
                 future.result(timeout=3)
+            except concurrent.futures.TimeoutError:
+                # Ctrl+C can stop the task loop before aiohttp cleanup finishes.
+                # This is expected during fast shutdown, so avoid noisy tracebacks.
+                future.cancel()
+            except RuntimeError:
+                # Event loop may already be stopping/closed while handling interrupt.
+                pass
             except Exception as exc:
                 Log.FailedTrace(CATEGORY_NAME, exc, no_take_as_error=True)
 

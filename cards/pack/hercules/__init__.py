@@ -32,9 +32,9 @@ def RevealAllVersusAll(effect: 'Effect', player: 'Player|None'=None) -> None:
 
 
 def GetTopGiftCard(player: 'Player') -> 'Upgrade|None':
-	top = player.set_aside_deck.GetTop()
-	if top and top.paper.card_id in GIFT_CARD_IDS:
-		return top.CastTo(Upgrade)
+	for face in player.set_aside_deck.Get():
+		if face.paper.card_id in GIFT_CARD_IDS:
+			return face.CastTo(Upgrade)
 	return None
 
 

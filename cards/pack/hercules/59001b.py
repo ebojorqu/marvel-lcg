@@ -41,7 +41,7 @@ def GetAbilities() -> Sequence['Ability']:
             AbilityType.Action,
             new_labors_of_hercules,
             conditions=[
-                lambda effect, message: effect.GetInitiator().form.IsInAlterEgoForm(),
+                lambda effect, message: effect.GetInitiator().IsAlterEgo(),
                 lambda effect, message: not Worlds.FindCardOnField(effect, trait="LABOR"),
             ],
         ).SetName("New Labors of Hercules"),

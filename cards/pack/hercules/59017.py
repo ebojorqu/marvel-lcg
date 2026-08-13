@@ -7,7 +7,7 @@ def GetAbilities() -> Sequence['Ability']:
     def prince_of_power(effect: 'Effect', message: 'Message.AfterUnitAttackEnd') -> None:
         total_excess = sum(x.excess_damage for x in message.atk_messages if x.has_defeated_target)
         if total_excess > 0:
-            effect.GetInitiator().GetHero().Heal(total_excess, effect)
+            effect.GetInitiator().GetHero().HealHealth(total_excess, effect)
 
     return [
         AbilityFactory.AfterUnitAttackEnd(

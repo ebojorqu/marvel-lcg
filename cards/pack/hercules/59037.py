@@ -17,14 +17,15 @@ def GetAbilities() -> Sequence['Ability']:
 
         pay_effect = player.MayChooseOneAbility(
             effect,
-            AbilityFactory.ForChoiceAbility(
+            AbilityFactory.ForChoiceAbilityWithCost(
+                Cost("R"),
                 "Spend a physical resource",
-                lambda targets: None,
-            ).SetCost(Cost("R")),
+                lambda targets, resources: None,
+            ),
         )
 
         if not pay_effect:
-            effect.this.CastTo(Minion).Heal(2, effect)
+            effect.this.CastTo(Minion).HealHealth(2, effect)
 
     return [
         AbilityFactory.AfterUnitAttackEnd(
