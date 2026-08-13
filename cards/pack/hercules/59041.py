@@ -5,7 +5,8 @@ from . import *
 def GetAbilities() -> Sequence['Ability']:
 
     def all_versus_all_gain_threat(effect: 'Effect', message: 'Message.WhenUnitBeDefeated') -> None:
-        effect.this.CastTo(SchemeSide2).PlaceThreat(2, effect)
+        this = effect.this.CastTo(SchemeSide2)
+        this.PlaceThreatOnSchemes([this], 2, effect)
 
     def all_versus_all_set_aside(effect: 'Effect', message: 'Message.WhenSchemeBeDefeated') -> None:
         Faces.SetAside([effect.this], effect)

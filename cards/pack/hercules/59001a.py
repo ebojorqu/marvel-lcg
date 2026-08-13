@@ -21,14 +21,14 @@ def GetAbilities() -> Sequence['Ability']:
         if not this.IsInPlay():
             return False
         for face in message.faces:
-            if face.card.area == effect.world.victory_display and face.HasTrait("LABOR"):
+            if face.card.area == effect.world.victory_display and face.paper.card_id in LABOR_CARD_IDS:
                 return True
         return False
 
     return [
         AbilityFactory.AfterCardsMoved(
             AbilityType.Response,
-            CardFinder(trait="LABOR"),
+            None,
             atonement,
             conditions=[labor_added_to_victory_display],
         ).SetName("Atonement").LimitOncePerPhase(),

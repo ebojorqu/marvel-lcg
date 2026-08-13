@@ -10,7 +10,7 @@ def GetAbilities() -> Sequence['Ability']:
     def hecate_activates(effect: 'Effect', message: 'Message.AfterEnemyActivationEnd') -> None:
         scheme = Worlds.FindCardOnField(effect, name=ALL_VERSUS_ALL, card_type=SchemeSide2)
         if scheme:
-            scheme.PlaceThreat(2, effect)
+            scheme.PlaceThreatOnSchemes([scheme], 2, effect)
 
     return [
         AbilityFactory.WhenCardRevealed(

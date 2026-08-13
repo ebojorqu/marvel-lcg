@@ -8,7 +8,7 @@ def GetAbilities() -> Sequence['Ability']:
         this = effect.this.CastTo(SchemeSide2)
         olympus_cards = len(Worlds.FindCardsOnField(effect, CardFinder(trait="OLYMPUS")))
         if olympus_cards > 0:
-            this.PlaceThreat(olympus_cards, effect)
+            this.PlaceThreatOnSchemes([this], olympus_cards, effect)
 
     return [
         AbilityFactory.WhenCardRevealed(
