@@ -9,6 +9,7 @@ def GetAbilities() -> Sequence['Ability']:
         Unused(this)
 
         player = effect.GetInitiator()
+        player.additional_deck.bind_discard_pile = None
         faces = list(player.set_aside_deck.Get())
 
         labor_faces = [x for x in faces if x.paper.card_id in LABOR_CARD_IDS]

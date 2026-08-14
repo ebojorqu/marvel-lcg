@@ -456,6 +456,7 @@ class ModelOnEvent(ModelBase):
 
         this.OnFlip(by_effect, None)
 
+        this.card.state.is_revealing = False
         this.card.state.is_swapping_end = True
         this.OnAfterFlip(by_effect, call_reveal=call_reveal)
         this.card.state.is_swapping_end = False

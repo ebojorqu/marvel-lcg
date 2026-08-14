@@ -98,9 +98,9 @@ export class ButtonSetting {
     static music_on = 1
 
     static show_all_players = 1
-    static show_all_hand_cards = Setting.is_hot_seat ? 1 : 0
+    static show_all_hand_cards = 0
     static always_show_minions_belong = 1
-    static hide_no_action_cards = 1
+    static hide_no_action_cards = 2
     static players_pin = 1
 
     static show_auto_activate = 0

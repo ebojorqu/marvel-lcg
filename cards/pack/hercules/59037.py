@@ -4,15 +4,15 @@ from . import *
 
 def GetAbilities() -> Sequence['Ability']:
 
-    def lernean_hydra(effect: 'Effect', message: 'Message.AfterUnitAttackEnd') -> None:
-        dealt_to_hydra = sum(
-            x.dealt_damage
+    # Prevented damage doesn't count, so use `taken_damage` instead of `dealt_damage`
+    def damage_taken_from_attack(effect: 'Effect', message: 'Message.AfterUnitAttackEnd') -> int:
+        return sum(
+            x.taken_damage
             for x in message.atk_messages
             if x.attacked == effect.this
         )
-        if dealt_to_hydra <= 0:
-            return
 
+    def lernean_hydra(effect: 'Effect', message: 'Message.AfterUnitAttackEnd') -> None:
         player = message.attacker.GetControlByPlayer()
 
         pay_effect = player.MayChooseOneAbility(
@@ -34,7 +34,7 @@ def GetAbilities() -> Sequence['Ability']:
             lernean_hydra,
             conditions=[
                 lambda effect, message: effect.this.IsInPlay(),
-                lambda effect, message: any(x.attacked == effect.this for x in message.atk_messages),
+                lambda effect, message: damage_taken_from_attack(effect, message) > 0,
             ],
         ).NoOutOfPlayLimit(),
     ]

@@ -122,6 +122,28 @@ class Resources:
     def OnlyHasColor(self, text: "Resources.RBY") -> bool:
         return self.rbyg.OnlyHasColor(text)
 
+    # What is still needed to match `cost`, "0" when `IsMatchCost`
+    def GetMissingCost(self, cost: 'Cost') -> 'Cost':
+        from game.element.rbyg import ResRBYGA
+
+        if self.IsMatchCost(cost):
+            return Cost("0")
+        if self.reduce != 0:
+            cost -= self.reduce
+
+        wild = self.rbyg.g
+        missing: Dict[str, int] = {}
+        for color in Cast(List['Resources.RBY'], ["R", "B", "Y"]):
+            need = cost.rbyga.rbyg.GetColor(color, convert_green_res=False) - self.rbyg.GetColor(color, convert_green_res=False)
+            need = max(0, need)
+            used_wild = min(wild, need)
+            wild -= used_wild
+            missing[color] = need - used_wild
+
+        colored = missing["R"] + missing["B"] + missing["Y"]
+        any_type = max(0, cost.val - self.val - colored)
+        return Cost(ResRBYGA(any_type, ResRBYG(missing["R"], missing["B"], missing["Y"], 0)))
+
     # When `convert_green_res`, 'G' will not be a type of resources
     # `convert_green_res` == True
     #   self 'G' text 'R' return True ('G' -> 'R')

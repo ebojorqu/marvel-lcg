@@ -197,12 +197,27 @@ class EffectChecker:
                 payment = self.cost_for_different_target.GetPayment(target)
                 effect.context.paid_this_resources = player.SpendResource(effect, paid_effects, payment)
                 player.res_pool.Reset()
+                if not effect.context.paid_this_resources.IsMatchCost(need_cost):
+                    # A card can generate fewer resources than expected (e.g. "50014"),
+                    # let the player cover the difference instead of losing the whole action
+                    effect.context.paid_this_resources = pay_missing_resources(need_cost, effect.context.paid_this_resources)
                 return effect.context.paid_this_resources.IsMatchCost(need_cost)
             else:
                 effect.context.paid_this_resources = Resources("0")
                 return True
             self.failures.Set(player, f"pay cost, need {need_cost}, but only have {res_text}")
             return False
+
+        def pay_missing_resources(need_cost: 'Cost', paid: 'Resources') -> 'Resources':
+            while True:
+                missing_cost = paid.GetMissingCost(need_cost)
+                if missing_cost.val <= 0:
+                    return paid
+                extra = player.AskSpendResourcesInternal(missing_cost, effect)
+                player.res_pool.Reset()
+                if extra == None or extra.val == 0:
+                    return paid
+                paid += extra
 
         if not check_target():
             self.failures.Set(player, EffectFailure.CheckTarget)
