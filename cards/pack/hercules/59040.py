@@ -7,7 +7,7 @@ def GetAbilities() -> Sequence['Ability']:
     def god_of_war(effect: 'Effect', message: 'Message.WhenCardRevealed') -> None:
         did_attack = False
 
-        for player in Players.GetAll(effect):
+        for player in Worlds.GetPlayers(effect):
             for minion in player.GetEngagedMinions():
                 did_attack = True
                 minion.BasicAttack([player.GetIdentity()], effect)

@@ -21,14 +21,14 @@ def GetAbilities() -> Sequence['Ability']:
             this.AttachTo2(scheme, effect)
             this.PlaceThreatOnSchemes([scheme], 6, effect)
 
-    def only_hercules_can_remove_threat(effect: 'Effect', message: 'Message.WhenUnitWouldThwart') -> bool:
+    def only_hercules_can_remove_threat(effect: 'Effect', message: 'Message.WhenSchemeWouldRemoveThreat') -> bool:
         this = effect.this.CastTo(Attachment)
-        if this.bind_face not in message.schemes:
+        if this.bind_face != message.trigger:
             return False
-        return not message.attacker.IsName("Hercules")
+        return message.would_thw_message is None or not message.by_face.IsName("Hercules")
 
-    def cancel_thwart(effect: 'Effect', message: 'Message.WhenUnitWouldThwart') -> None:
-        message.GainValue(-message.will_remove_threat, effect)
+    def prevent_threat_removal(effect: 'Effect', message: 'Message.WhenSchemeWouldRemoveThreat') -> None:
+        message.SetCannotBeRemoved(effect)
 
     return [
         AbilityFactory.WhenCardRevealed(
@@ -40,11 +40,10 @@ def GetAbilities() -> Sequence['Ability']:
             Scheme2,
             assault=1,
         ),
-        AbilityFactory.WhenUnitWouldThwart(
+        AbilityFactory.WhenSchemeWouldRemoveThreat(
             AbilityType.NonKeyword,
             "AnyCard",
-            cancel_thwart,
-            thwarted_scheme="AnyCard",
+            prevent_threat_removal,
             conditions=[only_hercules_can_remove_threat],
         ).NoOutOfPlayLimit(),
     ]

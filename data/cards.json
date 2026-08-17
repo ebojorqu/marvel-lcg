@@ -58646,7 +58646,7 @@
             "subtitle": "",
             "desc": {
                 "Cost": "2",
-                "RES": "B",
+                "RES": "Y",
                 "Class": "Basic"
             },
             "traits": [
@@ -58867,7 +58867,7 @@
                 "HP": "2",
                 "ATK": "1*",
                 "THW": "1*",
-                "RES": "B",
+                "RES": "G",
                 "Class": "Hero"
             },
             "traits": [
@@ -59397,5 +59397,5 @@
             "text": "[star] Increase the cost to play this card by 1 for each ally you control.\n<b>Hero Action</b>: Ready your hero."
         }
     ],
-    "checksum": "152b25964f2a61db84f9402236b9ef98e23db0dc51f4b31d864adf625bb28a7d"
+    "checksum": "ec6677530fe44d279791de8038f97ad9e9068b0695c9bff20a00809eaf9c3817"
 }
