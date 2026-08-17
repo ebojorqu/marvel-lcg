@@ -1088,6 +1088,9 @@ class Ability:
         assert effect.ability.flags.is_delay_ability
         assert self.flags.is_interrupt or self.flags.is_response or self.flags.is_when_defeated or self.flags.is_temp or self.flags.is_nonkeyword or self.flags.is_action or self.flags.is_rule or self.flags.is_challenge
 
+        if effect.ability.name:
+            self.SetName(effect.ability.name)
+
         for cost_func in effect.ability.cost_funcs:
             self.SetCostFunc(cost_func)
         if effect.ability.play_cost:
