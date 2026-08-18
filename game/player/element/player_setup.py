@@ -20,14 +20,23 @@ class PlayerSetup:
         return [name.strip() for part in value.replace(",", ";").split(";") for name in part.split("/") if name.strip()]
 
     @staticmethod
-    def _IdentityTitles(hero_names: Sequence[str]) -> Set[str]:
+    def _IdentityPapers(hero_names: Sequence[str]) -> List['Paper']:
         from cards.database import CardsDB
+        # Each hero entry is a comma-separated list of the identity's face card ids
+        return [
+            CardsDB.FindCardPaper(card_id.strip())
+            for hero_name in hero_names
+            for card_id in hero_name.split(',')
+            if card_id.strip()
+        ]
+
+    @staticmethod
+    def _IdentityTitles(hero_names: Sequence[str]) -> Set[str]:
         titles: Set[str] = set()
-        for hero_name in hero_names:
-            for paper in CardsDB.FindCardPapers(hero_name):
-                titles.add(paper.name)
-                if paper.subtitle:
-                    titles.add(paper.subtitle)
+        for paper in PlayerSetup._IdentityPapers(hero_names):
+            titles.add(paper.name)
+            if paper.subtitle:
+                titles.add(paper.subtitle)
         return titles
 
     @staticmethod
@@ -38,11 +47,7 @@ class PlayerSetup:
             return player_deck
 
         own_titles = PlayerSetup._IdentityTitles(hero_names)
-        own_set_names = {
-            paper.set_name
-            for hero_name in hero_names
-            for paper in CardsDB.FindCardPapers(hero_name)
-        }
+        own_set_names = {paper.set_name for paper in PlayerSetup._IdentityPapers(hero_names)}
         replacement_by_title: Dict[str, str] = {}
         for card_id, paper in CardsDB.papers.items():
             teamup_names = PlayerSetup._TeamUpNames(paper)

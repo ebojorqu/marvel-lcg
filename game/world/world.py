@@ -222,7 +222,9 @@ class World(WorldAction, WorldFind):
                 if other_index == i:
                     continue
                 for hero_name in other_scene_player.hero:
-                    for paper in CardsDB.FindCardPapers(hero_name):
+                    # Each entry is a comma-separated list of the identity's face card ids
+                    for card_id in hero_name.split(','):
+                        paper = CardsDB.FindCardPaper(card_id.strip())
                         other_identity_titles.add(paper.name)
                         if paper.subtitle:
                             other_identity_titles.add(paper.subtitle)

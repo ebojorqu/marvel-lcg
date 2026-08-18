@@ -256,11 +256,11 @@ class Ability:
             conditions = [check_peril] + conditions
 
         from game.card.face.base import EncounterNonVillainCard
-        if EncounterNonVillainCard.IsType(self.this) and self.this.IsPeril():
+        if EncounterNonVillainCard.IsType(this) and this.IsPeril():
             def check_peril_card_ability(effect: 'Effect', message: 'Message2') -> bool:
-                if not self.this.IsInPlay() or effect.is_forced:
+                if not this.IsInPlay() or effect.is_forced:
                     return True
-                return effect.initiator == self.this.GetControlByOrOwner()
+                return effect.initiator == this.GetControlByOrOwner()
 
             conditions = [check_peril_card_ability] + conditions
 

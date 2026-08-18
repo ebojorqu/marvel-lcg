@@ -107,7 +107,7 @@ class Message(SenderRound, SenderPlayer, SenderCard, SenderTokenCounter, SenderD
             elif Event.IsType(this):
                 attacker = this.GetControlByOrOwner().GetRoleCharacter()
             elif Upgrade.IsType(this):
-                attacker = this.GetBindFace()
+                attacker = this.GetControlByOrOwnerFace()
             elif Support.IsType(this):
                 attacker = this
             else:
@@ -140,7 +140,7 @@ class Message(SenderRound, SenderPlayer, SenderCard, SenderTokenCounter, SenderD
             elif Event.IsType(this):
                 who_thwart = this.GetControlByOrOwner().GetRoleCharacter()
             elif Upgrade.IsType(this):
-                who_thwart = this.GetBindFace()
+                who_thwart = this.GetControlByOrOwnerFace()
             elif Support.IsType(this):
                 who_thwart = this
             else:

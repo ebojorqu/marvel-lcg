@@ -43,6 +43,8 @@ class HasTeamUp(HasAttribute):
         return list(faces)
 
     def CanIncludeInDeck(self, player: 'Player') -> bool:
+        if not any(self.team_up):
+            return True
         identity_faces = player.GetAllIdentityFace()
         return any(
             face.IsName(name)

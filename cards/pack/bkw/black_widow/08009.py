@@ -21,7 +21,7 @@ def GetAbilities() -> Sequence['Ability']:
             "You",
             CardFinder2("PREPARATION"),
             synth_suit,
-            card_control_by="You"
+            control_by_you=True
         ).SetCostFunc(CostFunc.Exhaust("This"))
         .SetTarget(name="Black Widow", canbe_ready=True),
     ]
