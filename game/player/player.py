@@ -158,6 +158,17 @@ class Player(User, PlayerAsk, PlayerCards, PlayerGet, PlayerAction, ):
                     # cards in its owner’s discard pile (even if that card has
                     # the permanent keyword)
 
+                    from game.card.face.attribute.has_permanent import HasPermanent
+                    from game.card.face.card_type import Attachment
+                    foreign_permanents = [
+                        face for face in Worlds.FindCardsOnField(rule, game_area=game_area)
+                        if HasPermanent.IsType(face) and face.permanent and \
+                        not Attachment.IsType(face) and \
+                        face.GetControlByOrOwner() == self and face.GetOwner() != self
+                    ]
+                    if foreign_permanents:
+                        Faces.RemoveAllFromGame(foreign_permanents, rule)
+
                     # 4. Place each card owned by the eliminated player in the
                     # eliminated player’s discard pile
                     if world.rule.v16_player_elimination:

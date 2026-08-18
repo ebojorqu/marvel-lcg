@@ -902,7 +902,7 @@ class PlayerAction:
 
         player.world.object_manager.ResetChooseEffect()
         ability = AbilityFactory.ForChoiceAbilityWithCost(
-            face.printed_cost,
+            face.GetPrintedCostWithRequirement(),
         )
 
         message = Message.WhenPlayerChooseAbility(player, by_effect, (1, 1), False)

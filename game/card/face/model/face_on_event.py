@@ -248,6 +248,25 @@ class ModelOnEvent(ModelBase):
                 if_no_entered_play: Callable[[], Any]|None=None,
                 if_entered_play: Callable[[], Any]|None=None
                 ) -> 'Message.WhenPlayerRevealCard|Message.WhenCardRevealed|None':
+        world = self.GetThis().card.world
+        world.BeginRevealResolution()
+        try:
+            return self._Reveal(
+                player,
+                by_effect,
+                is_by_flipping=is_by_flipping,
+                if_no_entered_play=if_no_entered_play,
+                if_entered_play=if_entered_play,
+            )
+        finally:
+            world.EndRevealResolution()
+
+    def _Reveal(self, player: 'Player|None|Literal["FirstPlayer"]', by_effect: 'Effect',
+                *,
+                is_by_flipping: bool=False,
+                if_no_entered_play: Callable[[], Any]|None=None,
+                if_entered_play: Callable[[], Any]|None=None
+                ) -> 'Message.WhenPlayerRevealCard|Message.WhenCardRevealed|None':
         from game.effect.rule import GameRule
         from game.message import Message
         from game.card.face.attribute.can_surge import CanSurge
@@ -257,6 +276,9 @@ class ModelOnEvent(ModelBase):
 
         this = self.GetThis()
         world = this.card.world
+
+        if this.card.area == world.area_removed:
+            return None
 
         if player == "FirstPlayer":
             player = world.GetFirstPlayer()
@@ -333,6 +355,11 @@ class ModelOnEvent(ModelBase):
             this.OnAfterCardRevealedEnd(end_message)
 
         this.card.state.is_revealing = False
+
+        if this.card.state.unique_entry_rejected:
+            this.card.state.unique_entry_rejected = False
+            if revealed_message and revealed_message.IsFromEncounterDeck():
+                player.DealEncounterCards(1, GameRule(this), by_surge=True)
 
         Effects.UnRegister(check_effects)
 

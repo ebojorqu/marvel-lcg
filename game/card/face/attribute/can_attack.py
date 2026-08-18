@@ -214,6 +214,9 @@ class CanAttack(CardFace):
             if not Unit2.IsType(target):
                 continue
 
+            if not target.CanBeAttackBy(by_effect):
+                continue
+
             if is_base_attack and not property.do_not_give_boost:
                 can_boost = this
                 if CanBoost.IsType(can_boost):
@@ -229,8 +232,13 @@ class CanAttack(CardFace):
 
             defense = 0
             if defense_messages and defender:
-                for defense_message in defense_messages:
-                    defense += defense_message.property.GetDefense(defender)
+                # Per v1.8 rulebook: "If a hero has been declared the defender of the attack,
+                # reduce the amount of damage dealt by that hero's DEF value."
+                # Allies do not get DEF reduction: "all damage from the attack is dealt to the ally"
+                from game.card.face.card_type import Hero
+                if Hero.IsType(defender):
+                    for defense_message in defense_messages:
+                        defense += defense_message.property.GetDefense(defender)
 
             attacked_you = None
             def update_atk_target(target: 'Unit2'):
@@ -334,7 +342,7 @@ class CanAttack(CardFace):
             # unit_health = target.health
 
             excess_damage = 0
-            if would_attack_unit_message.IsPiercing():
+            if calculated_damage > 0 and would_attack_unit_message.IsPiercing():
                 if atk_target.IsTough():
                     atk_target.DiscardTough(by_effect, rule="All")
 
@@ -412,9 +420,6 @@ class CanAttack(CardFace):
             total_dealt_damage += calculated_damage
 
             if is_not_delay:
-                retaliate_message = atk_target.ResolveRetaliate(would_attack_unit_message)
-                attacker_is_defeated += retaliate_message != None and isinstance(retaliate_message, Message.AfterUnitDefeatedUnit)
-
                 if being_atk_message.defense_messages:
                     defend_against_message = Message.AfterUnitDefendEnd(being_atk_message.defense_messages, would_atk_message, calculated_damage, took_damage)
                     defend_against_message.Send()

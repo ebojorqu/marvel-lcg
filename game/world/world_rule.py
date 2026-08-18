@@ -34,11 +34,12 @@ class WorldRule:
         self.v15_all                        = VariableBool(self, False, "v15_all")
 
         self.v16_all                        = VariableBool(self, False, "v16_all")
-        self.v16_reveal                     = VariableBool(self, False, "v16_reveal")
-        self.v16_teamwork                   = VariableBool(self, False, "v16_teamwork")
+        self.v16_reveal                     = VariableBool(self, True, "v16_reveal")
+        self.v16_teamwork                   = VariableBool(self, True, "v16_teamwork")
         self.v16_player_elimination         = VariableBool(self, False, "v16_player_elimination")
-        self.v16_referential_ability        = VariableBool(self, False, "v16_referential_ability")
+        self.v16_referential_ability        = VariableBool(self, True, "v16_referential_ability")
         self.v16_confuse_stun               = VariableBool(self, False, "v16_confuse_stun")
+        self.identity_specific_teamup        = VariableBool(self, True, "identity_specific_teamup")
 
         self.fix_surge                      = VariableBool(self, True, "fix_surge")
         self.fix_treachery                  = VariableBool(self, True, "fix_treachery")

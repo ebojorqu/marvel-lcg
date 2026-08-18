@@ -178,6 +178,11 @@ class CanHealth(HasHealth):
             return None
 
     @final
+    def CanTakeDamage(self) -> bool:
+        from game.buff.buff import BuffCannotTakeDamage
+        return self.IsInPlay() and not self.GetBuff(BuffCannotTakeDamage)
+
+    @final
     def TakeIndirectDamage(self, source: 'CardFace', damage: int, by_effect: 'Effect', *, from_atk_message: 'Message.WhenUnitWouldAttack|None'=None, as_group: bool=False, operation: Callable[['Message.AfterUnitTookDamage'], None]|None=None):
         from game.operate.worlds import Worlds
 
@@ -235,13 +240,13 @@ class CanHealth(HasHealth):
 
             excess_damage = lost_message_helper.excess_damage
 
-            if overkill_target and excess_damage:
+            if overkill_target and excess_damage and self.IsDefeated():
                 lost_message_overkill_helper = overkill_target.TakeDamageNoDeath(source, DamageProperty(damage=excess_damage, is_from_overkill=True), by_effect, would_attack_unit_message, from_atk_message=from_atk_message)
 
             units: List['Unit2'] = []
             if self.IsInPlay() and Unit2.IsType(self):
                 units.append(self)
-            if overkill_target and overkill_target.IsInPlay() and excess_damage:
+            if overkill_target and overkill_target.IsInPlay() and excess_damage and self.IsDefeated():
                 units.append(overkill_target)
 
             world = self.card.world

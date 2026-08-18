@@ -113,7 +113,7 @@ def GetStatisticsRule() -> List['Ability']:
     return [
         Ability(
             AbilityType.Statistics,
-            Message.WhenEffectWouldResolve,
+            Message.AfterEffectResolved,
             [
                 lambda effect, message:
                     not message.effect.is_rule and \
@@ -136,7 +136,7 @@ def GetStatisticsRule() -> List['Ability']:
         ),
         Ability(
             AbilityType.Statistics,
-            Message.WhenEffectWouldResolve,
+            Message.AfterEffectResolved,
             [
                 lambda effect, message:
                     not message.effect.is_rule and \

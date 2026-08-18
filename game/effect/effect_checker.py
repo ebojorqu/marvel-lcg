@@ -335,6 +335,12 @@ class EffectChecker:
                     self.failures.SetText(asked_player, f"{asked_player} doesn't have this card")
                     return False
 
+                from game.card.face.attribute.has_cost import HasCost
+                if self.effect.context.ignore_resource_cost and \
+                    HasCost.IsType(this) and this.requirement.val > 0:
+                    self.failures.SetText(asked_player, "Requirement resources cannot be ignored")
+                    return False
+
         if message.send_resolve_message:
             if not self.ability.flags.is_statistics:
                 check_message = Message.CheckEffectCondition(self.effect, this)

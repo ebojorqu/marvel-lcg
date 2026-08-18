@@ -403,6 +403,8 @@ class Card(Object):
         message = Message.WhenCardWouldMoveToArea(up_face, from_area, into_area, by_effect, ui_group)
         if not up_face.OnWhenCardWouldMoveToArea(message):
             return False
+        if from_area == self.world.area_removed:
+            return False
 
         if self.area == message.into_area:
             return True
@@ -429,6 +431,7 @@ class Card(Object):
 
         if self.world.is_game_started and into_area.flags.is_in_play:
             if self.world.IsThisUniqueInPlay(up_face):
+                self.state.unique_entry_rejected = True
                 self.Discard(by_effect)
                 early_exit()
                 return False

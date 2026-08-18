@@ -764,7 +764,7 @@
                 "AVENGER"
             ],
             "set_name": "Iron Man",
-            "text": "You get +1 hand size for each [[Tech]] upgrade you control (to a maximum hand size of 7)."
+            "text": "You get +1 hand size for each [[Tech]] upgrade you control (to a maximum of +6 hand size)."
         },
         {
             "card_id": "01029b",
@@ -5132,7 +5132,7 @@
             },
             "traits": [],
             "set_name": "Hawkeye Nemesis",
-            "text": "<b>When Revealed:</b> The Clint Barton player searches their hand, deck, discard pile, and play area for Mockingbird and places her faceup beneath this card. When this scheme is defeated, return Mockingbird to her owner's hand."
+            "text": "<b>When Revealed:</b> The Clint Barton player searches their hand, deck, discard pile, and play area for Mockingbird and tucks her faceup beneath this card. When this scheme is defeated, return the tucked Mockingbird to her owner's hand."
         },
         {
             "card_id": "04029",
@@ -9140,7 +9140,7 @@
                 "TECH"
             ],
             "set_name": "Black Widow",
-            "text": "Black Widow gets +1 DEF.\n<b>Hero Response</b>: After you trigger the ability of a [[Preparation]] card you control, exhaust Synth-Suit \u2192 ready Black Widow."
+            "text": "Black Widow gets +1 DEF.\n<b>Hero Response</b>: After you resolve the ability of a [[Preparation]] card you control, exhaust Synth-Suit \u2192 ready Black Widow."
         },
         {
             "card_id": "08010",
@@ -55777,7 +55777,7 @@
         {
             "card_id": "56019",
             "type": "Ally",
-            "name": "* Yellow Jacket",
+            "name": "* Yellowjacket",
             "subtitle": "Hank Pym",
             "desc": {
                 "Cost": "3",
@@ -55791,7 +55791,7 @@
                 "AVENGER"
             ],
             "set_name": "",
-            "text": "Play only if you have the [[Avenger]] trait.\n<b>Response</b>: After Yellow Jacket enters play, search the top 5 cards of your deck for an upgrade and add it to your hand."
+            "text": "Play only if you have the [[Avenger]] trait.\n<b>Response</b>: After Yellowjacket enters play, search the top 5 cards of your deck for an upgrade and add it to your hand."
         },
         {
             "card_id": "56020",
@@ -56594,7 +56594,7 @@
         {
             "card_id": "56073",
             "type": "Minion",
-            "name": "* Yellow Jacket",
+            "name": "* Yellowjacket",
             "subtitle": "",
             "desc": {
                 "HP": "4",
@@ -57002,7 +57002,7 @@
                 "SUPERPOWER"
             ],
             "set_name": "Captain Marvel",
-            "text": "Permanent.\n<b>Forced Response</b>: After a leader, hero, or ally attacks Captain Marvel, place 1 energy counter here. Then, if there are at least 4 energy counters here, remove all of them \u2192 Captain Marvel attacks that character. This attack gains overkill."
+            "text": "Permanent.\n<b>Forced Response</b>: After a leader, hero, or ally attacks Captain Marvel, place 1 energy counter here. Then, if there are at least 4 energy counters here, remove all of them and Captain Marvel attacks that character. This attack gains overkill."
         },
         {
             "card_id": "56099",

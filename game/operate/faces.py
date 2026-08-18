@@ -414,7 +414,7 @@ class Faces:
             size = len(faces)
             top_faces = deck.GetTops(size)
 
-            if top_faces:
+            if len(top_faces) == size:
                 original_decks = [x.card.area for x in faces]
                 Faces.MoveAllTo(faces, deck, by_effect)
                 for i, face in enumerate(top_faces):
@@ -469,6 +469,16 @@ class Faces:
             » Share a title, neither card is considered to enter or leave play. Tokens, attachments, and status cards on the previously in-play card are transferred to the other card and the other card maintains the state (ready or exhausted) of the previously in-play card.
             » Do not share a title, the in-play card is considered to leave play and the out-of-play card is considered to enter play. Tokens, attachments, and status cards on the previously in-play card are not transferred to the other card and the other card enters play ready.
         """
+        if len(targets) != 2 or targets[0].card == targets[1].card:
+            return
+
+        face0 = targets[0]
+        face1 = targets[1]
+        area0 = face0.card.area
+        area1 = face1.card.area
+        if area0.GetSize() == 0 or area1.GetSize() == 0:
+            return
+
         def do_move(face: 'CardFace', into_area: 'Deck', index: int, from_area: 'Deck'):
             if into_area.flags.is_in_play:
                 face.card.MoveToArea(into_area, by_effect)
@@ -478,13 +488,21 @@ class Faces:
                 into_area.Insert(index, face.card)
 
         from game.message import Message
-        face0 = targets[0]
-        area0 = face0.card.area
         index0 = area0.GetIndex(face0)
 
-        face1 = targets[1]
-        area1 = face1.card.area
         index1 = area1.GetIndex(face1)
+
+        one_in_play = area0.flags.is_in_play != area1.flags.is_in_play
+        if one_in_play and face0.name != face1.name:
+            if area0.flags.is_in_play:
+                face0.card.MoveToArea(area1, by_effect)
+                face1.card.MoveToArea(area0, by_effect)
+            else:
+                face1.card.MoveToArea(area0, by_effect)
+                face0.card.MoveToArea(area1, by_effect)
+            message = Message.AfterCardsSwapDeck_Text(face0, face1)
+            message.Send()
+            return
 
         do_move(face1, area0, index0, area1)
         do_move(face0, area1, index1, area0)

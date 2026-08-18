@@ -152,6 +152,7 @@ class SelectorFilter:
                     canbe_ready: bool|None=None,
                     has_non_health: bool|None=None,
                     canbe_heal: int|None=None,
+                    canbe_take_damage: bool|None=None,
                     check_effect_fn: Callable[['Effect', 'CardFace'], bool]|None=None, # Only call when has effect
                     ):
         from game.card.face.base import Unit2
@@ -160,6 +161,7 @@ class SelectorFilter:
             canbe_ready != None or \
             has_non_health != None or \
             canbe_heal != None or \
+            canbe_take_damage != None or \
             check_effect_fn != None
 
         if canbe_exhaust != None:
@@ -183,6 +185,11 @@ class SelectorFilter:
             self.check_effect_fns.append(
                 lambda effect, face: \
                     Unit2.IsType(face) and face.CanHeath() and face.sustained >= canbe_heal
+            )
+        if canbe_take_damage != None:
+            self.check_effect_fns.append(
+                lambda effect, face: \
+                    Unit2.IsType(face) and canbe_take_damage == face.CanTakeDamage()
             )
 
         if check_effect_fn != None:

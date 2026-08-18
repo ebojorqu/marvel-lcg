@@ -45,7 +45,10 @@ class CanSurge(HasSurge):
             if world.rule.fix_surge:
                 def action():
                     face = Worlds.PopEncounterCard(effect)
-                    face.Reveal(player, effect)
+                    if world.reveal_resolution_depth > 0:
+                        world.QueueRevealFollowup(lambda: face.Reveal(player, effect))
+                    else:
+                        face.Reveal(player, effect)
                 RunAt.AfterRevealed(self.CastTo(CardFace), action)
             else:
                 player.DealEncounterCards(1, effect, by_surge=True)

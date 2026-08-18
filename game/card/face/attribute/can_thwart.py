@@ -132,6 +132,9 @@ class CanThwart(CardFace):
             if not Scheme2.IsType(target):
                 continue
 
+            if not target.CanBeThwartBy(by_effect):
+                continue
+
             being_thw_message = Message.WhenSchemeBeingThwart(target, would_thw_message)
             being_thw_message.Send()
             gain_value_when_divided_for_this_target(being_thw_message)

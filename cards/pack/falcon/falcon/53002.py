@@ -21,10 +21,20 @@ def GetAbilities() -> Sequence['Ability']:
             return face.health > 0
         return False
 
+    def redwing_has_known_boost_value(effect: 'Effect', message: 'Message2') -> bool:
+        encounter_deck = Worlds.GetEncounterDeck(effect)
+        top_card = encounter_deck.GetTop()
+        if top_card is None:
+            return False
+        if top_card.IsFaceUp():
+            return FacesCounter.CountTotalBoostStarAndBoost([top_card]) > 0
+        return True
+
     return [
         AbilityFactory.WhenInYourPlayTurn(
             AbilityType.HeroAction,
-            redwing
+            redwing,
+            conditions=[redwing_has_known_boost_value]
         ).SetCostFunc(CostFunc.Exhaust("This"))
         .SetCostFunc(CostFunc.ReturnToHand("This", to_who="Initiator"))
         .SetCostFunc(CostFunc.DiscardDeckTopCards("EncounterDeck", 1))

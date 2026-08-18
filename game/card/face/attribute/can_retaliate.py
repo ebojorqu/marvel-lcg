@@ -28,6 +28,26 @@ class HasRetaliate(HasAttribute):
 
 class CanRetaliate(HasRetaliate):
 
+    @override
+    def GetAbilities(self) -> List['Ability']:
+        from game.ability import AbilityType
+        from game.ability.factory import AbilityFactory
+
+        abilities = [
+            AbilityFactory.AfterUnitAttackUnitInternal(
+                AbilityType.ForcedResponse,
+                None,
+                None,
+                lambda effect, message:
+                    effect.this.ResolveRetaliate(message.would_atk_unit_message),
+                conditions=[
+                    lambda effect, message:
+                        message.attacked == effect.this,
+                ],
+            )
+        ]
+        return abilities + super().GetAbilities()
+
     @final
     def ResolveRetaliate(self, atk_message: 'Message.WhenUnitWouldAttackUnit'):
         from game.effect.rule import Retaliate

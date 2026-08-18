@@ -28,12 +28,13 @@ class HasRestricted(HasAttribute):
 
     @override
     def OnWouldEnterPlay(self, into_area: 'Deck') -> bool:
-        if super().OnWouldEnterPlay(into_area):
-            if self.restricted:
-                if not self.CheckRestrictedLimit([self]):
-                    return False
-            return True
-        return False
+        return super().OnWouldEnterPlay(into_area)
+
+    @override
+    def OnAfterCardPutIntoPlay(self, message: 'Message.AfterCardPutIntoPlay') -> None:
+        if self.restricted:
+            self.CheckRestrictedLimit([])
+        return super().OnAfterCardPutIntoPlay(message)
 
     @override
     def OnAfterCardLeavePlay(self, message: 'Message.AfterCardLeavePlay') -> None:

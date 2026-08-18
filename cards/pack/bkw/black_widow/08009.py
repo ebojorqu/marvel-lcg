@@ -16,7 +16,7 @@ def GetAbilities() -> Sequence['Ability']:
             CardFinder(name="Black Widow"),
             defense=1,
         ),
-        AbilityFactory.AfterPlayerTriggerAbility(
+        AbilityFactory.AfterPlayerResolveAbility(
             AbilityType.HeroResponse,
             "You",
             CardFinder2("PREPARATION"),

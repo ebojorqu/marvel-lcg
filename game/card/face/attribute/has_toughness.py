@@ -11,14 +11,12 @@ class HasToughness(HasAttribute):
         self.RegisterInfoDict('toughness')
 
     @override
-    def OnWhenCardEnterPlay(self, message: 'Message.WhenCardEnterPlay') -> bool:
+    def OnAfterCardEnterPlay(self, message: 'Message.AfterCardEnterPlay') -> None:
         from game.effect.rule import Toughness
         from game.operate.faces import Faces
-        if super().OnWhenCardEnterPlay(message):
-            if self.IsToughness():
-                Faces.GiveStatus([self], "Tough", Toughness(self))
-            return True
-        return False
+        super().OnAfterCardEnterPlay(message)
+        if self.IsToughness() and self.IsInPlay():
+            Faces.GiveStatus([self], "Tough", Toughness(self))
 
     ################################################################################
     #

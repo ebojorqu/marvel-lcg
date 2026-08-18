@@ -100,6 +100,10 @@ class World(WorldAction, WorldFind):
 
         self.additional_decks: List[Deck] = []
         self.additional_discard_piles: List[Deck] = []
+        self.reveal_resolution_depth = 0
+        self.deferred_reveal_messages: List['Message2'] = []
+        self.deferred_reveal_message_ids: Set[int] = set()
+        self.deferred_reveal_followups: List[Callable[[], None]] = []
 
         self.scenario_decks: Dict[Worlds.ASIDE_DECK_NAME, SetAsideDeck] = {}
         for name in Types.LiteralToList(Worlds.ASIDE_DECK_NAME):
@@ -145,6 +149,29 @@ class World(WorldAction, WorldFind):
 
     ################################################################################
     #
+    def BeginRevealResolution(self) -> None:
+        self.reveal_resolution_depth += 1
+
+    def EndRevealResolution(self) -> None:
+        assert self.reveal_resolution_depth > 0
+        self.reveal_resolution_depth -= 1
+        if self.reveal_resolution_depth != 0:
+            return
+
+        deferred_messages = self.deferred_reveal_messages[:]
+        self.deferred_reveal_messages.clear()
+        self.deferred_reveal_message_ids.clear()
+        for message in deferred_messages:
+            self.event_manager.BroadcastMessage(message)
+
+        deferred_followups = self.deferred_reveal_followups[:]
+        self.deferred_reveal_followups.clear()
+        for followup in deferred_followups:
+            followup()
+
+    def QueueRevealFollowup(self, followup: Callable[[], None]) -> None:
+        self.deferred_reveal_followups.append(followup)
+
     def GetScenario(self) -> 'Scenario':
         return self.scenario
 
@@ -189,7 +216,25 @@ class World(WorldAction, WorldFind):
         for player in self.const_players:
             i = self.const_players.index(player)
             scene_player = self.scene.players[i]
-            player.setup.SelectIdentity(scene_player.name, scene_player.hero, scene_player.hero_deck, scene_player.obligations, scene_player.nemesis_set, scene_player.player_deck)
+            other_identity_titles: Set[str] = set()
+            from cards.database import CardsDB
+            for other_index, other_scene_player in enumerate(self.scene.players):
+                if other_index == i:
+                    continue
+                for hero_name in other_scene_player.hero:
+                    for paper in CardsDB.FindCardPapers(hero_name):
+                        other_identity_titles.add(paper.name)
+                        if paper.subtitle:
+                            other_identity_titles.add(paper.subtitle)
+            player.setup.SelectIdentity(
+                scene_player.name,
+                scene_player.hero,
+                scene_player.hero_deck,
+                scene_player.obligations,
+                scene_player.nemesis_set,
+                scene_player.player_deck,
+                other_identity_titles=other_identity_titles,
+            )
 
         if self.is_game_over:
             return

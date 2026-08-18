@@ -50,6 +50,8 @@ class HasBoostIcon(HasAttribute):
     @final
     @property
     def boost_star(self) -> int:
+        if self.is_treat_as_if_blank:
+            return 0
         value = 0
         # if self.FindEffect(when=Send.WhenCardBecomeBoost):
         if self.effect.Find(type=AbilityType.Boost):

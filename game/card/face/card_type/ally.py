@@ -40,7 +40,14 @@ class Ally(HasThwart, CanThwart, HasAttack, CanAttack, Friend, CanDefense, HasAc
             if isinstance(end_message, Message.AfterUnitThwartEnd):
                 if this.thwart_consequential_damage > 0 and \
                 not any(x.does_not_take_consequential_damage for x in end_message.would_thw_messages):
-                    damage = self.thwart_consequential_damage
+                    # Check if thwart was against an assault scheme
+                    # Per v1.8 rulebook: "If the thwarting character is an ally, it takes the
+                    # consequential damage listed under its ATK instead of its THW after the thwart."
+                    is_assault_thwart = any(target.assault for target in end_message.thwarted_targets)
+                    if is_assault_thwart and self.attack_consequential_damage > 0:
+                        damage = self.attack_consequential_damage
+                    else:
+                        damage = self.thwart_consequential_damage
             if isinstance(end_message, Message.AfterUnitAttackEnd):
                 if self.attack_consequential_damage > 0 and \
                 not any(x.does_not_take_consequential_damage for x in end_message.would_atk_messages):

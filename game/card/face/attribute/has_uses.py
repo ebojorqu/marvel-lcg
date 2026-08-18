@@ -25,6 +25,34 @@ class HasUses(CanPlaceCounter, HasAttribute):
         self.RegisterAttribute("Uses", parse)
 
     @override
+    def GetAbilities(self) -> List['Ability']:
+        def return_labor_to_deck(effect: 'Effect', message: 'Message.AfterCardDiscard') -> None:
+            from cards.pack.hercules import LABOR_CARD_IDS
+            from game.player import Player
+
+            if self.paper.card_id not in LABOR_CARD_IDS:
+                return
+            if self.card.area.flags.is_victory_display:
+                return
+            owner = self.GetOwner()
+            if not Player.IsType(owner):
+                return
+            labor_deck = owner.additional_deck
+            if self.card.area == labor_deck:
+                labor_deck.Remove(self.card)
+            else:
+                self.card.area.Remove(self.card)
+            labor_deck.Insert(0, self.card)
+
+        return [
+            AbilityFactory.AfterCardDiscardInternal(
+                AbilityType.Rule,
+                "This",
+                return_labor_to_deck,
+            )
+        ] + super().GetAbilities()
+
+    @override
     def OnWhenCardEnterPlay(self, message: 'Message.WhenCardEnterPlay') -> bool:
         if super().OnWhenCardEnterPlay(message):
             if self.uses_counters:
@@ -57,7 +85,8 @@ class HasUses(CanPlaceCounter, HasAttribute):
 
         after_message = super().RemoveCountersInternal(counters, name, by_effect, forced=forced)
         if after_message and self.IsInPlay():
-            if self.GetAllCounters() <= 0 and self.uses_counters != 0:
+            if self.uses_counters != 0 and \
+                self.GetCounters(self.uses_counter_name) <= 0:
                 effect = GameRule(self)
                 # Hack
                 if self.HasTrait("LABOR"):

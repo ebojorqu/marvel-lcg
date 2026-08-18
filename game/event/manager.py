@@ -428,6 +428,13 @@ class EventManager:
             if effect.is_unregister:
                 continue
 
+            if world.reveal_resolution_depth > 0 and effect.ability.flags.is_response:
+                message_id = id(message)
+                if message_id not in world.deferred_reveal_message_ids:
+                    world.deferred_reveal_message_ids.add(message_id)
+                    world.deferred_reveal_messages.append(message)
+                continue
+
             assert isinstance(message, effect.ability.when), f"{message=} {effect.ability.when=}"
 
             if effect.this.is_treat_as_if_blank and \
@@ -437,7 +444,8 @@ class EventManager:
                 continue
             if effect.this.card.area.flags.is_removed and \
                 not effect.ability.ignore.be_removed and \
-                type(message) is not Message.WhenPlayerLikeInTurn:
+                (type(message) is not Message.WhenPlayerLikeInTurn or \
+                 effect.this.card.area == world.area_removed):
                 # not effect.this.IsName("rule") and \
                 effect.failures.Set(asked_player, EffectFailure.IsRemoved)
                 continue

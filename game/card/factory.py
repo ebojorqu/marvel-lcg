@@ -49,6 +49,11 @@ class CardFactory:
 
         card = Card(owner, *faces, world=world)
 
+        if deck and deck.flags.is_player_deck and Player.IsType(owner):
+            from game.card.face.attribute.has_teamup import HasTeamUp
+            if HasTeamUp.IsType(card.face) and not card.face.CanIncludeInDeck(owner):
+                raise ValueError(f"{card.face} cannot be included with {owner.GetIdentity()}")
+
         if not deck:
             deck = world.area_removed
 

@@ -255,6 +255,15 @@ class Ability:
                 return True
             conditions = [check_peril] + conditions
 
+        from game.card.face.base import EncounterNonVillainCard
+        if EncounterNonVillainCard.IsType(self.this) and self.this.IsPeril():
+            def check_peril_card_ability(effect: 'Effect', message: 'Message2') -> bool:
+                if not self.this.IsInPlay() or effect.is_forced:
+                    return True
+                return effect.initiator == self.this.GetControlByOrOwner()
+
+            conditions = [check_peril_card_ability] + conditions
+
         if self.is_like_defense:
             def can_defense_attack(effect: 'Effect', message: 'Message2') -> bool:
                 if isinstance(message, AttackerMessage):
@@ -695,6 +704,7 @@ class Ability:
                 has_threat          : bool|None=None,
                 can_place_threat    : bool|None=None,
                 has_non_health      : bool|None=None,
+                canbe_take_damage   : bool|None=None,
                 canbe_discard       : bool|None=None,
                 canbe_flip          : bool|None=None,
                 with_texts          : List[Literal["Hero Action", "Hero Response"]]|None=None,
@@ -868,6 +878,7 @@ class Ability:
             least_threat=least_threat,
             share_trait_with_your_hero=share_trait_with_your_hero,
             share_trait_with_your_identity=share_trait_with_your_identity,
+            canbe_take_damage=canbe_take_damage,
             fewest_remaining_hp=fewest_remaining_hp,
             highest_atk=highest_atk,
             highest_thw=highest_thw,

@@ -13,6 +13,7 @@ class CardIsStates:
         self.is_face_up         = True
         self.is_ready           = True
         self.is_attached        = False
+        self.unique_entry_rejected = False
 
 class CardCanStates:
 

@@ -13,11 +13,7 @@ def GetAbilities() -> Sequence['Ability']:
             need_shuffle = False
             cards: List[Ally] = []
             if cards == []:
-                cards += Worlds.FindCardsOnField(
-                    effect,
-                    name=name,
-                    card_type=Ally
-                )
+                cards += player.GetControlCards(CardFinder(name=name, card_type=Ally))
             if cards == []:
                 cards += player.hand_cards.FindCards(name=name, card_type=Ally)
             if cards == []:
@@ -35,7 +31,8 @@ def GetAbilities() -> Sequence['Ability']:
     def marked_for_death_return(effect: 'Effect', message: 'Message.WhenSchemeBeDefeated') -> None:
         this = effect.this.CastTo(EncounterSideScheme)
 
-        faces = Faces.MoveAllToProcessingArea(this.GetPlacedCardArea().Get(), effect)
+        faces = this.GetPlacedCardArea().FindCards(name="Mockingbird", card_type=Ally)
+        faces = Faces.MoveAllToProcessingArea(faces, effect)
         Faces.ReturnToHand(faces, "Owner", effect)
 
 

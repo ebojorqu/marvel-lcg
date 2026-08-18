@@ -12,6 +12,56 @@ class PlayerSetup:
     def __init__(self, player: 'Player') -> None:
         self.player = player
 
+    @staticmethod
+    def _TeamUpNames(paper: 'Paper') -> List[str]:
+        value = paper.desc.get("TeamUp")
+        if not value:
+            return []
+        return [name.strip() for part in value.replace(",", ";").split(";") for name in part.split("/") if name.strip()]
+
+    @staticmethod
+    def _IdentityTitles(hero_names: Sequence[str]) -> Set[str]:
+        from cards.database import CardsDB
+        titles: Set[str] = set()
+        for hero_name in hero_names:
+            for paper in CardsDB.FindCardPapers(hero_name):
+                titles.add(paper.name)
+                if paper.subtitle:
+                    titles.add(paper.subtitle)
+        return titles
+
+    @staticmethod
+    def ReplaceIdentitySpecificTeamUps(player_deck: List[str], hero_names: Sequence[str], other_identity_titles: Set[str]) -> List[str]:
+        from cards.database import CardsDB
+
+        if not other_identity_titles:
+            return player_deck
+
+        own_titles = PlayerSetup._IdentityTitles(hero_names)
+        own_set_names = {
+            paper.set_name
+            for hero_name in hero_names
+            for paper in CardsDB.FindCardPapers(hero_name)
+        }
+        replacement_by_title: Dict[str, str] = {}
+        for card_id, paper in CardsDB.papers.items():
+            teamup_names = PlayerSetup._TeamUpNames(paper)
+            if own_titles.intersection(teamup_names) and other_identity_titles.intersection(teamup_names):
+                replacement_by_title[next(iter(other_identity_titles.intersection(teamup_names)))] = card_id
+
+        updated_deck = player_deck[:]
+        for index, card_id in enumerate(player_deck):
+            paper = CardsDB.papers.get(card_id)
+            if not paper or paper.set_name not in own_set_names or paper.desc.get("Class") != "Hero" or not paper.is_unique:
+                continue
+            matching_titles = {paper.name, paper.subtitle} & other_identity_titles
+            for matching_title in matching_titles:
+                replacement = replacement_by_title.get(matching_title)
+                if replacement:
+                    updated_deck[index] = replacement
+                    break
+        return updated_deck
+
     def SetupPlayerAbility(self, hero: 'CardFace'):
         from game.message import Message
         player = self.player
@@ -178,7 +228,7 @@ class PlayerSetup:
         register_change_form()
         register_ask_effect()
 
-    def SelectIdentity(self, name: str, hero_names: Sequence[str], hero_deck: Sequence[str], obligations: Sequence[str], nemesis_set: Sequence[str], player_deck: Sequence[str]) -> None:
+    def SelectIdentity(self, name: str, hero_names: Sequence[str], hero_deck: Sequence[str], obligations: Sequence[str], nemesis_set: Sequence[str], player_deck: Sequence[str], *, other_identity_titles: Set[str]|None=None) -> None:
         from game.effect.rule import GameRule
         from game.message import Message
         from game.card.factory import CardFactory
@@ -234,6 +284,12 @@ class PlayerSetup:
             player_hero_deck = list(player_deck) + list(hero_deck)
         else:
             player_hero_deck = list(hero_deck) + list(player_deck)
+        if player.world.rule.identity_specific_teamup:
+            player_hero_deck = PlayerSetup.ReplaceIdentitySpecificTeamUps(
+                player_hero_deck,
+                hero_names,
+                other_identity_titles or set(),
+            )
         CardFactory.GenerateCards(player_hero_deck, player.player_deck, player.world)
 
         player.stat.ResetPlayedRevealedCards()

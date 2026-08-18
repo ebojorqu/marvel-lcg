@@ -96,6 +96,7 @@ class Select:
             lowest_cost: bool=False,
             share_trait_with_your_hero: bool=False,
             share_trait_with_your_identity: bool=False,
+            canbe_take_damage: bool|None=None,
 
             ################################################################################
             # Select rule
@@ -246,6 +247,8 @@ class Select:
             highest_cost=highest_cost,
             lowest_cost=lowest_cost,
         )
+        if canbe_take_damage != None:
+            selector_filter.AddParameter(canbe_take_damage=canbe_take_damage)
 
         ################################################################################
         # SelectorRule

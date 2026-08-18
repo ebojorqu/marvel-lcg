@@ -11,6 +11,8 @@ class Minion(Enemy, CanQuickstrike, CanTeamwork, HasGuard, HasPatrol, HasVillain
     @override
     def __init__(self, paper: 'Paper') -> None:
         self.nemesis = ""
+        self.defer_quickstrike = False
+        self.defer_teamwork = False
 
         super().__init__(paper)
 
@@ -45,9 +47,25 @@ class Minion(Enemy, CanQuickstrike, CanTeamwork, HasGuard, HasPatrol, HasVillain
     def OnWhenCardRevealed(self, revealed_message: 'Message.WhenCardRevealed') -> None:
         from game.effect.rule import UniqueMinionRevealed
         player = revealed_message.GetToPlayer()
-        if self.PutIntoPlay(player, revealed_message.by_effect):
-            return super().OnWhenCardRevealed(revealed_message)
-        else:
+        self.defer_quickstrike = True
+        self.defer_teamwork = True
+        try:
+            if self.PutIntoPlay(player, revealed_message.by_effect):
+                result = super().OnWhenCardRevealed(revealed_message)
+                self.defer_quickstrike = False
+                self.defer_teamwork = False
+                self.ResolveQuickstrike(player)
+                self.ResolveTeamwork(revealed_message.by_effect)
+                return result
+            else:
+                self.defer_quickstrike = False
+                self.defer_teamwork = False
+        finally:
+            self.defer_quickstrike = False
+            self.defer_teamwork = False
+
+        if not self.IsInPlay():
+            self.card.state.unique_entry_rejected = False
             # If a unique minion is revealed from the encounter deck and attempts to enter play while another unique character with the same title is already in play, the player who is revealing that minion discards it, then reveals a new card from the encounter deck.
             if revealed_message.IsFromEncounterDeck():
                 player.DealEncounterCards(1, UniqueMinionRevealed(self))
@@ -118,7 +136,8 @@ class Minion(Enemy, CanQuickstrike, CanTeamwork, HasGuard, HasPatrol, HasVillain
         engaged_message = Message.WhenMinionEngagePlayer(would_message)
         engaged_message.Send()
 
-        self.ResolveQuickstrike(player)
+        if not self.defer_quickstrike:
+            self.ResolveQuickstrike(player)
 
         after_message = Message.AfterMinionEngagePlayer(self, player, engaged_message)
         after_message.Send()

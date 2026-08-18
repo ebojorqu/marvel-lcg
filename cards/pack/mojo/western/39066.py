@@ -9,7 +9,11 @@ def GetAbilities() -> Sequence['Ability']:
         this = effect.this.CastTo(Environment)
         Unused(this)
 
-        message.IncreaseDamage(1, effect)
+        if message.IsOverkill():
+            message.property.damage += 1
+            Message.WhenDamageUpdated_Text(1, effect)
+        else:
+            message.IncreaseDamage(1, effect)
 
 
     return [
