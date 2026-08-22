@@ -1,5 +1,24 @@
 from . import *
 
+
+def _GetResourcePaymentPlayer(message: 'Message2', effect: 'Effect') -> 'Player':
+    from game.card.face.card_type import Event
+    from game.player import Player
+
+    player = message.GetToPlayer()
+
+    paying_for_effect = getattr(message, "paying_for_effect", None)
+    if paying_for_effect is None:
+        paying_for_effect = getattr(message, "for_effect", None)
+
+    if paying_for_effect and Event.IsType(paying_for_effect.this) and paying_for_effect.this.alliance:
+        controller = effect.this.GetControlByOrOwner()
+        if Player.IsType(controller):
+            return controller
+
+    return player
+
+
 class AbilityFactoryResources:
 
     @staticmethod
@@ -162,7 +181,7 @@ class AbilityFactoryResources:
                         return
 
             # Hack
-            player = message.GetToPlayer()
+            player = _GetResourcePaymentPlayer(message, effect)
             effect.context.initiator = player
 
             res = resources_fn(effect, message)
@@ -242,7 +261,7 @@ class AbilityFactoryResources:
                 if message.paying_for_effect.this.alliance:
                     return True
             # Hack
-            player = message.GetToPlayer()
+            player = _GetResourcePaymentPlayer(message, effect)
             effect.context.initiator = player
 
             if effect.ability.CheckAnyPlayerCanTriggerThis(effect):
