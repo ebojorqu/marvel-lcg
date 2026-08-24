@@ -211,7 +211,9 @@ class AbilityFactoryFriend:
                     return False
             if message.would_atk_message.property.must_defend_with_ally:
                 if not Ally.IsType(effect.this):
-                    effect.context.only_work_when_no_other_options = True
+                    controller = effect.this.GetControlByPlayer()
+                    if controller and controller.GetControlAllies():
+                        effect.context.only_work_when_no_other_options = True
                 else:
                     effect.SetMustChoose()
             return True
