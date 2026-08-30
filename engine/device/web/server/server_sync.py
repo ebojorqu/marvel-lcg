@@ -1,8 +1,14 @@
+from __future__ import annotations
+
 from core import *
 from engine.lib import Json
 from engine.log import Log
-from engine.device import *
-from engine.device.web import *
+
+if TYPE_CHECKING:
+    from engine.device.base.device import Device
+    from engine.device.base.input import InputDevice
+    from engine.device.base.output import OutputDevice
+    from engine.device.manager.base import DeviceManager
 
 from aiohttp import web
 from engine.device.web.server.server_base import GameServerBase

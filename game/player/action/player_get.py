@@ -1,7 +1,11 @@
+from typing import TYPE_CHECKING, List, Sequence
+
 from core import *
 from game.card.face import *
 from game.ability import *
-from game.player import *
+
+if TYPE_CHECKING:
+    from game.player import Player
 
 class PlayerGet:
     def GetPlayer(self) -> 'Player':

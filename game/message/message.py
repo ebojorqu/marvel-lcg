@@ -1,14 +1,17 @@
+from typing import TYPE_CHECKING
+
 from typing_extensions import NotRequired
 from core import *
-from game.card.face import *
-from game.message import *
-from game.effect import *
-from game.world import *
-from game.player import *
 from game.object import Object
 from engine.log import Log
 from engine.lib import TransText
-from game.ability.condition import *
+
+if TYPE_CHECKING:
+    from game.ability.condition import Condition
+    from game.card.face.card_face import CardFace
+    from game.effect import Effect
+    from game.player import Player
+    from game.world.world import World
 
 CATEGORY_NAME = "MESSAGE"
 

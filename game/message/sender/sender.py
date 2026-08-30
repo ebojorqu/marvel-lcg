@@ -1,15 +1,13 @@
-from typing import Final
+from typing import TYPE_CHECKING, Final
 from core import *
-from game.card import *
-from game.card.face import *
-from game.deck import *
-from game.ability import *
-from game.message import *
-from game.world import *
-from game.player import *
-from game.world.game_area import *
-
 from engine.lib import TransText
+from game.message.message import Message2
+
+if TYPE_CHECKING:
+    from game.effect.effect import Effect
+    from game.player import Player, User
+    from game.world.world import World
+    from game.world.game_area.game_area import GameArea
 
 """
 Name rule
@@ -27,17 +25,17 @@ After
 `group`         This param only appear in Card event, and only effect the UI
 """
 
-from game.message.message_type import TextMessage
-from game.message.message_type import TriggerPlayerMessage
-from game.message.message_type import TriggerFaceMessage
-from game.message.message_type import TriggerUnitMessage
-from game.message.message_type import TriggerSchemeMessage
-from game.message.message_type import CalculateMessage
-from game.message.message_type import CheckIfMessage
-from game.message.message_type import GettingMessage
-from game.message.message_type import CanBeInstead
+from game.message.message_type import *
 
-Unused(TextMessage, TriggerPlayerMessage, TriggerFaceMessage, TriggerUnitMessage, TriggerSchemeMessage, CalculateMessage, CheckIfMessage, CanBeInstead, GettingMessage)
+Unused(
+    TextMessage, TriggerPlayerMessage, TriggerFaceMessage, TriggerUnitMessage,
+    TriggerSchemeMessage, CalculateMessage, CheckIfMessage, CanBeInstead,
+    GettingMessage, AttackerMessage, AttackerNoneMessage, AttackMessage,
+    TargetsMessage, DamageMessage, HasEndEventMessage, HasPreEventMessage,
+    CardStateUpdatedMessage, NoSendMessage, NoSendResolve, CanGainValueMessage,
+    DefenderMessage, DefenderNoneMessage, SchemerMessage, ThwarterMessage,
+    TriggerNonePlayerMessage, TriggerMessage,
+)
 
 from game.message.sender.sender_player import SenderPlayer
 from game.message.sender.sender_round import SenderRound

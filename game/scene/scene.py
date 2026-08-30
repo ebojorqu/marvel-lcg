@@ -5,7 +5,6 @@ from engine.lib import Json, Ver
 from engine.log import Log
 from engine.file import FileManager
 from engine.config import ConfigVariables
-from game import *
 
 CATEGORY_NAME = "SCENE"
 

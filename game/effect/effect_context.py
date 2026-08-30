@@ -1,11 +1,15 @@
+from typing import TYPE_CHECKING
+
 from core import *
 from game.card.face import *
-from game.effect import *
-from game.message import *
-from game.player import *
-from game.world import *
 from game.element.resources import Resources
 from game.element.cost import Cost
+
+if TYPE_CHECKING:
+    from game.effect.effect import Effect
+    from game.message.message import Message2
+    from game.player import Player, User
+    from game.world.world import World
 
 @final
 class EffectContext:

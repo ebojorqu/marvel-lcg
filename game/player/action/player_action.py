@@ -1,4 +1,4 @@
-from typing import TypeAlias
+from typing import TYPE_CHECKING, TypeAlias
 from core import *
 from build import Build
 from engine.log import Log
@@ -9,10 +9,12 @@ from game.ability import *
 from game.selector import *
 from game.ability.factory import *
 from game.message import *
-from game.player import *
 from game.element.resources import Resources
 from game.element.cost import Cost
 from game.effect.effect_target_cost import TargetCost
+
+if TYPE_CHECKING:
+    from game.player import Player
 
 CATEGORY_NAME = "PLAYER"
 

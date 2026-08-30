@@ -1,7 +1,13 @@
+from typing import TYPE_CHECKING
+
 from core import *
-from game.card.face import *
-from game.deck import *
-from game.effect import *
+from game.deck.deck import Deck, Deck2
+from game.deck.deck_type import DeckType
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.effect.effect import Effect
+    from game.player import Player
 
 # Only use for scenario deck,
 # For `player.additional_deck`, use `ShuffleAllTo`

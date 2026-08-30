@@ -1,4 +1,7 @@
-from . import *
+from __future__ import annotations
+
+from core import *
+from game.card.face.attribute.can_place_token import CanPlaceToken
 
 class CanAccelerationToken(CanPlaceToken):
 

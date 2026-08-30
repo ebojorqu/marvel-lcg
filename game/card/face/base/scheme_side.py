@@ -1,8 +1,10 @@
-from game.card.face.base import *
-from game.card.face import *
-from game.ability import *
-from game.message import *
-from game.player import *
+from core import *
+from game.card.face.base.scheme import Scheme2
+from game.card.face.attribute.has_acceleration_icon import HasAccelerationIcon
+from game.card.face.card_face import CardFace
+from game.ability.ability import Ability
+from game.message.sender.sender import Message
+from game.player.player import Player
 from cards.paper import Paper
 
 class SchemeSide2(HasAccelerationIcon, Scheme2):

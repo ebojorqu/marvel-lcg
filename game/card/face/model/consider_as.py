@@ -1,6 +1,8 @@
 from core import *
-from game.card.face import *
 from game.card.face.model.base import ModelBase
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
 
 class ModelConsider(ModelBase):
 

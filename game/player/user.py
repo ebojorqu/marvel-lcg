@@ -1,9 +1,11 @@
+from typing import TYPE_CHECKING
+
 from core import *
 from game.object.object import Object
-from game.world.game_area import *
-from game.card.face import *
+from game.card.face.card_face import CardFace
 
 if TYPE_CHECKING:
+    from game.world.game_area import GameArea
     from game.world.world import World
 
 class User(Object):

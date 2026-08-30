@@ -1,4 +1,8 @@
-from . import *
+from __future__ import annotations
+
+from core import *
+from game.card.face.attribute.has_attribute import HasAttribute
+from game.card.face.card_face import CardFace
 
 class HasSurge(HasAttribute):
 

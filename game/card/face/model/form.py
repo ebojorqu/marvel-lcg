@@ -1,7 +1,13 @@
-from game.card.face import *
-from game.effect import *
-from game.player import *
+from typing import TYPE_CHECKING
+
 from game.card.face.model.base import ModelBase
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.effect.effect import Effect
+    from game.player import Player
+
+# Avoid importing Player at runtime; player.py imports card.face during bootstrap.
 
 class ModelForm(ModelBase):
     def DefaultChangeToFace(self, to_form: 'AlterEgo|Hero|Villain', by_effect: 'Effect') -> bool:

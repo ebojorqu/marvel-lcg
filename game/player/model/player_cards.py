@@ -1,8 +1,9 @@
+from typing import TYPE_CHECKING, List
+
 from core import *
-from game.card.face import *
-from game.deck import *
-from game.effect import *
-from game.player import *
+
+if TYPE_CHECKING:
+    from game.player import Player
 
 class PlayerCards:
     def GetPlayer(self) -> 'Player':

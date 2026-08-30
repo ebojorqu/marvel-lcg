@@ -1,9 +1,11 @@
-from typing import TypeAlias
+from typing import TYPE_CHECKING, TypeAlias
 from core import *
 from engine.log import Log
 from engine.task.condition import Condition
-from game.scene import *
-from engine.controller import *
+from game.scene import SceneLoader
+
+if TYPE_CHECKING:
+    from engine.controller.manager import ControllerManager
 
 CATEGORY_NAME = "GAME_STATE"
 

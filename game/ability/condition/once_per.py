@@ -1,7 +1,9 @@
-from game.card.face import *
-from game.ability import *
-from game.message import *
-from game.player import *
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from game.effect.effect import Effect
+    from game.message.message import Message2
+    from game.ability.ability import Ability
 
 def GetForDelayAbility(effect: 'Effect') -> 'Ability|None':
     # if effect.ability.type.is_delay_ability:

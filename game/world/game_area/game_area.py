@@ -1,8 +1,12 @@
+from typing import TYPE_CHECKING
+
 from core import *
 from game.object import Object
 from game.card import *
-from game.player import *
-from game.world import *
+
+if TYPE_CHECKING:
+    from game.player import Player
+    from game.world.world import World
 
 class GameArea(Object):
     def __init__(self, world: 'World') -> None:

@@ -1,9 +1,11 @@
-from typing import Final
+from typing import TYPE_CHECKING, Final
 from core import *
 from game.render.symbol import Symbol
 from game.element.cost import Cost
 from game.element.rbyg import ResRBYG
-from game.player import *
+
+if TYPE_CHECKING:
+    from game.player import Player
 
 class Resources:
 

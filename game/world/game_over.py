@@ -1,7 +1,9 @@
-from typing import Final
+from typing import TYPE_CHECKING, Final
 from core import *
-from game.world import *
-from game.effect import *
+
+if TYPE_CHECKING:
+    from game.effect.effect import Effect
+    from game.world.world import World
 
 GAME_OVER_REASON_RULE = Literal[
     "There were no cards in either the encounter deck or the encounter discard pile",

@@ -1,10 +1,10 @@
-from typing import TypeAlias
+from typing import TYPE_CHECKING, TypeAlias
 from core import *
 
-from game.ability import *
-from game.player import *
-from game.card.face import *
-from game.message import *
+if TYPE_CHECKING:
+    from game.effect.effect import Effect
+    from game.message.message import Message2
+    from game.player import Player, User, PlayerFinder
 
 class ConditionPlayerType:
 

@@ -1,17 +1,20 @@
-from typing import Final, TypeAlias
+from typing import TYPE_CHECKING, Final, TypeAlias
 from core import *
 
 from game.card.face import *
 from game.ability import *
-from game.player import *
 from game.deck import *
-from game.scene import *
-from game.message import *
 from engine.job import JobManager
-from engine.controller import *
-from game.world.game_area import *
+from game.world.game_area.game_area import GameArea
 from engine.lib import Json
 from game.world.game_over import GameOverReason
+
+if TYPE_CHECKING:
+    from engine.controller.controller import Controller
+    from game.player import Player, Scenario
+    from game.effect.effect import Effect
+    from game.scene.scene import Scene
+    from game.world.game_area.game_area import GameArea
 
 from game.world.world_action import WorldAction
 from game.world.world_find import WorldFind

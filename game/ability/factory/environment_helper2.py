@@ -1,4 +1,4 @@
-from . import *
+from core import *
 
 CardTypeMin = Condition.CARD_TYPE_MIN
 

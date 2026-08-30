@@ -1,11 +1,18 @@
-from typing import Final
+from typing import TYPE_CHECKING, Final, TypeVar
 from core import *
-from game.card.face import *
-from game.deck import *
-from game.effect import *
-from game.message import *
-from game.world import *
-from game.player import *
+from game.message.message import Message2
+
+TC = TypeVar('TC')
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.deck.deck import Deck
+    from game.effect.effect import Effect
+    from game.player import Player
+    from game.world.world import World
+
+# Important: avoid importing card.face or game.player at runtime here; those modules
+# import message definitions back during package bootstrap and create the circular loop.
 
 class WorldKwargs(TypedDict):
     world: 'World'

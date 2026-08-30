@@ -1,8 +1,6 @@
 from typing import TypeAlias
 from core import *
 
-from game.ability import *
-
 class ConditionAbilityType:
 
     ONE_ABILITY_TYPE: TypeAlias = Literal["AlterEgoAction", "Action", "TriggeredAbility", "Interrupt", "Response", "Special", "ForcedResponse", "WhenRevealed", "ForcedInterrupt", "NonKeyword"]

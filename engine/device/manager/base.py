@@ -1,6 +1,4 @@
 from core import *
-from engine.device import *
-from engine.controller import *
 from engine.log import Log
 
 CATEGORY_NAME = "DEVICE_MANAGER"

@@ -1,7 +1,5 @@
 from typing import Final
 from core import *
-from game.ability import *
-from game.effect import *
 
 class AbilityIgnore:
 

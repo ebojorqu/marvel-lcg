@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from . import *
 from typing import Final
 
@@ -206,8 +208,9 @@ class SenderDamage:
                 until_event_end=self
             )
 
-        def IfUnitTakeDamageFromThisAttack(self, operation: Callable[[List['Unit2']], Any], by_effect: 'Effect', *, which_unit: Condition.CARD_TYPE=None):
+        def IfUnitTakeDamageFromThisAttack(self, operation: Callable[[List['Unit2']], Any], by_effect: 'Effect', *, which_unit: 'Condition.CARD_TYPE'=None):
             from game.ability.ability import AbilityType
+            from game.ability.condition import Condition
             from game.ability.factory import AbilityFactory
 
             this = by_effect.this
@@ -690,7 +693,7 @@ class SenderDamage:
 
     # TODO: Pre message
     class AfterDamageBePrevented(TriggerUnitMessage):
-        def __init__(self, who_not_take_damage: 'Unit2', damage: int, property: DamageProperty, effect: 'Effect', would_atk_message: 'Message.WhenUnitWouldAttack|None') -> None:
+        def __init__(self, who_not_take_damage: 'Unit2', damage: int, property: 'DamageProperty', effect: 'Effect', would_atk_message: 'Message.WhenUnitWouldAttack|None') -> None:
             self.would_atk_message: Final = would_atk_message
             self.prevent_by_effect: Final = effect
             self.property: Final = property
@@ -716,7 +719,7 @@ class SenderDamage:
             self.Present(text, "", by_effect.this)
 
     class WhenUnitWouldTakeDamage(TriggerUnitMessage, AttackerNoneMessage, DamageMessage, HasEndEventMessage, CanBeInstead):
-        def __init__(self, unit: 'Unit2', source: 'CardFace', property: DamageProperty, effect: 'Effect', would_deal_damage_message: 'Message.WhenFaceWouldDealDamage') -> None:
+        def __init__(self, unit: 'Unit2', source: 'CardFace', property: 'DamageProperty', effect: 'Effect', would_deal_damage_message: 'Message.WhenFaceWouldDealDamage') -> None:
             from game.message import Message
             self.source: Final = source
             self.by_effect: Final = effect

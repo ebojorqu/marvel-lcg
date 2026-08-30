@@ -1,6 +1,12 @@
-from typing import final
-from engine.device import *
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, final
+
+from engine.device.base.device import Device
 from engine.log import Log
+
+if TYPE_CHECKING:
+    from engine.device.manager.base import DeviceManager
 
 class OutputDevice(Device):
 

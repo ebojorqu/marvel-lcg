@@ -1,7 +1,13 @@
-from typing import TypeAlias
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, TypeAlias
+
 from core import *
-from game.ability import *
-from game.card.face import *
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.card.face.card_type import Ally, Identity, Hero, AlterEgo, Minion, StatusCard
+    from game.card.face.base import Villain
 
 # CardFinderUtils
 class CardFinderHelper:

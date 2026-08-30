@@ -1,4 +1,7 @@
-from . import *
+from __future__ import annotations
+
+from core import *
+from game.element.resources import Resources
 
 
 def _GetResourcePaymentPlayer(message: 'Message2', effect: 'Effect') -> 'Player':

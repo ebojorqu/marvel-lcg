@@ -1,17 +1,22 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from core import *
 from build import Build
 from engine.log import Log
 from engine.profile import Coverage, Profile
 from engine.config import ConfigVariables
-from engine.device.manager import *
-from game import *
-from game.world import *
-from game.scene import *
 from game.scene.loader import SceneLoader
 from game.game_run.game_new import NewGameDescriptor
 from game.game_run.game_state import GameState
 from game.game_run.game_session import GameSession
 from game.statistics.game_statistics import GameStatistics
+from game.world import World
+from game.scene import Scene
+
+if TYPE_CHECKING:
+    from engine.device.manager.base import DeviceManager
 
 CATEGORY_NAME = "GAME"
 

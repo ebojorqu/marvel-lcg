@@ -1,18 +1,24 @@
-from typing import Final
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Final, TypeVar
 from core import *
-from game.card.face import *
-from game.effect import *
-from game.message import *
-from game.player import *
+
+if TYPE_CHECKING:
+    from game.ability.ability import Ability
+    from game.card.face.card_face import CardFace
+    from game.player import Player, User
+    from game.world.world import World
+    from game.message.message import Message2
+    from game.message.message_type import HasPreEventMessage, HasEndEventMessage
 from game.element.resources import Resources
+
+TMP = TypeVar("TMP")
+
 from game.render.descriptor.effect import EffectDescriptor
 from game.object import Object
 from engine.log import Log
 from engine.profile import Coverage
-from game.message.message_type import HasPreEventMessage, HasEndEventMessage
-from game.world import *
 from game.effect.effect_failure import EffectFailure
-from game.effect.effect_invoke import EffectInvoker
 
 Unused(EffectFailure)
 
@@ -145,10 +151,12 @@ class Effect(Object):
 
 
     def ResolveToPlayer(self, to_player: 'Player', by_effect: 'Effect', ref_message: 'Message2|None') -> bool:
+        from game.effect.effect_invoke import EffectInvoker
         result = EffectInvoker.ResolveSelfInternal(self, None, to_player, by_effect, ref_message, skip_cost=True)
         return result
 
     def ResolveSelf(self, message: 'Message2|None', by_effect: 'Effect', *, to_player: 'Player|None'=None, skip_cost: bool=False) -> bool:
+        from game.effect.effect_invoke import EffectInvoker
         result = EffectInvoker.ResolveSelfInternal(self, message, to_player, by_effect, skip_cost=skip_cost)
         return result
 

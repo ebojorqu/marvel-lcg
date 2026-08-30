@@ -1,8 +1,13 @@
-from game.card.face.base import *
-from game.card.face import *
-from game.deck import *
-from game.ability import *
-from game.message import *
+from core import *
+from game.card.face.attribute.can_health import CanHealth
+from game.card.face.attribute.can_retaliate import CanRetaliate
+from game.card.face.attribute.can_status import CanStatus
+from game.card.face.attribute.can_place_counter import CanPlaceCounter
+from game.card.face.attribute.can_place_token import CanPlaceToken
+from game.card.face.card_face import CardFace
+from game.deck.deck import Deck
+from game.ability.ability import Ability
+from game.message.sender.sender import Message
 
 # Rename Character
 class Unit2(CanHealth, CanRetaliate, CanStatus, CanPlaceCounter, CanPlaceToken):

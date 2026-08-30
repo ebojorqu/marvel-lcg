@@ -1,5 +1,14 @@
-from core import *
+from core import Unused
 
-from engine.engine import Engine
-Unused(Engine)
+__all__ = ["Engine"]
+
+
+def __getattr__(name):
+    if name == "Engine":
+        from engine.engine import Engine
+        return Engine
+    raise AttributeError(name)
+
+
+Unused(__all__)
 

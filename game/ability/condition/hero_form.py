@@ -1,10 +1,10 @@
+from typing import TYPE_CHECKING
 from core import *
 
-from game.card.face import *
-from game.ability import *
-from game.ability.condition import *
-from game.message import *
-from game.player import *
+if TYPE_CHECKING:
+    from game.effect.effect import Effect
+    from game.player import Player
+    from game.card.face.card_face import CardFace
 
 class ConditionHeroForm:
 

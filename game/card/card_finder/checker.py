@@ -1,9 +1,12 @@
+from typing import TYPE_CHECKING
+
 from core import *
 
-from game.effect import *
-from game.card.face import *
-from game.world.game_area import *
-from game.player import *
+if TYPE_CHECKING:
+    from game.effect.effect import Effect
+    from game.card.face.card_face import CardFace
+    from game.player import Player
+    from game.world.game_area.game_area import GameArea
 
 from game.element.resources import Resources
 

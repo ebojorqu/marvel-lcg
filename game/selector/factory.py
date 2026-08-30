@@ -1,12 +1,18 @@
-from typing import TypeAlias
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, TypeAlias
 from core import *
-from game.card.face import *
-from game.effect import *
-from game.selector import *
-from game.message import *
-from game.player import *
-from game.world.game_area import *
-from game.deck import *
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.message.message import Message2
+    from game.world.game_area.game_area import GameArea
+    from game.deck.deck import Deck
+    from game.effect.effect import Effect
+    from game.player import Player
+    from game.selector.selector import Selector
+    from game.card.card_finder import CardFinder
+    from game.card.card_finder import CardFinderHelper
 
 from game.selector.selector_rule import SelectorRule
 from game.selector.selector_target import SelectorTarget

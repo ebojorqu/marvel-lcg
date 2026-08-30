@@ -6,6 +6,3 @@ from game.ability.ability import Ability
 Unused(AbilityType)
 Unused(TimingPriority)
 Unused(Ability)
-
-from game.ability.cost_func import CostFunc
-Unused(CostFunc)

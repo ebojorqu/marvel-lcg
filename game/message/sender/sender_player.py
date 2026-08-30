@@ -1,6 +1,8 @@
 from . import *
 from typing import Final
 
+from game.element.resources import Resources
+
 class SenderPlayer:
     
     ################################################################################

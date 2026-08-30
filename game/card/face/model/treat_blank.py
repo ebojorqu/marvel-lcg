@@ -1,9 +1,13 @@
+from typing import TYPE_CHECKING
+
 from core import *
-from game.card.face import *
-from game.effect import *
-from game.message import *
 from game.card.face.model.base import ModelBase
-from game.buff import *
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.effect.effect import Effect
+    from game.message.message import Message2
+from game.buff.buff import BuffIsTreatAsIfBlank
 
 class ModelTreatBlank(ModelBase):
     def OnResetModel(self):

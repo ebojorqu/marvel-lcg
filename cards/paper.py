@@ -1,5 +1,9 @@
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Type
+
 from core import *
-from game.card.face import *
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
 
 @dataclass
 class Paper:

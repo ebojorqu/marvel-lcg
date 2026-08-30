@@ -1,7 +1,11 @@
+from typing import TYPE_CHECKING
+
 from core import *
-from game.card.face import *
-from game.effect import *
 from game.card.face.model.base import ModelBase
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.effect.effect import Effect
 from game.element.damage_property import DamageProperty
 
 class ModelDamage(ModelBase):

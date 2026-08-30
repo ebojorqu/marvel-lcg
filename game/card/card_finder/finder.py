@@ -1,10 +1,16 @@
-from typing import TypeAlias
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, TypeAlias
 from core import *
 
-from game.effect import *
-from game.card.face import *
-from game.world.game_area import *
-from game.player import *
+if TYPE_CHECKING:
+    from game.effect.effect import Effect
+    from game.player import Player
+    from game.world.game_area.game_area import GameArea
+    from game.card.face.card_face import CardFace
+
+TC = TypeVar("TC", bound='CardFace', covariant=True)
+TF = TypeVar("TF", bound='CardFace')
 
 from game.element.resources import Resources
 

@@ -1,13 +1,14 @@
-from core import *
-from game.card.face import *
-from game.ability import *
-from game.selector import *
-from game.deck import *
-from game.ability.factory import *
-from game.message import *
-from game.player import *
+from typing import TYPE_CHECKING, Any, Callable, List, Sequence, Type, TypeVar
 
+from core import *
 from game.element.resources import Resources
+
+if TYPE_CHECKING:
+    from game.ability import Ability
+    from game.selector.selector import Selector
+    from game.effect.effect import Effect
+    from game.message.message import Message2
+    from game.player import Player
 
 class PlayerAsk:
     def GetPlayer(self) -> 'Player':

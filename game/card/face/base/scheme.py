@@ -1,9 +1,16 @@
+from __future__ import annotations
+
 from core import *
-from game.card.face.base import *
-from game.card.face import *
-from game.deck import *
-from game.ability import *
-from game.message import *
+from game.card.face.attribute.has_amplify import HasAmplify
+from game.card.face.attribute.has_hazard import HasHazard
+from game.card.face.attribute.can_hinder import CanHinder
+from game.card.face.attribute.can_place_counter import CanPlaceCounter
+from game.card.face.attribute.has_assault import HasAssault
+from game.card.face.attribute.has_attribute import HasAttribute
+from game.card.face.card_face import CardFace
+from game.deck.deck import Deck
+from game.ability.ability import Ability
+from game.message.sender.sender import Message
 from cards.paper import Paper
 
 class Scheme2(HasAmplify, HasHazard, CanHinder, CanPlaceCounter, HasAssault, HasAttribute):

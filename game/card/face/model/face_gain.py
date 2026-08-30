@@ -1,11 +1,15 @@
+from typing import TYPE_CHECKING
+
 from core import *
-from game.card.face import *
-from game.ability import *
-from game.buff import *
-from game.effect import *
-from game.player import *
 from game.card.face.model.base import ModelBase
 from game.element.resources import Resources
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.effect.effect import Effect
+    from game.card.card_finder import CardFinder
+    from game.player import Player
+    from game.buff.buff import Buff
 
 class ModelGain(ModelBase):
 

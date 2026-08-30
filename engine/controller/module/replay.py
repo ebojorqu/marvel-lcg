@@ -1,9 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from core import *
 from engine.log import Log
 from game.scene.replay import *
 from game.world import *
 from engine.config import ConfigVariables
-from engine.controller import *
+
+if TYPE_CHECKING:
+    from engine.controller.manager import ControllerManager
 
 CATEGORY_NAME = "REPLAY"
 DISABLE_CRC_ERROR_ASSERT    = ConfigVariables.Bool('disable_crc_error_assert', False)

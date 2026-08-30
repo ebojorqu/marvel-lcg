@@ -1,14 +1,23 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from core import *
 from build import Build
-from engine.device import *
-from engine.controller import *
 from engine.lib import Json
 from engine.log import Log, Notify
-from game.ability import *
-from game.message import *
-from game.render import *
 from game.scene.replay import *
 from game.exceptions import *
+
+if TYPE_CHECKING:
+    from engine.controller.manager import ControllerManager
+    from engine.device.base.device import DeviceManager
+    from engine.device.base.input import InputDevice
+    from engine.device.base.output import OutputDevice
+    from game.effect.effect import Effect
+    from game.message.message import Message2
+    from game.message.message_type import TimingPriority
+    from game.world.world import World
 
 CATEGORY_NAME = "CONTROLLER"
 

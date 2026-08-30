@@ -1,4 +1,11 @@
+from __future__ import annotations
+
+from core import *
 from game.card.face.card_face import CardFace
+from game.card.face.attribute.has_boost_icon import HasBoostIcon
+from game.card.face.attribute.can_incite import CanIncite
+from game.card.face.attribute.has_victory import HasVictory
+from game.card.face.attribute.has_peril import HasPeril
 from game.card.face.attribute.can_surge import CanSurge
 from game.card.face.attribute.can_acceleration_token import CanAccelerationToken
 

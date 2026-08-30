@@ -1,7 +1,7 @@
 from core import *
 from engine.device.manager import DeviceManager
 
-from game import *
+from game.game import Game
 from game.statistics.game_statistics import GameStatistics
 from build import Build
 from engine.log import Log

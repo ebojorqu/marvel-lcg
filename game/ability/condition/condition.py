@@ -1,8 +1,12 @@
+from typing import TYPE_CHECKING
+
 from core import *
-from game.card.face import *
-from game.ability import *
-from game.message import *
-from game.player import *
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.message import Message2, TriggerNonePlayerMessage
+    from game.player import Player, User
+    from game.effect.effect import Effect
 
 from game.ability.condition.card_type import ConditionCardType
 from game.ability.condition.player_type import ConditionPlayerType

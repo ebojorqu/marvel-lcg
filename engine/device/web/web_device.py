@@ -1,10 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from core import *
 from game.render import *
 from engine.task import TaskManager
-from engine.device import *
-from engine.device.web import *
+from engine.device.base.device import Device
+from engine.device.base.input import InputDevice
+from engine.device.base.output import OutputDevice
 from engine.device.manager.web.manager import WebDeviceManager
-from engine.controller import *
+
+if TYPE_CHECKING:
+    from engine.controller.controller import Controller
 
 CATEGORY_NAME = "WEB"
 

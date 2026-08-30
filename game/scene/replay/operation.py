@@ -1,5 +1,9 @@
+from typing import TYPE_CHECKING
+
 from core import *
-from game.effect import *
+
+if TYPE_CHECKING:
+    from game.effect import Effect
 
 @dataclass
 class CommandDescriptor:

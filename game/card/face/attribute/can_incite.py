@@ -1,4 +1,7 @@
-from . import *
+from __future__ import annotations
+
+from core import *
+from game.card.face.attribute.has_attribute import HasAttribute
 
 class HasIncite(HasAttribute):
     @override

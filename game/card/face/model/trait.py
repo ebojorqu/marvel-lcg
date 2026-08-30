@@ -1,7 +1,15 @@
+from typing import TYPE_CHECKING
+
 from core import *
-from game.card.face import *
-from game.effect import *
 from game.card.face.model.base import ModelBase
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.effect.effect import Effect
+    from game.player import Player
+    from game.world.world import World
+
+# Avoid importing game.effect at module import time; the effect package depends on card faces.
 
 class ModelTrait(ModelBase):
     def GetInfoTraits(self) -> Dict[str, int]:

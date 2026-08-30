@@ -1,8 +1,13 @@
-from typing import Final
+from __future__ import annotations
+
+from typing import Final, TYPE_CHECKING
+
 from core import *
 from game.ability import *
 from game.message import *
-from engine.controller import *
+
+if TYPE_CHECKING:
+    from engine.controller.manager import ControllerManager
 
 class UndoModule:
 

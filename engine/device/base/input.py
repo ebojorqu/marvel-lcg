@@ -1,6 +1,13 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from core import *
-from engine.device import *
+from engine.device.base.device import Device
 from engine.device.manager.base import AskOptionPayload
+
+if TYPE_CHECKING:
+    from engine.device.manager.base import DeviceManager
 
 class InputDevice(Device):
 

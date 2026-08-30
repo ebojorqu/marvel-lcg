@@ -1,6 +1,5 @@
 from enum import Enum
 from typing import Final
-from game.ability import *
 
 """
 1. Constant abilities, keywords, and scheme icons.

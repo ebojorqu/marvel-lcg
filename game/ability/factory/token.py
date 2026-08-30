@@ -1,4 +1,4 @@
-from . import *
+from core import *
 
 class AbilityTokenFactory:
 

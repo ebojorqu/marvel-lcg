@@ -1,64 +1,54 @@
-# from typing import TypeAlias
-from core import *
+from typing import Callable, List
+import sys
+
 from core import Unused
 
-TM = TypeVar("TM", bound='Message2', covariant=True)
-TMP = TypeVar("TMP", bound='Message2')
-Unused(TM, TMP)
-
-from game.ability import *
-from game.effect import *
-# ConditionType  : TypeAlias = Callable[['Effect', TM], bool]
-# ConditionsType : TypeAlias = List[ConditionType[TM]]
-# OperationType  : TypeAlias = Callable[['Effect', TM], None]
-
-ConditionType  = Callable[['Effect', TM], bool]
-ConditionsType = List[ConditionType[TM]]
-OperationType  = Callable[['Effect', TM], None]
+__all__ = [
+    "Message", "Message2", "OnEvent",
+    "ConditionType", "ConditionsType", "OperationType",
+    "CanBeInstead", "AttackerMessageInternal", "AttackerNoneOldMessage",
+    "AttackerNoneMessage", "AttackerMessage", "SchemerMessage", "ThwarterMessage",
+    "DefenderNoneMessage", "DefenderMessage", "TriggerFaceMessage", "TriggerMessage",
+    "TriggerNonePlayerMessage", "TriggerPlayerMessage", "TriggerSchemeMessage",
+    "TriggerUnitMessage", "TargetsMessage", "CanGainValueMessage",
+]
 
 
-from game.message.message import Message2
-Unused(Message2)
+def __getattr__(name):
+    if name == "Message2":
+        module = sys.modules.get("game.message.message")
+        if module is not None:
+            return getattr(module, "Message2")
+        from game.message.message import Message2
+        return Message2
+    if name == "Message":
+        module = sys.modules.get("game.message.sender.sender")
+        if module is not None:
+            return getattr(module, "Message")
+        from game.message.sender.sender import Message
+        return Message
+    if name == "OnEvent":
+        module = sys.modules.get("game.message.on_event.on_event")
+        if module is not None:
+            return getattr(module, "OnEvent")
+        from game.message.on_event import OnEvent
+        return OnEvent
+    if name == "ConditionType":
+        return Callable[["Effect", "Message2"], bool]
+    if name == "ConditionsType":
+        return List[Callable[["Effect", "Message2"], bool]]
+    if name == "OperationType":
+        return Callable[["Effect", "Message2"], None]
+    if name in {
+        "CanBeInstead", "AttackerMessageInternal", "AttackerNoneOldMessage",
+        "AttackerNoneMessage", "AttackerMessage", "SchemerMessage", "ThwarterMessage",
+        "DefenderNoneMessage", "DefenderMessage", "TriggerFaceMessage", "TriggerMessage",
+        "TriggerNonePlayerMessage", "TriggerPlayerMessage", "TriggerSchemeMessage",
+        "TriggerUnitMessage", "TargetsMessage", "CanGainValueMessage",
+    }:
+        import game.message.message_type as mt
+        return getattr(mt, name)
+    raise AttributeError(name)
 
-from game.message.message_type import CanBeInstead
-Unused(CanBeInstead)
-
-from game.message.message_type import AttackerMessageInternal
-from game.message.message_type import AttackerNoneOldMessage
-from game.message.message_type import AttackerNoneMessage
-from game.message.message_type import AttackerMessage
-from game.message.message_type import SchemerMessage
-from game.message.message_type import ThwarterMessage
-from game.message.message_type import DefenderNoneMessage
-from game.message.message_type import DefenderMessage
-from game.message.message_type import TriggerFaceMessage
-from game.message.message_type import TriggerMessage
-from game.message.message_type import TriggerNonePlayerMessage
-from game.message.message_type import TriggerPlayerMessage
-from game.message.message_type import TriggerSchemeMessage
-from game.message.message_type import TriggerUnitMessage
-from game.message.message_type import TargetsMessage
-from game.message.message_type import CanGainValueMessage
-Unused(AttackerMessageInternal)
-Unused(AttackerNoneOldMessage)
-Unused(AttackerNoneMessage)
-Unused(AttackerMessage)
-Unused(SchemerMessage)
-Unused(ThwarterMessage)
-Unused(DefenderNoneMessage)
-Unused(DefenderMessage)
-Unused(TriggerFaceMessage)
-Unused(TriggerMessage)
-Unused(TriggerNonePlayerMessage)
-Unused(TriggerPlayerMessage)
-Unused(TriggerSchemeMessage)
-Unused(TriggerUnitMessage)
-Unused(TargetsMessage)
-Unused(CanGainValueMessage)
-
-from game.message.sender.sender import Message
-Unused(Message)
-
-from game.message.on_event import OnEvent
-Unused(OnEvent)
+Unused(__all__)
 

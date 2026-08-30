@@ -1,7 +1,5 @@
 from enum import Enum
 from core import *
-from game.player import *
-from game.effect import *
 
 class EffectFailure(str, Enum):
     OK                      = "",

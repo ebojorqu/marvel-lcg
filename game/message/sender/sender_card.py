@@ -884,6 +884,7 @@ class SenderCard:
                 return super().Send()
 
         def IsIncludeFace(self, which_card: 'Condition.CARD_TYPE', by_effect: 'Effect') -> 'CardFace|None':
+            from game.ability.condition import Condition
             for face in self.face_areas:
                 if Condition.CheckWhichCard(which_card, face, by_effect):
                     return face

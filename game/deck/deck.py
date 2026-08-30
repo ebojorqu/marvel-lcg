@@ -1,13 +1,15 @@
-from typing import TypeAlias
+from typing import TYPE_CHECKING, TypeAlias
 from core import *
 from typing_extensions import Unpack
-from game.card.face import *
-from game.card import *
-from game.player import *
-from game.effect import *
-from game.world.game_area import *
+from game.card.face.card_face import CardFace
 from game.object import Object
 from game.deck.deck_type import DeckType
+
+if TYPE_CHECKING:
+    from game.card.card import Card
+    from game.effect.effect import Effect
+    from game.player import Player, Scenario
+    from game.world.game_area.game_area import GameArea
 
 CardFaceType: TypeAlias = 'CardFace'
 

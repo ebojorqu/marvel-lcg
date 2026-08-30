@@ -1,8 +1,14 @@
+from typing import TYPE_CHECKING
+
 from core import *
-from game.card.face import *
-from game.ability.factory import *
-from game.message import *
 from game.card.face.model.base import ModelBase
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.effect.effect import Effect
+    from game.message.message import Message2
+    from game.message.sender.sender import CanGainValueMessage
+    from game.ability.ability import Ability
 
 class ModelAction(ModelBase):
     ################################################################################

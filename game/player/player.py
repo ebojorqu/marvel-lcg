@@ -1,25 +1,23 @@
+from typing import TYPE_CHECKING
+
 from core import *
-from game.card.face import *
-from game.card import *
-from game.ability import *
-from game.ability.condition import *
-from game.ability.factory import *
-from game.selector import *
-from game.player import *
-from game.world.game_area import *
-from engine.controller import *
 
 from game.player.model.player_ask import PlayerAsk
 from game.player.model.player_cards import PlayerCards
-
 from game.player.action.player_get import PlayerGet
 from game.player.action.player_action import PlayerAction
+from game.player.user import User
 
-from game.player.element.resources_pool import ResourcesPool
-from game.player.element.player_flag import PlayerFlag
-from game.player.element.player_phase import PlayerPhase
-
-from game.world import *
+if TYPE_CHECKING:
+    from game.ability.condition import Condition
+    from game.card.card import Card
+    from game.card.face.card_face import CardFace
+    from game.effect.effect import Effect
+    from game.player.element.resources_pool import ResourcesPool
+    from game.player.element.player_flag import PlayerFlag
+    from game.player.element.player_phase import PlayerPhase
+    from game.world.world import World
+    from game.world.game_area.game_area import GameArea
 
 class Player(User, PlayerAsk, PlayerCards, PlayerGet, PlayerAction, ):
     def __enter__(self):

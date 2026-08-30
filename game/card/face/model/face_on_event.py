@@ -1,13 +1,17 @@
+from typing import TYPE_CHECKING
+
 from core import *
-from game.card.face import *
-from game.ability import *
-from game.ability.factory import *
-from game.message import *
-from game.player import *
-from game.deck import *
 from game.card.face.model.base import ModelBase
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.ability import Ability
+    from game.effect.effect import Effect
+    from game.message import Message
+    from game.player import Player
+    from game.deck import Deck
+    from game.world.game_area import GameArea
 from game.element.damage_property import DamageProperty
-from game.world.game_area import *
 
 # Actions
 class ModelOnEvent(ModelBase):

@@ -1,8 +1,12 @@
-from typing import TypeAlias
+from typing import TYPE_CHECKING, TypeAlias, TypeGuard
 from core import *
 
-from game.card.face import *
-from game.effect import *
+if TYPE_CHECKING:
+    from game.card.card_finder import CardFinder
+    from game.effect import Effect
+    from game.card.face.card_face import CardFace
+    from game.card.face.card_type import Ally, Attachment, Environment, Event, Evidence, Hero, Identity, Leader, MainScheme, Minion, Obligation, PlayerSideScheme, Resource, Support, Treachery, Upgrade
+    from game.card.face.base import Enemy, Friend, Scheme2, SchemeSide2, Unit2, Villain
 
 class ConditionCardType:
 

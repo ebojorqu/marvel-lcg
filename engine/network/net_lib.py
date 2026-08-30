@@ -54,12 +54,14 @@ class NetLib:
         import socket
         family = socket.AF_INET6 if ':' in address else socket.AF_INET
 
-        # Probe by connecting instead of binding. Binding can fail under some
-        # macOS sandbox contexts even when the port is actually usable by the server.
+        # Bind probing is the most reliable way to confirm the local port is free.
+        # A connect probe can return success for stale listeners that are still bound
+        # to the same port, which causes repeated startup assertions during debug runs.
         with socket.socket(family, socket.SOCK_STREAM) as s:
-            s.settimeout(0.2)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             try:
-                return s.connect_ex((address, port)) != 0
+                s.bind((address, port))
+                return True
             except OSError:
                 return False
 

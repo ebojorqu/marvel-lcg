@@ -1,31 +1,26 @@
-from core import *
+from __future__ import annotations
 
-from game.card.face import *
-from game.ability import *
-from game.ability.factory import *
-from game.effect import *
-from game.message import *
-from game.deck import *
-from game.player import *
-from game.world.game_area import *
+from typing import TYPE_CHECKING
+
+from core import *
+from game.card.face.card_face import CardFace
+
+if TYPE_CHECKING:
+    from game.ability import Ability
+    from game.ability.factory import AbilityFactory
+    from game.effect import Effect
+    from game.message import Message
+    from game.deck import Deck
+    from game.player import Player
+    from game.world.game_area import GameArea
 
 from cards.paper import Paper
-Unused(Paper)
 
 from game.element.damage_property import DamageProperty
-Unused(DamageProperty)
-
 from game.card.face.attribute.power.power_property import PowerProperty
-Unused(PowerProperty)
-
 from game.card.face.attribute.has_attribute import HasAttribute
-Unused(HasAttribute)
-
 from game.card.face.attribute.can_place_counter import CanPlaceCounter
 from game.card.face.attribute.can_place_token import CanPlaceToken
-Unused(CanPlaceCounter)
-Unused(CanPlaceToken)
-
 from game.card.face.attribute.can_attacked import CanAttacked
 from game.card.face.attribute.has_acceleration_icon import HasAccelerationIcon
 from game.card.face.attribute.can_acceleration_token import CanAccelerationToken
@@ -53,34 +48,6 @@ from game.card.face.attribute.has_victory import HasVictory
 from game.card.face.attribute.has_setup import HasSetup
 from game.card.face.attribute.has_starting import HasStarting
 from game.card.face.attribute.has_uses import HasUses
-Unused(CanAttacked)
-Unused(HasAccelerationIcon)
-Unused(CanAccelerationToken)
-Unused(CanAttach)
-Unused(HasAmplify)
-Unused(HasAttack)
-Unused(CanAttack)
-Unused(CanBoost)
-Unused(CanCrisis)
-Unused(HasDefense)
-Unused(CanDefense)
-Unused(HasHazard)
-Unused(CanHealth)
-Unused(CanHinder)
-Unused(CanIncite)
-Unused(HasRecover)
-Unused(CanRecover)
-Unused(CanRetaliate)
-Unused(HasScheme)
-Unused(CanScheme)
-Unused(CanSurge)
-Unused(HasThwart)
-Unused(CanThwart)
-Unused(HasVictory)
-Unused(HasSetup)
-Unused(HasStarting)
-Unused(HasUses)
-
 from game.card.face.attribute.has_hand_size import HasHandSize
 from game.card.face.attribute.has_modify import HasModify
 from game.card.face.attribute.has_stage import HasStage
@@ -106,29 +73,4 @@ from game.card.face.attribute.has_steady import HasSteady
 from game.card.face.attribute.has_stalwart import HasStalwart
 from game.card.face.attribute.can_status import CanStatus, CanNoStatus
 from game.card.face.attribute.has_peril import HasPeril
-Unused(HasHandSize)
-Unused(HasModify)
-Unused(HasStage)
-Unused(HasBoostIcon)
-Unused(HasCost)
-Unused(HasAssault)
-Unused(HasForm)
-Unused(HasRestricted)
-Unused(HasResourceIcon)
-Unused(HasPermanent)
-Unused(HasTemporary)
-Unused(HasTeamUp)
-Unused(CanTeamwork)
-Unused(HasAlliance)
-Unused(CanQuickstrike)
-Unused(HasGuard)
-Unused(HasPatrol)
-Unused(HasVillainous)
-Unused(HasMaxPer)
-Unused(HasToughness)
-Unused(HasSteady)
-Unused(HasStalwart)
-Unused(HasVulnerable)
-Unused(CanStatus, CanNoStatus)
-Unused(HasPeril)
 

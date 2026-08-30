@@ -1,13 +1,8 @@
 from typing import TypeAlias
 from core import *
-from game.card.face import *
-from game.effect import *
-from game.selector import *
-from game.player import *
-from game.message import *
+from game.card.face.card_face import CardFace
 from game.element.resources import Resources
 from game.element.cost import Cost
-# from game.ability.condition import Condition
 from game.card.card_finder import CardFinder
 
 TARGET_TYPE: TypeAlias = 'SELECT.HELPER_TYPE|Selector|CardFinder'

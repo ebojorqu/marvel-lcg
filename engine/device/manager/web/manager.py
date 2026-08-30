@@ -1,10 +1,19 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from core import *
 from engine.config import ConfigVariables
 from engine.log import Log
-from engine.device import *
-from engine.controller import *
+from engine.device.manager.base import DeviceManager
 from engine.device.manager.web.client import ClientManager
 from engine.network.net_lib import NetLib
+
+if TYPE_CHECKING:
+    from engine.controller.controller import Controller
+    from engine.device.base.device import DeviceManager
+    from engine.device.base.input import InputDevice
+    from engine.device.base.output import OutputDevice
 
 IP                  = ConfigVariables.Str('ip', "")
 PORT                = ConfigVariables.Int('port', 2345)

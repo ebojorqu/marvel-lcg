@@ -1,18 +1,16 @@
+from __future__ import annotations
+
 import types
-from typing import Final, TypeAlias
+from typing import TYPE_CHECKING, Callable, Final, List, Type, TypeAlias, TypeVar
 from core import *
 
-from game.card.face import *
-from game.effect import *
-from game.selector import *
-from game.message import *
-from game.player import *
-from cards.paper import Paper
+TM = TypeVar('TM')
+ConditionType = Callable[["Effect", "Message2"], bool]
+ConditionsType = List[Callable[["Effect", "Message2"], bool]]
+OperationType = Callable[["Effect", "Message2"], None]
 
 from game.element.cost import Cost
 from game.element.resources import Resources
-from game.ability.condition import Condition
-from game.ability.condition import Condition2
 
 TARGET_TYPE: TypeAlias = "Type['CardFace']|Sequence['CardFace']|'SELECT.HELPER_TYPE'|'CardFinder'|None"
 
@@ -29,11 +27,15 @@ class Ability:
                  operation: OperationType[TM],
                  *,
                  is_local: bool|None=None):
+        from cards.paper import Paper
+        from game.ability.ability_ignore import AbilityIgnore
+        from game.ability.ability_type import AbilityType
+        from game.ability.condition import Condition2
+        from game.message import Message
+
         self.is_initialized = False
         self.name = ""
         self.func_names: Set["Ability.FUNCTION_NAME"] = set()
-
-        from game.ability.ability_ignore import AbilityIgnore
 
         self.type: Final = ability_type
         self.flags: Final = ability_type.flags

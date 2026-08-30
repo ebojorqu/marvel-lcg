@@ -1,8 +1,12 @@
-from typing import Final
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Final
 from core import *
-from game.card.face import *
-from game.ability import *
-from game.message import *
+
+if TYPE_CHECKING:
+    from game.ability import Ability
+    from game.card.face import CardFace
+    from game.message import Message2
 
 class Buff:
     def __init__(self) -> None:

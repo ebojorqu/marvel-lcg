@@ -1,5 +1,6 @@
-from . import *
-
+from game.ability.ability import Ability
+from game.ability.ability_type import AbilityType
+from game.ability.condition import Condition, Condition2
 from game.ability.factory.setup import AbilityFactorySetup
 from game.ability.factory.turn_phase import AbilityFactoryTurnPhase
 from game.ability.factory.do_attack import AbilityFactoryDoAttack

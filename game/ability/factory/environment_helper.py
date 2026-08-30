@@ -1,4 +1,4 @@
-from . import *
+from core import *
 
 # TODO: Add card type as param
 # No need to be attached

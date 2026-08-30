@@ -1,15 +1,18 @@
+from typing import TYPE_CHECKING
+
+from typing import TYPE_CHECKING
+
 from core import *
 from game.card.face import *
-from game.effect import *
-from game.player import *
-from game.world import *
-from game.world.game_area import *
+
+if TYPE_CHECKING:
+    from game.effect.effect import Effect
+    from game.player import Player
+    from game.world.game_area.game_area import GameArea
+    from game.world.world import World
 
 class WorldAction:
-    from game.card.face.card_type import Ally
-    from game.card.face.card_type import Minion
-    from game.card.face.base import Villain
-    Character = AlterEgo|Hero|Ally|Villain|Minion
+    Character = object
 
     def GetWorld(self) -> 'World':
         from game.world import World

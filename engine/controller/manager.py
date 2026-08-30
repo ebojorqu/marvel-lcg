@@ -1,17 +1,21 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from core import *
-from engine.controller import *
 from engine.log import Notify
 from engine.job import JobManager
 from game.scene.replay import *
-from engine.device import *
-from game.world import *
-from game.scene import *
 from game.game_run.game_state import GameState
-from game import *
 from engine.controller.module.replay import InputModule
 from engine.controller.module.skip import SkipModule
 from engine.controller.module.undo import UndoModule
 from engine.console import Console
+
+if TYPE_CHECKING:
+    from engine.controller.controller import Controller
+    from engine.device.manager.base import DeviceManager
+    from game.scene.scene import Scene
 
 class ControllerManager:
 

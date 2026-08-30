@@ -1,15 +1,20 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from core import *
 from build import Build
 
-from game.deck import *
-from game.card import *
-from game.world.game_area import *
-
-from game.effect import *
-from game.buff import *
-from game.message import *
-from game.player import *
 from cards.paper import Paper
+
+if TYPE_CHECKING:
+    from game.deck.deck import Deck
+    from game.card.card import Card
+    from game.effect.effect import Effect
+    from game.message.message import Message2
+    from game.player import Player
+    from game.world.game_area.game_area import GameArea
+    from game.world.world import World
 
 from game.card.face.model.trait import ModelTrait
 from game.card.face.model.damage import ModelDamage

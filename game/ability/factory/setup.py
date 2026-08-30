@@ -1,4 +1,6 @@
-from . import *
+from typing import Callable, List
+
+from core import *
 
 class AbilityFactorySetup:
 

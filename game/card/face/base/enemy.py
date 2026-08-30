@@ -1,10 +1,15 @@
 from core import *
-from game.card.face.base import *
-from game.card.face import *
-from game.ability import *
-from game.ability.factory import *
-from game.message import *
-from game.player import *
+from game.card.face.attribute.can_scheme import HasScheme, CanScheme
+from game.card.face.attribute.can_attack import HasAttack, CanAttack
+from game.card.face.base.unit import Unit2
+from game.card.face.attribute.can_boost import CanBoost
+from game.card.face.attribute.can_place_counter import CanPlaceCounter
+from game.card.face.card_face import CardFace
+from game.ability.ability import Ability
+from game.ability.ability_type import AbilityType
+from game.ability.factory import AbilityFactory
+from game.message.sender.sender import Message
+from game.player.player import Player
 from cards.paper import Paper
 
 class Enemy(HasScheme, CanScheme, HasAttack, CanAttack, Unit2, CanBoost, CanPlaceCounter):

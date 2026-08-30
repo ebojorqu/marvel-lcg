@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from core import *
 from core.lib import Time
 from game.world import *
@@ -8,11 +12,13 @@ from engine.lib import Ver, Random, Json
 from engine.log import Log
 # from engine.task.condition import Condition
 from engine.file import FileManager
-from engine.controller import *
 from engine.log import Notify
 from game import *
 from engine.config import ConfigVariables
 from game.statistics.session_statistics import SessionStatistics
+
+if TYPE_CHECKING:
+    from engine.controller.manager import ControllerManager
 
 CATEGORY_NAME = "SESSION"
 

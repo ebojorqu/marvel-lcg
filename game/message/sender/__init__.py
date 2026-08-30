@@ -1,56 +1,19 @@
+from typing import TYPE_CHECKING
+
 from core import *
 
-from game.ability.condition import *
+if TYPE_CHECKING:
+    from game.effect.effect import Effect
+    from game.player import Player
+    from game.world.world import World
+    from game.world.game_area.game_area import GameArea
 
-from game.card.face import *
-from game.deck import *
+# Importing this during __init__ time pulls in engine/world/scene layers too early,
+# which re-enters the circular bootstrap chain. Keep the runtime dependency deferred.
 
-from game.effect import *
-from game.element.cost import Cost
-from game.element.damage_property import DamageProperty
-from game.element.resources import Resources
-Unused(Cost)
-Unused(DamageProperty)
-Unused(Resources)
-
-from game.player import *
-from game.world import *
-from game.world.game_area import *
-
-from game.scene.replay.campaign import CampaignDescriptor
-Unused(CampaignDescriptor)
-
-from game.render.symbol import Symbol
-Unused(Symbol)
-from engine.lib import TransText
-Unused(TransText)
-
-from game.message import *
-from game.message.message_type import CalculateMessage
-from game.message.message_type import CanBeInstead
-from game.message.message_type import CanGainValueMessage
-from game.message.message_type import CardStateUpdatedMessage
-from game.message.message_type import CheckIfMessage
-from game.message.message_type import GettingMessage
-from game.message.message_type import CheckNoneMessage
-from game.message.message_type import DamageMessage
-from game.message.message_type import DeckMessage
-from game.message.message_type import DefenderMessage
-from game.message.message_type import HasEndEventMessage
-from game.message.message_type import HasPreEventMessage
-from game.message.message_type import InActivationMessage
-from game.message.message_type import LikeFakeMessage
-from game.message.message_type import NoSendMessage
-from game.message.message_type import NoSendResolve
-from game.message.message_type import SchemerMessage
-from game.message.message_type import TargetsMessage
-from game.message.message_type import TextMessage
-from game.message.message_type import ThwarterMessage
-from game.message.message_type import TriggerFaceMessage
-from game.message.message_type import TriggerNonePlayerMessage
-from game.message.message_type import TriggerPlayerMessage
-from game.message.message_type import TriggerSchemeMessage
-from game.message.message_type import TriggerUnitMessage
+from game.message.message import Message2
+from game.message.message_type import *
+Unused(Message2)
 Unused(CalculateMessage)
 Unused(CanBeInstead)
 Unused(CanGainValueMessage)

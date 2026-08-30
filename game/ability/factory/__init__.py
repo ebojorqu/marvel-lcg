@@ -1,26 +1,26 @@
+from __future__ import annotations
+
 from core import *
+from core import Unused
 
-from game.ability.condition import Condition
-AbilitiesType   = Condition.ABILITY_TYPE
-CardType        = Condition.CARD_TYPE
-CardTypeMin     = Condition.CARD_TYPE_MIN
-EventType       = Condition.EVENT_TYPE
-PlayerType      = Condition.PLAYER_TYPE
+__all__ = [name for name in globals() if not name.startswith("_")]
 
-from game.card.face import *
-from game.ability import *
-from game.effect import *
-from game.selector import *
-from game.message import *
-from game.player import *
-from game.ability.condition import *
-from game.element.resources import *
-from game.card.card_finder import *
-from game.player.player_finder import *
 
-from game.ability.factory.ability_factory import AbilityFactory
-Unused(AbilityFactory)
+def __getattr__(name):
+    if name in {"AbilitiesType", "CardType", "CardTypeMin", "EventType", "PlayerType"}:
+        from game.ability.condition import Condition
+        mapping = {
+            "AbilitiesType": "ABILITY_TYPE",
+            "CardType": "CARD_TYPE",
+            "CardTypeMin": "CARD_TYPE_MIN",
+            "EventType": "EVENT_TYPE",
+            "PlayerType": "PLAYER_TYPE",
+        }
+        return getattr(Condition, mapping[name])
+    if name == "AbilityFactory":
+        from game.ability.factory.ability_factory import AbilityFactory
+        return AbilityFactory
+    raise AttributeError(name)
 
-from game.deck import *
-from game.exceptions import *
-from game.buff import *
+
+Unused(__all__)

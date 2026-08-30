@@ -1,4 +1,4 @@
-from . import *
+from core import *
 
 def ThisGainKeywordInternal(change_on_event: EventType,
                             # condition_fn: ConditionType[TM],

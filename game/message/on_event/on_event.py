@@ -1,10 +1,18 @@
-from typing import Final, TypeAlias
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Final, TypeAlias
 from core import *
-from game.card.face import *
-from game.card.card_finder import *
-from game.message import *
-from game.ability import *
-from game.deck.deck_type import DeckType
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.card.card_finder.finder import CardFinder
+    from game.ability.ability import Ability
+    from game.ability.ability_type import AbilityType
+    from game.ability.condition.condition import ConditionType, ConditionsType, OperationType
+    from game.deck.deck_type import DeckType
+    from game.player import Player
+    from game.effect.effect import Effect
+    from game.message.message import Message2
 
 from game.ability.condition import Condition
 

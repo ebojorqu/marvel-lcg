@@ -1,9 +1,10 @@
 from game.card.face.attribute.can_attach import CanAttach
 from game.card.face.attribute.has_max_per import HasMaxPer
 from game.card.face.card_face import CardFace
-from game.card import *
-from game.ability import *
-from game.message import *
+from game.card.card import Card
+from game.ability.ability import Ability
+from game.ability.ability_type import AbilityType
+from game.message.sender.sender import Message
 from cards.paper import Paper
 
 class Asset2(CanAttach, CardFace):

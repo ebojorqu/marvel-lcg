@@ -1,4 +1,4 @@
-from . import *
+from core import *
 
 from game.message.sender.sender import CanBeInstead
 

@@ -1,8 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from core import *
 from engine.network import WebServer
 from aiohttp import web
 from engine.device.manager.web.manager import WebDeviceManager
-from engine.controller import *
+
+if TYPE_CHECKING:
+    from engine.controller.controller import Controller
 
 class GameServerBase(WebServer):
 

@@ -1,8 +1,9 @@
 from core import *
-from game.card.face.base import *
-from game.card.face import *
-from game.message import *
-from game.ability import *
+from core import *
+from game.card.face.base.unit import Unit2
+from game.card.face.card_face import CardFace
+from game.message.sender.sender import Message
+from game.ability.ability import Ability
 from cards.paper import Paper
 
 class Friend(Unit2):

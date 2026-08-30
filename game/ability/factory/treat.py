@@ -1,4 +1,4 @@
-from . import *
+from core import *
 
 def TreatAsMinion(face: 'CardFace', as_card_name: str, engage_player: 'Player', effect: 'Effect', *, process: Callable[['Minion', 'Any', 'Effect'], Any]|None=None) -> bool:
     from game.ability.factory import AbilityFactory

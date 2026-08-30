@@ -1,7 +1,10 @@
-from typing import TypeAlias
+from typing import TYPE_CHECKING, TypeAlias
 from core import *
-from game.ability import *
-from game.message import *
+
+if TYPE_CHECKING:
+    from game.ability import Ability, AbilityType
+    from game.message import Message2
+    from game.message.on_event import OnEvent
 
 class ConditionOnEventType:
 
@@ -20,7 +23,7 @@ class ConditionOnEventType:
 
     @staticmethod
     def GetEventAbilities(change_on_event: 'EVENT_TYPE',
-                        ability_type: AbilityType,
+                        ability_type: 'AbilityType',
                         condition: Callable[['Effect', 'Message2'], bool],
                         operation: Callable[['Effect', 'Message2'], None]
                         ) -> List['Ability']:
