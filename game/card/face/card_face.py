@@ -1,7 +1,6 @@
 from core import *
 from build import Build
 
-from game.card.face import *
 from game.deck import *
 from game.card import *
 from game.world.game_area import *
@@ -48,7 +47,7 @@ class CardFace(ModelName, ModelTrait, ModelAction, ModelOnEvent, ModelGain, Mode
         "MaxPerUnit", "MaxPerDeck", "TeamUp",
         "Class", "Permanent", "Steady", "Incite", "Villainous", "Patrol", "Hinder", "Stalwart",
         "Requirement", "Victory", "Alliance",
-        "Setup", "Peril", "Stage",
+        "Setup", "Starting", "Peril", "Stage",
         "Linked", "Form", "CorrespondingCard",
         "Temporary", "Teamwork", "Vulnerable",
         "Subtype", 

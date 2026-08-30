@@ -53,6 +53,8 @@ class CardFactory:
             from game.card.face.attribute.has_teamup import HasTeamUp
             if HasTeamUp.IsType(card.face) and not card.face.CanIncludeInDeck(owner):
                 raise ValueError(f"{card.face} cannot be included with {owner.GetIdentity()}")
+            if HasStarting.IsType(card.face) and not card.face.CanIncludeInDeck(owner):
+                raise ValueError(f"{card.face} cannot be included in {owner.GetIdentity()}'s deck because only one Starting card may be included")
 
         if not deck:
             deck = world.area_removed

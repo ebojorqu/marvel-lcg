@@ -59383,6 +59383,22 @@
     ],
     "fne": [
         {
+            "card_id": "60038",
+            "type": "Upgrade",
+            "name": "Innate Reflexes",
+            "subtitle": "",
+            "desc": {
+                "Cost": "1",
+                "RES": "Y",
+                "Class": "Protection",
+                "DEF": "1",
+                "Starting": "1"
+            },
+            "traits": [],
+            "set_name": "Fear No Evil",
+            "text": "Starting. <i>(You may add this card to your hand before drawing your starting hand.)</i>\nYour hero gets +1 DEF."
+        },
+        {
             "card_id": "60048",
             "type": "Event",
             "name": "Army of One",
@@ -59395,6 +59411,52 @@
             "traits": [],
             "set_name": "Fear No Evil",
             "text": "[star] Increase the cost to play this card by 1 for each ally you control.\n<b>Hero Action</b>: Ready your hero."
+        },
+        {
+            "card_id": "60052",
+            "type": "Upgrade",
+            "name": "The Best Offense...",
+            "subtitle": "",
+            "desc": {
+                "Cost": "1",
+                "RES": "B",
+                "Class": "Protection",
+                "DEF": "1",
+                "Temporary": "1"
+            },
+            "traits": [],
+            "set_name": "Fear No Evil",
+            "text": "Temporary. <i>(Discard this card at the end of the round.)</i>\nYour hero gets +1 DEF.\nUse your DEF in place of your THW and ATK. <i>(Ignore any modifiers to your THW and ATK.)</i>"
+        },
+        {
+            "card_id": "60053",
+            "type": "Upgrade",
+            "name": "* Ronin",
+            "subtitle": "",
+            "desc": {
+                "Cost": "1",
+                "RES": "B",
+                "Class": "Protection",
+                "DEF": "1"
+            },
+            "traits": [],
+            "set_name": "Fear No Evil",
+            "text": "While you do not control any allies, your hero gets +1 DEF and gains retaliate 1."
+        },
+        {
+            "card_id": "60054",
+            "type": "Upgrade",
+            "name": "Stand Alone",
+            "subtitle": "",
+            "desc": {
+                "Cost": "1",
+                "RES": "Y",
+                "Class": "Protection",
+                "MaxPerUnit": "1"
+            },
+            "traits": [],
+            "set_name": "Fear No Evil",
+            "text": "Max 1 per player.\n<b>Hero Interrupt</b>: When an enemy attacks you <i>(before any defender is declared)</i>, if you do not control any allies, exhaust Stand Alone \u2192 ready your hero."
         }
     ],
     "checksum": "eb92a1a40b171de04eab93c9ff6cfed491d752efff805b0eabd5048f092edb03"

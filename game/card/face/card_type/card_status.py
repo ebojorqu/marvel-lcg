@@ -1,5 +1,5 @@
 from core import *
-from game.card.face import *
+from game.card.face.base.final_type import FinalType
 from game.ability import *
 from game.ability.factory import *
 from game.message import *

@@ -1,4 +1,4 @@
-from game.card.face import *
+from game.card.face.card_face import CardFace
 
 class FinalType(CardFace):
     is_final = True

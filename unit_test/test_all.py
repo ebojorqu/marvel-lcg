@@ -54,6 +54,96 @@ class TestMain(unittest.TestCase):
             TestRunner.Execute(TestEntry.Test, folder, profile)
             Engine.Shutdown()
 
+    def test_rapid_response_hero_defend_player_resolution(self):
+        from types import SimpleNamespace
+        import game.player as player_module
+        import game.card.face.card_type as card_type_module
+        from game.ability.condition import Condition
+
+        class FakePlayer:
+            def __init__(self, identity):
+                self._identity = identity
+            def GetIdentity(self):
+                return self._identity
+            @staticmethod
+            def IsType(obj):
+                return isinstance(obj, FakePlayer)
+
+        class FakeIdentity:
+            def __init__(self, controller):
+                self._controller = controller
+            def GetControlBy(self):
+                return self._controller
+
+        class FakeFace:
+            def __init__(self, control_by):
+                self.card = SimpleNamespace(area=SimpleNamespace(flags=SimpleNamespace(is_obligations_area=False)))
+                self._control_by = control_by
+            def GetControlByOrOwner(self):
+                return self._control_by
+            def GetControlBy(self):
+                return self._control_by
+
+        class FakeUpgrade(FakeIdentity):
+            def __init__(self, bind_face):
+                super().__init__(bind_face._control_by)
+                self.bind_face = bind_face
+            def GetBindFace(self):
+                return self.bind_face
+
+        old_player = player_module.Player
+        old_identity = card_type_module.Identity
+        old_upgrade = card_type_module.Upgrade
+        old_event = card_type_module.Event
+        try:
+            player_module.Player = FakePlayer
+            card_type_module.Identity = FakeIdentity
+            card_type_module.Upgrade = FakeUpgrade
+            card_type_module.Event = type('FakeEvent', (), {})
+
+            attack_target_player = FakePlayer(FakeIdentity(None))
+            defending_player = FakePlayer(FakeIdentity(None))
+            identity = FakeIdentity(attack_target_player)
+            effect = SimpleNamespace(
+                this=FakeFace(defending_player),
+                initiator=attack_target_player,
+                context=SimpleNamespace(ask_player=defending_player),
+            )
+
+            self.assertTrue(Condition.ThisIsYou(effect, identity))
+
+            ally_face = FakeFace(attack_target_player)
+            self.assertTrue(Condition.CheckWhichCard("YouControlAlly", [ally_face], effect))
+        finally:
+            player_module.Player = old_player
+            card_type_module.Identity = old_identity
+            card_type_module.Upgrade = old_upgrade
+            card_type_module.Event = old_event
+
+    def test_starting_max_one_per_deck(self):
+        from game.card.face.attribute.has_starting import HasStarting
+
+        class FakeDeck:
+            def __init__(self, owner):
+                self.owner = owner
+                self.cards = []
+            def GetAll(self):
+                return self.cards
+
+        class FakePlayer:
+            def __init__(self):
+                self.player_deck = FakeDeck(self)
+
+        player = FakePlayer()
+        start1 = object.__new__(HasStarting)
+        start1.printed_starting = 1
+        start1.GetControlByOrOwner = lambda: player
+        existing = object.__new__(HasStarting)
+        existing.printed_starting = 1
+        player.player_deck.cards = [existing, start1]
+
+        self.assertFalse(start1.CanIncludeInDeck(player))
+
     def test_min(self):
         self.RunCases("min_test_folder")
 

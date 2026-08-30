@@ -129,7 +129,15 @@ class ConditionCardType:
                 elif from_effect.initiator.IsScenario():
                     return Player.IsType(face.GetControlByOrOwner())
                 else:
-                    return Select.GetYou(from_effect) == face.GetControlByOrOwner()
+                    controlled_by = face.GetControlByOrOwner()
+                    current_player = Select.GetYou(from_effect)
+                    if Player.IsType(current_player) and current_player == controlled_by:
+                        return True
+                    if Player.IsType(from_effect.initiator) and from_effect.initiator == controlled_by:
+                        return True
+                    if hasattr(from_effect.context, 'ask_player') and Player.IsType(from_effect.context.ask_player) and from_effect.context.ask_player == controlled_by:
+                        return True
+                    return False
             def check_another():
                 # Fix "53008"
                 if Upgrade.IsType(from_effect.this) or Attachment.IsType(from_effect.this):

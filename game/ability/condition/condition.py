@@ -65,7 +65,15 @@ class Condition(ConditionCardType, ConditionPlayerType, ConditionAbilityType, Co
         if Identity.IsType(identity):
             assert Player.IsType(identity.GetControlBy())
 
-            return Select.GetYou(effect).GetIdentity() == identity
+            current_player = Select.GetYou(effect)
+            if Player.IsType(current_player) and current_player.GetIdentity() == identity:
+                return True
+
+            if Player.IsType(effect.initiator) and effect.initiator.GetIdentity() == identity:
+                return True
+
+            if hasattr(effect.context, 'ask_player') and Player.IsType(effect.context.ask_player) and effect.context.ask_player.GetIdentity() == identity:
+                return True
 
             # this effect from players' card
             controller = effect.this.GetControlBy()

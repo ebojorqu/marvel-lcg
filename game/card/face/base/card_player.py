@@ -1,7 +1,12 @@
 from typing import TypeAlias
 from core import *
-from game.card.face.base import *
-from game.card.face import *
+from game.card.face.attribute.has_starting import HasStarting
+from game.card.face.attribute.has_resource import HasResourceIcon
+from game.card.face.attribute.has_cost import HasCost
+from game.card.face.attribute.has_max_per import HasMaxPer
+from game.card.face.attribute.can_surge import CanSurge
+from game.card.face.attribute.can_acceleration_token import CanAccelerationToken
+from game.card.face.card_face import CardFace
 from game.deck import *
 from game.ability import *
 from game.ability.factory import *
@@ -13,7 +18,7 @@ from game.element.resources import Resources
 class PlayerCard(CanSurge, CanAccelerationToken, CardFace):
     pass
 
-class ClassCard(HasResourceIcon, HasCost, HasMaxPer, PlayerCard):
+class ClassCard(HasStarting, HasResourceIcon, HasCost, HasMaxPer, PlayerCard):
 
     ASPECT_CLASS_TYPE: TypeAlias = Literal[
         'Aggression',   # red

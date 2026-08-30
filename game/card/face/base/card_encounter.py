@@ -1,5 +1,6 @@
-from game.card.face import *
-from game.player import *
+from game.card.face.card_face import CardFace
+from game.card.face.attribute.can_surge import CanSurge
+from game.card.face.attribute.can_acceleration_token import CanAccelerationToken
 
 class EncounterCard(CanSurge, CanAccelerationToken, CardFace):
     pass

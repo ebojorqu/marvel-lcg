@@ -14,9 +14,11 @@ def GetAbilities() -> Sequence['Ability']:
 
 
     return [
-        AbilityFactory.ReduceCostToPlayThis(
-            -1,
-            each_card_you_control=CardFinder(card_type=Ally),
+        AbilityFactory.UpdateCostOfCardInternal(
+            "This",
+            lambda effect: len(effect.GetInitiator().GetControlCards(CardFinder(card_type=Ally))),
+            "You",
+            is_play=True,
         ),
         AbilityFactory.WhenInYourPlayTurn(
             AbilityType.HeroAction,

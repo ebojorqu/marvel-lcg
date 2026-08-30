@@ -1,7 +1,9 @@
-from typing import Final
+from typing import Final, TYPE_CHECKING
 from core import *
-from game.world import *
-from game.object import *
+
+if TYPE_CHECKING:
+    from game.object.manager import ObjectManager
+    from game.world.world import World
 
 class Object:
 

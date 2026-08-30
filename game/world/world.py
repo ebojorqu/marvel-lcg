@@ -333,6 +333,12 @@ class World(WorldAction, WorldFind):
         for face in faces:
             face.ProcessSetup(game_start_effect)
 
+        # Starting cards are added to a player's hand before the opening draw,
+        # and they count against the hand-size limit for that draw.
+        faces = [x for y in decks for x in y.GetAll() if HasStarting.IsType(x) and x.printed_starting > 0]
+        for face in faces:
+            face.ProcessStarting(game_start_effect)
+
         if self.is_game_over:
             return
 

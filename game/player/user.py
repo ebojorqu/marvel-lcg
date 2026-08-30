@@ -1,8 +1,10 @@
 from core import *
-from game.object import Object
+from game.object.object import Object
 from game.world.game_area import *
 from game.card.face import *
-from game.world import *
+
+if TYPE_CHECKING:
+    from game.world.world import World
 
 class User(Object):
     def __init__(self, name: Literal['player', 'scenario'], world: 'World'):
