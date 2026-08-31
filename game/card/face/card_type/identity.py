@@ -1,5 +1,6 @@
 from core import *
 from game.card.face import *
+from game.card.face.base.final_type import FinalType as _FinalType
 from game.ability import *
 from game.ability.factory import *
 from game.message import *
@@ -122,7 +123,7 @@ class Identity(Friend, HasHandSize, PlayerCard):
 #
 # We add `CanThwart` for fixing resolve issue with "37013" and "37015" interaction
 @final
-class AlterEgo(HasRecover, CanRecover, CanThwart, Identity, FinalType):
+class AlterEgo(HasRecover, CanRecover, CanThwart, Identity, _FinalType):
     @override
     def __init__(self, paper: 'Paper') -> None:
         super().__init__(paper)
@@ -142,7 +143,7 @@ class AlterEgo(HasRecover, CanRecover, CanThwart, Identity, FinalType):
 ################################################################################
 #
 @final
-class Hero(HasThwart, CanThwart, HasAttack, CanAttack, HasDefense, CanDefense, HasAccelerationIcon, Identity, FinalType):
+class Hero(HasThwart, CanThwart, HasAttack, CanAttack, HasDefense, CanDefense, HasAccelerationIcon, Identity, _FinalType):
     @override
     def __init__(self, paper: 'Paper') -> None:
 

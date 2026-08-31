@@ -9,8 +9,10 @@ class Ver:
 
     @staticmethod
     def Initialize():
-        Ver.version = Ver(f'{Build.MAJOR}.{Build.MINOR}.{Build.PATCH}.{Build.BUILD}')
-        Ver.ui_version_str = f"{Ver.version}{'r' if Build.release else 'd'}"
+        if not hasattr(Ver, 'version') or Ver.version is None:
+            Ver.version = Ver(f'{Build.MAJOR}.{Build.MINOR}.{Build.PATCH}.{Build.BUILD}')
+        if not hasattr(Ver, 'ui_version_str') or Ver.ui_version_str is None:
+            Ver.ui_version_str = f"{Ver.version}{'r' if Build.release else 'd'}"
 
     # https://stackoverflow.com/questions/11887762/how-do-i-compare-version-numbers-in-python
     def __init__(self, ver: 'str|Ver') -> None:
@@ -72,6 +74,8 @@ class Ver:
 
     def IsFixTreachery(self):
         return self >= Versions.fix_treachery
+
+Ver.Initialize()
 
 class Versions:
 

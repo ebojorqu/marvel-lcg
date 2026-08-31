@@ -1,5 +1,6 @@
 from core import *
 from game.card.face import *
+from game.card.face.base.final_type import FinalType as _FinalType
 from game.message import *
 from game.ability import *
 from game.ability.factory import *
@@ -20,7 +21,7 @@ resolve the obligation.
 """
 
 @final
-class Obligation(Asset2, CanHinder, HasHazard, HasAccelerationIcon, HasUses, EncounterNonVillainCard, FinalType):
+class Obligation(Asset2, CanHinder, HasHazard, HasAccelerationIcon, HasUses, EncounterNonVillainCard, _FinalType):
     @override
     def __init__(self, paper: 'Paper') -> None:
         self.printed_give_to: str|None = None

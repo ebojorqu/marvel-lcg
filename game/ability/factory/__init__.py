@@ -3,7 +3,15 @@ from __future__ import annotations
 from core import *
 from core import Unused
 
-__all__ = [name for name in globals() if not name.startswith("_")]
+__all__ = [
+    "AbilityFactory",
+    "CostFunc",
+    "AbilitiesType",
+    "CardType",
+    "CardTypeMin",
+    "EventType",
+    "PlayerType",
+]
 
 
 def __getattr__(name):
@@ -20,6 +28,9 @@ def __getattr__(name):
     if name == "AbilityFactory":
         from game.ability.factory.ability_factory import AbilityFactory
         return AbilityFactory
+    if name == "CostFunc":
+        from game.ability.cost_func import CostFunc
+        return CostFunc
     raise AttributeError(name)
 
 

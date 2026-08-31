@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from core import *
 from game.card.face import *
+from game.card.face.base.final_type import FinalType as _FinalType
 from game.ability import *
 from game.ability.factory import *
 from game.message import *
@@ -9,7 +10,7 @@ from game.player import *
 from cards.paper import Paper
 
 @final
-class MainScheme(Scheme2, HasStage, EncounterCard, FinalType):
+class MainScheme(Scheme2, HasStage, EncounterCard, _FinalType):
     @override
     def __init__(self, paper: 'Paper') -> None:
         self.printed_target_threat: int|None = None

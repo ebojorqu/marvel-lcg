@@ -1,5 +1,6 @@
 from typing import TypeAlias
 from core import *
+from game.selector import Select, Selector
 from game.card.face.card_face import CardFace
 from game.element.resources import Resources
 from game.element.cost import Cost

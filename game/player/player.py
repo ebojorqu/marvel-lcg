@@ -51,6 +51,9 @@ class Player(User, PlayerAsk, PlayerCards, PlayerGet, PlayerAction, ):
         from game.card.face.card_type import Hero
         from game.card.face.card_type import Environment
         from game.player.element.player_stat import PlayerStat
+        from game.player.element.resources_pool import ResourcesPool
+        from game.player.element.player_flag import PlayerFlag
+        from game.player.element.player_phase import PlayerPhase
         from game.player.limit_monitor import AllyLimit, RestrictedLimit, TeamLimit
         from game.player.form.form import Form
         from game.player.element.player_setup import PlayerSetup

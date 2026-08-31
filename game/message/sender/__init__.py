@@ -1,6 +1,8 @@
 from typing import TYPE_CHECKING
 
 from core import *
+from engine.lib import TransText
+from game.render.symbol import Symbol
 
 if TYPE_CHECKING:
     from game.effect.effect import Effect
@@ -39,4 +41,6 @@ Unused(TriggerNonePlayerMessage)
 Unused(TriggerPlayerMessage)
 Unused(TriggerSchemeMessage)
 Unused(TriggerUnitMessage)
+Unused(TransText)
+Unused(Symbol)
 

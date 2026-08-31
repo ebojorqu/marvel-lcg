@@ -11,6 +11,7 @@ OperationType = Callable[["Effect", "Message2"], None]
 
 from game.element.cost import Cost
 from game.element.resources import Resources
+from game.selector import SELECT
 
 TARGET_TYPE: TypeAlias = "Type['CardFace']|Sequence['CardFace']|'SELECT.HELPER_TYPE'|'CardFinder'|None"
 

@@ -1,11 +1,12 @@
 from typing import TypeAlias
 from core import *
 from game.card.face import *
+from game.card.face.base.final_type import FinalType as _FinalType
 from game.message import *
 from cards.paper import Paper
 
 @final
-class Evidence(CanAttach, HasAttribute, FinalType):
+class Evidence(CanAttach, HasAttribute, _FinalType):
 
     SUBTYPE: TypeAlias = Literal["Opportunity", "Motive", "Means"]
 

@@ -1,5 +1,6 @@
 from core import *
 from game.card.face import *
+from game.card.face.base.final_type import FinalType as _FinalType
 from game.ability import *
 from game.message import *
 from game.player import *
@@ -7,7 +8,7 @@ from game.world.game_area import *
 from cards.paper import Paper
 
 @final
-class Minion(Enemy, CanQuickstrike, CanTeamwork, HasGuard, HasPatrol, HasVillainous, HasAccelerationIcon, HasHazard, HasAmplify, CanAttach, EncounterNonVillainCard, FinalType):
+class Minion(Enemy, CanQuickstrike, CanTeamwork, HasGuard, HasPatrol, HasVillainous, HasAccelerationIcon, HasHazard, HasAmplify, CanAttach, EncounterNonVillainCard, _FinalType):
     @override
     def __init__(self, paper: 'Paper') -> None:
         self.nemesis = ""

@@ -1,12 +1,13 @@
 from core import *
 from game.card.face import *
+from game.card.face.base.final_type import FinalType as _FinalType
 from game.ability import *
 from game.message import *
 from game.player import *
 from cards.paper import Paper
 
 @final
-class EncounterSideScheme(SchemeSide2, CanCrisis, HasSetup, HasPermanent, EncounterNonVillainCard, FinalType):
+class EncounterSideScheme(SchemeSide2, CanCrisis, HasSetup, HasPermanent, EncounterNonVillainCard, _FinalType):
     @override
     def __init__(self, paper: 'Paper') -> None:
         super().__init__(paper)

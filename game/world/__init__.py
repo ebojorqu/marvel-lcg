@@ -1,3 +1,4 @@
+import importlib
 import sys
 from core import Unused
 
@@ -9,18 +10,36 @@ def _placeholder(name: str):
 
 
 def __getattr__(name):
-    module = sys.modules.get("game.world.world")
+    module_name = "game.world.world"
+    module = sys.modules.get(module_name)
+    if module is None:
+        try:
+            module = importlib.import_module(module_name)
+        except Exception:
+            module = None
+
     if module is not None:
         if name in module.__dict__:
-            return getattr(module, name)
+            value = getattr(module, name)
+            globals()[name] = value
+            return value
+
     if name == "World":
         if module is not None and hasattr(module, "World"):
-            return module.World
-        return _placeholder("World")
+            value = module.World
+            globals()[name] = value
+            return value
+        value = _placeholder("World")
+        globals()[name] = value
+        return value
     if name == "GAME_OVER":
         if module is not None and hasattr(module, "GAME_OVER"):
-            return module.GAME_OVER
-        return False
+            value = module.GAME_OVER
+            globals()[name] = value
+            return value
+        value = False
+        globals()[name] = value
+        return value
     raise AttributeError(name)
 
 Unused(__all__)

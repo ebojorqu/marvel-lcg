@@ -2,6 +2,8 @@ def Unused(*_: object):
     pass
 
 import builtins
+import importlib
+import sys
 
 try:
     from typing_extensions import override, final
@@ -69,19 +71,127 @@ TYPE_CHECKING = False
 # These project modules use many annotation references like Message, User, Player,
 # CardFace, etc. during import-time class creation. Keep the placeholders simple but
 # compatible with nested attribute access while the real modules finish bootstrapping.
-class _PlaceholderMeta(ClassNameMeta):
+class _PlaceholderMetaBase(ClassNameMeta):
+    def _resolve_runtime(self, cls):
+        return _resolve_runtime_placeholder(cls.__name__)
+
     def __getattr__(cls, name):
+        resolved = cls._resolve_runtime(cls)
+        if resolved is not None and resolved is not cls:
+            return getattr(resolved, name)
         return type(name, (), {})
+
+    def __mro_entries__(cls, bases):
+        resolved = cls._resolve_runtime(cls)
+        if resolved is not None and resolved is not cls:
+            return (resolved,)
+        return bases
 
     def __getitem__(cls, item):
         return item
 
-class _GenericPlaceholderMeta(ClassNameMeta):
-    def __getitem__(cls, item):
-        return item
+    def __instancecheck__(cls, instance):
+        resolved = cls._resolve_runtime(cls)
+        if resolved is not None and resolved is not cls:
+            return isinstance(instance, resolved)
+        return super().__instancecheck__(instance)
 
-    def __getattr__(cls, name):
-        return type(name, (), {})
+    def __subclasscheck__(cls, subclass):
+        resolved = cls._resolve_runtime(cls)
+        if resolved is not None and resolved is not cls:
+            return issubclass(subclass, resolved)
+        return super().__subclasscheck__(subclass)
+
+    def __call__(cls, *args, **kwargs):
+        resolved = cls._resolve_runtime(cls)
+        if resolved is not None and resolved is not cls:
+            return resolved(*args, **kwargs)
+        return super().__call__(*args, **kwargs)
+
+class _PlaceholderMeta(_PlaceholderMetaBase):
+    pass
+
+class _GenericPlaceholderMeta(_PlaceholderMetaBase):
+    pass
+
+
+def _resolve_runtime_placeholder(name: str):
+    known = {
+        "Message": "game.message.sender.sender",
+        "User": "game.player.user",
+        "Player": "game.player.player",
+        "Effect": "game.effect.effect",
+        "World": "game.world.world",
+        "Scenario": "game.player.scenario",
+        "CardFace": "game.card.face.card_face",
+        "Deck": "game.deck.deck",
+        "GameArea": "game.world.game_area.game_area",
+        "Ability": "game.ability.ability",
+        "Condition": "game.ability.condition.condition",
+        "OnEvent": "game.event.on_event",
+        "Unit2": "game.card.face.base.unit",
+        "Scheme2": "game.card.face.base.scheme",
+        "Selector": "game.selector.selector",
+        "Villain": "game.card.face.base.villain",
+        "Enemy": "game.card.face.base.enemy",
+        "Friend": "game.card.face.base.friend",
+        "EncounterCard": "game.card.face.base.card_encounter",
+        "EncounterNonVillainCard": "game.card.face.base.card_encounter",
+        "PlayerCard": "game.card.face.base.card_player",
+        "ClassCard": "game.card.face.base.card_player",
+        "MainScheme": "game.card.face.card_type.scheme_main",
+        "PlayerSideScheme": "game.card.face.card_type.scheme_player",
+        "EncounterSideScheme": "game.card.face.card_type.scheme_side",
+        "Hero": "game.card.face.card_type.identity",
+        "AlterEgo": "game.card.face.card_type.identity",
+        "Identity": "game.card.face.card_type.identity",
+        "Ally": "game.card.face.card_type.ally",
+        "Asset2": "game.card.face.base.asset",
+        "Buff": "game.buff.buff",
+        "Scheme": "game.card.face.base.scheme",
+        "SchemeSide2": "game.card.face.base.scheme_side",
+        "FinalType": "game.card.face.base.final_type",
+        "StatusCard": "game.card.face.card_type.card_status",
+        "Insert": "game.card.face.card_type.insert",
+        "Challenge": "game.card.face.card_type.insert",
+        "Minion": "game.card.face.card_type.minion",
+        "Leader": "game.card.face.card_type.leader",
+        "Environment": "game.card.face.card_type.environment",
+        "Upgrade": "game.card.face.card_type.upgrade",
+        "Support": "game.card.face.card_type.support",
+        "Attachment": "game.card.face.card_type.attachment",
+        "Event": "game.card.face.card_type.event",
+        "Obligation": "game.card.face.card_type.obligation",
+        "Treachery": "game.card.face.card_type.treachery",
+        "Resource": "game.card.face.card_type.resource",
+        "Evidence": "game.card.face.card_type.evidence",
+        "AbilityType": "game.ability.ability_type",
+        "TimingPriority": "game.ability.ability_type",
+    }
+
+    module_name = known.get(name)
+    if module_name is not None:
+        module = sys.modules.get(module_name)
+        if module is None:
+            try:
+                module = importlib.import_module(module_name)
+            except Exception:
+                module = None
+        if module is not None:
+            value = getattr(module, name, None)
+            if value is not None and value.__name__ == name:
+                return value
+
+    for module in list(sys.modules.values()):
+        if module is None:
+            continue
+        value = getattr(module, name, None)
+        if value is not None and getattr(value, "__name__", None) == name:
+            module_name_attr = getattr(value, "__module__", "")
+            if module_name_attr != __name__:
+                return value
+
+    return None
 
 
 def _make_placeholder(name: str, *, generic: bool = False):
@@ -231,6 +341,35 @@ for _name, _value in {
     "TMP": TMP,
 }.items():
     setattr(builtins, _name, _value)
+
+_CARD_FACE_EXPORTS = [
+    "CardFace", "CardFinder", "CardFinder2", "CardFinderHelper", "Deck2",
+    "PowerProperty", "HasAttribute",
+    "AttackProperty", "DefenseProperty", "RecoverProperty", "SchemeProperty", "ThwartProperty",
+    "CanPlaceCounter", "CanPlaceToken",
+    "CanAttacked", "HasAccelerationIcon", "CanAccelerationToken", "CanAttach", "HasAmplify", "HasAttack",
+    "CanAttack", "CanBoost", "CanCrisis", "HasDefense", "CanDefense", "HasHazard", "CanHealth",
+    "CanHinder", "CanIncite", "HasRecover", "CanRecover", "CanRetaliate", "HasScheme", "CanScheme",
+    "CanSurge", "HasThwart", "CanThwart", "HasVictory", "HasSetup", "HasStarting", "HasUses",
+    "HasHandSize", "HasModify", "HasStage", "HasBoostIcon", "HasCost", "HasAssault", "HasForm",
+    "HasRestricted", "HasResourceIcon", "HasPermanent", "HasTemporary", "HasTeamUp", "CanTeamwork",
+    "HasAlliance", "CanQuickstrike", "HasGuard", "HasPatrol", "HasVillainous", "HasMaxPer",
+    "HasVulnerable", "HasToughness", "HasSteady", "HasStalwart", "CanStatus", "CanNoStatus",
+    "HasPeril",
+    "EncounterCard", "EncounterNonVillainCard", "PlayerCard", "ClassCard",
+    "Asset2", "Scheme2", "SchemeSide2", "Unit2", "Enemy", "Friend", "Villain",
+    "FinalType",
+    "StatusCard", "Insert", "Challenge", "Ally", "Identity", "Hero", "AlterEgo", "Minion",
+    "EncounterVillain", "Leader", "EncounterSideScheme", "MainScheme", "PlayerSideScheme",
+    "Environment", "Upgrade", "Support", "Attachment", "Event", "Obligation", "Treachery",
+    "Resource", "Evidence",
+]
+
+for _name in _CARD_FACE_EXPORTS:
+    if not hasattr(builtins, _name):
+        _value = _make_placeholder(_name)
+        globals()[_name] = _value
+        setattr(builtins, _name, _value)
 
 from typing import Literal
 Unused(Literal)

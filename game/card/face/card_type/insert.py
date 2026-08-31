@@ -1,11 +1,12 @@
 from core import *
 from game.card.face import *
+from game.card.face.base.final_type import FinalType as _FinalType
 from game.ability import *
 from game.message import *
 from game.player import *
 
 @final
-class Insert(FinalType):
+class Insert(_FinalType):
     # @override
     # def OnPutIntoPlay(self, message: 'Message.WhenCardPutIntoPlay') -> 'bool':
     #     from game.operate.faces import Faces
@@ -17,7 +18,7 @@ class Insert(FinalType):
     pass
 
 @final
-class Challenge(FinalType):
+class Challenge(_FinalType):
     @override
     def OnPutIntoPlay(self, message: 'Message.WhenCardPutIntoPlay') -> 'bool':
         from game.operate.faces import Faces

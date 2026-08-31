@@ -150,6 +150,80 @@ class TestMain(unittest.TestCase):
     def test_all(self):
         self.RunCases("all")
 
+    def test_world_package_exports_real_class(self):
+        import importlib
+        import sys
+
+        sys.modules.pop('game.world.world', None)
+        import game.world as world_pkg
+
+        # Simulate the star-import path used during partial bootstrap; it must not
+        # resolve to the placeholder type that would later fail with TypeError.
+        namespace = {}
+        exec('from game.world import *', namespace)
+
+        world_type = namespace['World']
+        self.assertEqual(world_type.__module__, 'game.world.world')
+        self.assertTrue(callable(world_type))
+        self.assertIs(world_type, importlib.import_module('game.world.world').World)
+
+    def test_ability_type_placeholder_resolves_real_enum(self):
+        namespace = {}
+        exec('from core import *', namespace)
+
+        ability_type = namespace['AbilityType']
+        resolved_rule = ability_type.Rule
+        self.assertEqual(resolved_rule.__class__.__name__, 'AbilityType')
+        self.assertTrue(hasattr(resolved_rule, 'flags'))
+        self.assertIs(resolved_rule, __import__('game.ability.ability_type', fromlist=['AbilityType']).AbilityType.Rule)
+
+        final_type = namespace['FinalType']
+        actual_final_type = __import__('game.card.face.base.final_type', fromlist=['FinalType']).FinalType
+        self.assertTrue(isinstance(object.__new__(actual_final_type), final_type))
+        self.assertTrue(issubclass(actual_final_type, final_type))
+
+        has_cost = namespace['HasCost']
+        self.assertTrue(hasattr(has_cost, 'IsType'))
+        self.assertTrue(callable(has_cost.IsType))
+
+    def test_ability_factory_star_import_resolves_runtime_factory(self):
+        namespace = {}
+        exec('from game.ability.factory import *', namespace)
+
+        self.assertIn('AbilityFactory', namespace)
+        self.assertIs(namespace['AbilityFactory'], __import__('game.ability.factory.ability_factory', fromlist=['AbilityFactory']).AbilityFactory)
+
+    def test_ability_factory_star_import_exposes_cost_func(self):
+        namespace = {}
+        exec('from game.ability.factory import *', namespace)
+
+        self.assertIn('CostFunc', namespace)
+        self.assertIs(namespace['CostFunc'], __import__('game.ability.cost_func', fromlist=['CostFunc']).CostFunc)
+
+    def test_cost_func_module_has_runtime_selectors(self):
+        module = __import__('game.ability.cost_func', fromlist=['CostFunc'])
+        self.assertTrue(hasattr(module, 'Select'))
+        self.assertTrue(hasattr(module, 'Selector'))
+        self.assertIsNotNone(module.Select.From)
+
+    def test_ability_module_has_runtime_select_namespace(self):
+        module = __import__('game.ability.ability', fromlist=['SELECT'])
+        self.assertTrue(hasattr(module, 'SELECT'))
+        self.assertTrue(hasattr(module.SELECT, 'HELPER_TYPE'))
+
+    def test_version_exists_before_engine_initialize(self):
+        from engine.lib.version import Ver
+
+        self.assertTrue(hasattr(Ver, 'version'))
+        self.assertIsNotNone(Ver.version)
+        self.assertTrue(str(Ver.version).count('.') >= 3)
+
+    def test_identity_uses_real_final_type_base(self):
+        from game.card.face.card_type.identity import Hero, AlterEgo
+
+        self.assertTrue(any(base.__module__ == 'game.card.face.base.final_type' for base in Hero.__bases__))
+        self.assertTrue(any(base.__module__ == 'game.card.face.base.final_type' for base in AlterEgo.__bases__))
+
     def test_profile_profile(self):
         self.RunCases("profile_folder", release=False, profile=True)
 

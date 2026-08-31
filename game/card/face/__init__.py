@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 
 from core import Unused
+from core import _PlaceholderMeta as _CorePlaceholderMeta
 
 __all__ = [
     "CardFace", "CardFinder", "CardFinder2", "CardFinderHelper", "Deck2",
@@ -28,13 +29,11 @@ __all__ = [
 ]
 
 
-from core.meta_class.class_name import ClassNameMeta
-
 _RESOLVED_CACHE: dict[str, object] = {}
 _PLACEHOLDER_CACHE: dict[str, type] = {}
 
 
-class _PlaceholderMeta(ClassNameMeta):
+class _PlaceholderMeta(_CorePlaceholderMeta):
     pass
 
 

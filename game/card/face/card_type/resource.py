@@ -1,5 +1,6 @@
 from core import *
 from game.card.face import *
+from game.card.face.base.final_type import FinalType as _FinalType
 from game.deck import *
 from game.ability import *
 from game.message import *
@@ -8,7 +9,7 @@ from cards.paper import Paper
 from game.element.resources import Resources
 
 @final
-class Resource(ClassCard, FinalType):
+class Resource(ClassCard, _FinalType):
     @override
     def __init__(self, paper: 'Paper') -> None:
         super().__init__(paper)

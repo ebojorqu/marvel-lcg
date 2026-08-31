@@ -1,5 +1,6 @@
 from core import *
 from game.card.face import *
+from game.card.face.base.final_type import FinalType as _FinalType
 from game.deck import *
 from game.ability import *
 from game.message import *
@@ -7,7 +8,7 @@ from game.player import *
 from cards.paper import Paper
 
 @final
-class Treachery(EncounterNonVillainCard, FinalType):
+class Treachery(EncounterNonVillainCard, _FinalType):
     @override
     def __init__(self, paper: 'Paper') -> None:
         super().__init__(paper)

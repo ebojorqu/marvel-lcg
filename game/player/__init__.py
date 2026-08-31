@@ -1,3 +1,4 @@
+import importlib
 import sys
 from core import Unused
 
@@ -22,11 +23,21 @@ def __getattr__(name):
         "Form": "game.player.form.form",
     }
     if name in module_map:
-        module = sys.modules.get(module_map[name])
+        module_name = module_map[name]
+        module = sys.modules.get(module_name)
+        if module is None:
+            try:
+                module = importlib.import_module(module_name)
+            except Exception:
+                module = None
         if module is not None and hasattr(module, name):
-            return getattr(module, name)
+            value = getattr(module, name)
+            globals()[name] = value
+            return value
         if name in {"User", "Player", "Scenario"}:
-            return _placeholder(name)
+            value = _placeholder(name)
+            globals()[name] = value
+            return value
     raise AttributeError(name)
 
 Unused(__all__)

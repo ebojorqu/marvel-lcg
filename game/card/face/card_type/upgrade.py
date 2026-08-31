@@ -1,5 +1,6 @@
 from core import *
 from game.card.face import *
+from game.card.face.base.final_type import FinalType as _FinalType
 from game.ability import *
 from game.message import *
 from game.ability.factory import *
@@ -7,7 +8,7 @@ from game.player import *
 from game.element.damage_property import DamageProperty
 
 @final
-class Upgrade(Asset2, HasModify, HasForm, HasRestricted, HasUses, HasHazard, CanCrisis, HasPermanent, HasTemporary, HasSetup, HasVictory, ClassCard, FinalType):
+class Upgrade(Asset2, HasModify, HasForm, HasRestricted, HasUses, HasHazard, CanCrisis, HasPermanent, HasTemporary, HasSetup, HasVictory, ClassCard, _FinalType):
     @override
     def GetAbilities(self) -> List['Ability']:
         abilities: List['Ability'] = []

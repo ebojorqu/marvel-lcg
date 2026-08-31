@@ -1,11 +1,12 @@
 from core import *
 from game.card.face import *
+from game.card.face.base.final_type import FinalType as _FinalType
 from game.ability import *
 from game.ability.factory import *
 from game.message import *
 
 @final
-class PlayerSideScheme(SchemeSide2, CanCrisis, HasAmplify, HasVictory, ClassCard, FinalType):
+class PlayerSideScheme(SchemeSide2, CanCrisis, HasAmplify, HasVictory, ClassCard, _FinalType):
 
     @override
     def GetAbilities(self) -> List['Ability']:
