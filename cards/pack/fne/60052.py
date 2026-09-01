@@ -28,7 +28,7 @@ def GetAbilities() -> Sequence['Ability']:
             defense=1,
         ),
         AbilityFactory.WhenUnitUseBasicPower(
-            AbilityType.HeroInterrupt,
+            AbilityType.NonKeyword,
             "You",
             the_best_offense,
             powers=["ATK", "THW"],
@@ -36,5 +36,5 @@ def GetAbilities() -> Sequence['Ability']:
                 lambda effect, message:
                     effect.this.bind_face == message.trigger
             ],
-        ).SetTarget("Trigger")
+        )
     ]

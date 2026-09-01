@@ -28,8 +28,9 @@ class WorldRender:
         self.last_round_id: int = 0
 
     def PresentForceNoWait(self, is_update: bool=True) -> None:
-        skip = self.world.controller_manager.skip.is_skipping
-        assert skip == False # Call `controller_manager.skip.SetSkipTo(None)` first
+        controller_skip = self.world.controller_manager.skip
+        if controller_skip.is_skipping:
+            controller_skip.SetIsSkipping(False)
         return self.PresentInternal(None, is_update=True, skip=False, wait=False)
 
     def Present(self, origin_info: TransText, sound_name: str, event_name: str, *faces: 'CardFace', code_info: str) -> None:

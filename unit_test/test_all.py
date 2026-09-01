@@ -256,6 +256,62 @@ class TestMain(unittest.TestCase):
         self.assertTrue(ally.discarded)
         self.assertFalse(later.discarded)
 
+    def test_discard_until_returns_last_matching_ally(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+
+        from game.deck.deck import Deck2
+
+        class FakeFace:
+            def __init__(self, name, deck, *, is_ally=False):
+                self.name = name
+                self.deck = deck
+                self.is_ally = is_ally
+                self.discarded = False
+            def IsName(self, name):
+                return self.name == name
+            def IsSubName(self, name):
+                return False
+            def HasTrait(self, *traits):
+                return False
+            def IsTypeOld(self, card_type):
+                return self.is_ally and issubclass(card_type, FakeAlly)
+            def DiscardInternal(self, by_effect):
+                self.discarded = True
+                self.deck.cards = [c for c in self.deck.cards if c is not self]
+
+        class FakeAlly(FakeFace):
+            def __init__(self, name, deck):
+                super().__init__(name, deck, is_ally=True)
+
+        deck = object.__new__(Deck2)
+        deck.flags = SimpleNamespace(is_deck=True, is_discards=False, is_player_deck=False)
+        deck.cards = []
+        ally = FakeAlly('Professor X', deck)
+        deck.cards = [ally]
+        deck.Get = lambda from_top=False: list(deck.cards)
+        deck.GetSize = lambda: len(deck.cards)
+
+        with patch('game.message.Message.AfterCardsMoved') as after_cards_moved:
+            after_cards_moved.return_value.Send = lambda: None
+            found, other_faces = deck.DiscardUntil(object(), name=None, trait=None, card_type=FakeAlly)
+
+        self.assertIs(found, ally)
+        self.assertEqual(other_faces, [])
+        self.assertTrue(ally.discarded)
+
+    def test_present_force_no_wait_clears_skip_flag(self):
+        from types import SimpleNamespace
+
+        skip = SimpleNamespace(is_skipping=True, SetIsSkipping=lambda skip_value: setattr(skip, 'is_skipping', skip_value) or True)
+        world = SimpleNamespace(controller_manager=SimpleNamespace(skip=skip))
+        render = SimpleNamespace()
+        render.PresentInternal = lambda *args, **kwargs: None
+        world_render = __import__('game.world.world_render', fromlist=['WorldRender']).WorldRender(world)
+        world_render.PresentInternal = lambda *args, **kwargs: None
+        world_render.PresentForceNoWait()
+        self.assertFalse(skip.is_skipping)
+
     def test_shuffle_with_discard_pile_forces_render_after_reset(self):
         from types import SimpleNamespace
         from unittest.mock import patch
@@ -495,6 +551,13 @@ class TestMain(unittest.TestCase):
         self.assertTrue(hasattr(module, 'CostFunc'))
         self.assertIs(module.CostFunc, __import__('game.ability.cost_func', fromlist=['CostFunc']).CostFunc)
         self.assertTrue(callable(module.CostFunc.Custom))
+
+    def test_the_best_offense_is_constant(self):
+        from game.ability.ability_type import AbilityType
+        module = __import__('cards.pack.fne.60052', fromlist=['GetAbilities'])
+        ability_types = [ability.type for ability in module.GetAbilities()]
+        self.assertIn(AbilityType.NonKeyword, ability_types)
+        self.assertNotIn(AbilityType.HeroInterrupt, ability_types)
 
     def test_upgrade_cards_accept_def_printed_values(self):
         from cards.paper import Paper

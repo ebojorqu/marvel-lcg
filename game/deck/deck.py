@@ -474,8 +474,6 @@ class Deck2(Generic[TC], Object):
         message = Message.AfterCardsMoved({x: self for x in moved_faces}, by_discard=True)
         message.Send()
 
-        if self.GetSize() == 0:
-            return None, other_discard_faces
         if found_face != None:
             if isinstance(card_type, CardFace) or card_type == 'CardFace':
                 return Cast(Any, found_face), other_discard_faces
