@@ -36,6 +36,13 @@ class HasDefense(HasAttribute):
     def defense(self) -> int:
         return max(0, self.GetKeyword('DEF'))
 
+    @override
+    def GetInfoDict(self) -> Dict[str, int]:
+        info = super().GetInfoDict()
+        if self.defense <= 0 and self.printed_defense <= 0:
+            info.pop('defense', None)
+        return info
+
 class CanDefense(CardFace):
 
     ################################################################################

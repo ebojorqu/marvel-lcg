@@ -143,6 +143,8 @@ class CanStatus(HasVulnerable, HasSteady, HasToughness, HasStalwart):
         return self.tough < self.tough_max
 
     def CanbeStunned(self) -> bool:
+        from game.buff.buff import BuffCannotBeStunned
+
         if not self.IsInPlay():
             return False
         if self.IsStalwart():
@@ -154,6 +156,8 @@ class CanStatus(HasVulnerable, HasSteady, HasToughness, HasStalwart):
         return True
 
     def CanbeConfused(self) -> bool:
+        from game.buff.buff import BuffCannotBeConfused
+
         if not self.IsInPlay():
             return False
         if self.IsStalwart():

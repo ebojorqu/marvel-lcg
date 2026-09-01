@@ -3,6 +3,7 @@ from game.card.face.base.final_type import FinalType
 from game.ability import *
 from game.ability.factory import *
 from game.message import *
+from game.render.symbol import Symbol
 from cards.paper import Paper
 
 @final

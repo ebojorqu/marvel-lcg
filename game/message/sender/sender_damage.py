@@ -532,11 +532,10 @@ class SenderDamage:
             from game.player import Player
             if type(self.attacked_you) is Player:
                 return self.attacked_you
-            else:
-                # Hack "44014" "10026"
+            if self.by_effect is not None:
                 from game.operate.worlds import Worlds
-                assert self.by_effect.this.paper.card_id == "44014"
                 return Worlds.GetCurrentPlayer(self.by_effect)
+            raise AssertionError(f"No valid target player for {self.name}: attacked_you={self.attacked_you!r}")
 
     # class FakeAfterUnitAttackUnit(AfterUnitAttackUnit, LikeFakeMessage):
     #     pass

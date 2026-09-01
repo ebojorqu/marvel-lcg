@@ -180,6 +180,11 @@ class Deck2(Generic[TC], Object):
                 self.process_after_shuffle(self, by_effect)
                 reset_message = Message.AfterDeckReset(self)
                 reset_message.Send()
+
+            # The discard-to-deck reset happens with no user-facing card movement this frame,
+            # so force a final render to clear stale deck/discard DOM state after the shuffle.
+            if getattr(self, 'world', None) and getattr(self.world, 'render', None):
+                self.world.render.PresentForceNoWait()
         else:
             self.Shuffle(by_effect)
 
@@ -459,11 +464,10 @@ class Deck2(Generic[TC], Object):
         other_discard_faces: List['CardFace'] = []
         for face in self.Get()[::-1]:
             face.DiscardInternal(by_effect)
-            if not finder or finder.Check(face):
+            if finder is None or finder.Check(face):
                 found_face = face
                 break
-            else:
-                other_discard_faces.append(face)
+            other_discard_faces.append(face)
 
         moved_faces = other_discard_faces + [found_face] if found_face else []
         from game.message import Message

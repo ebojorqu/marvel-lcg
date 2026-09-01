@@ -101,6 +101,11 @@ Check port usage:
 lsof -nP -iTCP:2345 -sTCP:LISTEN
 ```
 
+If a stale Python process is still holding the port, clean it up before restarting:
+```
+pkill -f 'python.*main.py' || pkill -f 'python3.*main.py' || true
+```
+
 If needed, run from macOS Terminal (outside restricted/sandboxed runner).
 
 ### 4. `file_path='./module/card_statistics.js'` (404 / missing js)

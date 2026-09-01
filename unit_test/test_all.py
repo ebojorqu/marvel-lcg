@@ -65,6 +65,10 @@ class TestMain(unittest.TestCase):
                 self._identity = identity
             def GetIdentity(self):
                 return self._identity
+            def GetRoleCharacter(self):
+                return self._identity
+            def IsScenario(self):
+                return False
             @staticmethod
             def IsType(obj):
                 return isinstance(obj, FakePlayer)
@@ -72,6 +76,9 @@ class TestMain(unittest.TestCase):
         class FakeIdentity:
             def __init__(self, controller):
                 self._controller = controller
+            @staticmethod
+            def IsType(obj):
+                return isinstance(obj, FakeIdentity)
             def GetControlBy(self):
                 return self._controller
 
@@ -84,6 +91,11 @@ class TestMain(unittest.TestCase):
             def GetControlBy(self):
                 return self._control_by
 
+        class FakeAlly(FakeFace):
+            @staticmethod
+            def IsType(obj):
+                return isinstance(obj, FakeAlly)
+
         class FakeUpgrade(FakeIdentity):
             def __init__(self, bind_face):
                 super().__init__(bind_face._control_by)
@@ -94,16 +106,18 @@ class TestMain(unittest.TestCase):
         old_player = player_module.Player
         old_identity = card_type_module.Identity
         old_upgrade = card_type_module.Upgrade
+        old_ally = card_type_module.Ally
         old_event = card_type_module.Event
         try:
             player_module.Player = FakePlayer
             card_type_module.Identity = FakeIdentity
             card_type_module.Upgrade = FakeUpgrade
+            card_type_module.Ally = FakeAlly
             card_type_module.Event = type('FakeEvent', (), {})
 
-            attack_target_player = FakePlayer(FakeIdentity(None))
             defending_player = FakePlayer(FakeIdentity(None))
-            identity = FakeIdentity(attack_target_player)
+            identity = FakeIdentity(defending_player)
+            attack_target_player = FakePlayer(identity)
             effect = SimpleNamespace(
                 this=FakeFace(defending_player),
                 initiator=attack_target_player,
@@ -112,12 +126,13 @@ class TestMain(unittest.TestCase):
 
             self.assertTrue(Condition.ThisIsYou(effect, identity))
 
-            ally_face = FakeFace(attack_target_player)
+            ally_face = FakeAlly(attack_target_player)
             self.assertTrue(Condition.CheckWhichCard("YouControlAlly", [ally_face], effect))
         finally:
             player_module.Player = old_player
             card_type_module.Identity = old_identity
             card_type_module.Upgrade = old_upgrade
+            card_type_module.Ally = old_ally
             card_type_module.Event = old_event
 
     def test_message_to_player_accepts_runtime_player_instance_even_if_alias_is_stale(self):
@@ -148,6 +163,138 @@ class TestMain(unittest.TestCase):
             self.assertTrue(message.IsToPlayer())
         finally:
             player_module.Player = old_player_alias
+
+    def test_after_unit_attack_unit_get_to_player_ignores_card_specific_assertion(self):
+        from types import SimpleNamespace
+
+        message = object.__new__(__import__('game.message.sender.sender_damage', fromlist=['Message']).Message.AfterUnitAttackUnit)
+        message.attacked_you = object()
+        message.by_effect = SimpleNamespace(
+            this=SimpleNamespace(paper=SimpleNamespace(card_id='99999')),
+            world=SimpleNamespace(GetCurrentPlayer=lambda: 'fallback_player'))
+
+        self.assertEqual(message.GetToPlayer(), 'fallback_player')
+
+    def test_canbe_confused_uses_runtime_buff_symbol(self):
+        from game.card.face.attribute.can_status import CanStatus
+
+        status = object.__new__(CanStatus)
+        status.IsInPlay = lambda: True
+        status.IsStalwart = lambda: False
+        status.IsConfused = lambda: False
+        status.GetBuff = lambda _buff: False
+
+        self.assertTrue(status.CanbeConfused())
+
+    def test_status_card_uses_runtime_symbol_namespace(self):
+        from cards.paper import Paper
+        from game.card.face.card_type.card_status import StatusCard
+
+        paper = Paper('status-1', '', 'Status', False, 'Confused', '', {}, [], '', '', '')
+        card = StatusCard(paper)
+
+        self.assertEqual(card.symbol_name, __import__('game.render.symbol', fromlist=['Symbol']).Symbol.confused)
+
+    def test_zero_defense_is_hidden_for_cards_without_defense_value(self):
+        from types import SimpleNamespace
+        from game.card.face.attribute.can_defense import HasDefense
+
+        face = object.__new__(HasDefense)
+        face.info_dict = ['defense']
+        face.printed_defense = 0
+        face.card = SimpleNamespace(area=SimpleNamespace(GetOwner=lambda: SimpleNamespace(IsPlayer=lambda: False)))
+        face.GetKeyword = lambda _key: 0
+        face.GetBuff = lambda _buff: False
+        face.consider_as = ""
+
+        self.assertNotIn('defense', face.GetInfoDict())
+
+    def test_discard_until_stops_at_first_matching_ally(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+
+        from game.deck.deck import Deck2
+
+        class FakeFace:
+            def __init__(self, name, deck, *, is_ally=False):
+                self.name = name
+                self.deck = deck
+                self.is_ally = is_ally
+                self.discarded = False
+            def IsName(self, name):
+                return self.name == name
+            def IsSubName(self, name):
+                return False
+            def HasTrait(self, *traits):
+                return False
+            def IsTypeOld(self, card_type):
+                return self.is_ally and issubclass(card_type, FakeAlly)
+            def DiscardInternal(self, by_effect):
+                self.discarded = True
+                self.deck.cards = [c for c in self.deck.cards if c is not self]
+
+        class FakeAlly(FakeFace):
+            def __init__(self, name, deck):
+                super().__init__(name, deck, is_ally=True)
+
+        deck = object.__new__(Deck2)
+        deck.flags = SimpleNamespace(is_deck=True, is_discards=False, is_player_deck=False)
+        deck.cards = []
+        energy = FakeFace('Energy', deck)
+        ally = FakeAlly('Professor X', deck)
+        later = FakeFace('Later', deck)
+        deck.cards = [later, ally, energy]
+        deck.Get = lambda from_top=False: list(deck.cards)
+        deck.GetSize = lambda: len(deck.cards)
+
+        with patch('game.message.Message.AfterCardsMoved') as after_cards_moved:
+            after_cards_moved.return_value.Send = lambda: None
+            found, other_faces = deck.DiscardUntil(object(), name=None, trait=None, card_type=FakeAlly)
+
+        self.assertIs(found, ally)
+        self.assertEqual([face.name for face in other_faces], ['Energy'])
+        self.assertTrue(ally.discarded)
+        self.assertFalse(later.discarded)
+
+    def test_shuffle_with_discard_pile_forces_render_after_reset(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+
+        from game.deck.deck import Deck2
+
+        class FakeDeck:
+            def __init__(self, cards):
+                self.cards = list(cards)
+                self.flags = SimpleNamespace(is_deck=False, is_discards=False, is_player_deck=False)
+            def Get(self, from_top=False):
+                return list(self.cards)
+            def GetSize(self):
+                return len(self.cards)
+            def GetFalse(self):
+                return list(self.cards)
+            def GetAll(self, from_top=False, include_removed=True):
+                return list(self.cards)
+            def Clear(self):
+                self.cards.clear()
+            def __bool__(self):
+                return True
+
+        deck = object.__new__(Deck2)
+        discard = FakeDeck(['a', 'b'])
+        deck.bind_discard_pile = discard
+        deck.shuffle_with_discard_count = 0
+        deck.flags = SimpleNamespace(is_deck=True, is_discards=False, is_player_deck=False)
+        deck.process_after_shuffle = lambda _deck, _effect: None
+        deck.world = SimpleNamespace(render=SimpleNamespace(PresentForceNoWait=lambda: None))
+        deck.ShuffleInternal = lambda by_effect, only_for_most_top=None: None
+
+        with patch.object(deck.world.render, 'PresentForceNoWait', wraps=deck.world.render.PresentForceNoWait) as render_mock:
+            with patch('game.operate.faces.Faces.MoveAllTo', return_value=['a', 'b']):
+                with patch('game.message.Message.AfterDeckReset') as after_reset:
+                    after_reset.return_value.Send = lambda: None
+                    deck.ShuffleWithDiscardPile(False, object())
+
+        render_mock.assert_called_once_with()
 
     def test_starting_max_one_per_deck(self):
         from game.card.face.attribute.has_starting import HasStarting
@@ -183,6 +330,7 @@ class TestMain(unittest.TestCase):
         import importlib
         import sys
 
+        sys.modules.pop('game.world', None)
         sys.modules.pop('game.world.world', None)
         import game.world as world_pkg
 
@@ -253,11 +401,24 @@ class TestMain(unittest.TestCase):
 
         effect = object.__new__(Effect)
         effect.is_temp = True
-        effect.this = SimpleNamespace(effect=SimpleNamespace(RegisterTemp=lambda *args, **kwargs: []))
+        effect.this = SimpleNamespace(effect=SimpleNamespace())
         effect.world = SimpleNamespace(round_id=0)
         effect.ability = SimpleNamespace(flags=SimpleNamespace())
 
-        self.assertIs(effect.SetDestroyedAfter(False), effect)
+        registered = []
+        def register_temp(ability, unregister_after_exec=True):
+            registered.append(ability)
+            return []
+        effect.this.effect.RegisterTemp = register_temp
+
+        end_event = object()
+        until_event = SimpleNamespace(end_event=end_event)
+        until_event.pre_message = until_event
+        effect.SetDestroyedAfter(False, until_after_event=until_event)
+
+        condition = registered[-1].conditions[0]
+        message = SimpleNamespace(CastTo=lambda cls: SimpleNamespace(pre_message=until_event))
+        self.assertTrue(condition(effect, message))
 
     def test_effect_set_has_spell_in_phase_uses_runtime_trigger_message(self):
         from types import SimpleNamespace
@@ -293,6 +454,29 @@ class TestMain(unittest.TestCase):
         import game.player.model.player_ask as player_ask
         self.assertTrue(hasattr(player_ask, 'Select'))
         self.assertTrue(callable(player_ask.Select.From))
+
+    def test_attack_module_uses_runtime_unused_binding(self):
+        module = __import__('game.card.face.attribute.can_attack', fromlist=['AttackProperty'])
+        self.assertTrue(hasattr(module, 'Unused'))
+        self.assertIs(module.Unused, __import__('core', fromlist=['Unused']).Unused)
+
+    def test_ability_defense_condition_uses_runtime_attacker_message_binding(self):
+        from types import SimpleNamespace
+        from game.ability.ability import Ability
+        from game.ability.ability_type import AbilityType
+        from game.message import Message
+
+        ability = Ability(
+            AbilityType.Interrupt,
+            Message.WhenUnitWouldAttack,
+            [],
+            lambda effect, message: None,
+        )
+        ability.SetLabel('defense')
+        ability.Initialize(SimpleNamespace())
+
+        condition = next(c for c in ability.conditions if getattr(c, '__name__', '') == 'can_defense_attack')
+        self.assertTrue(condition(SimpleNamespace(), SimpleNamespace(attacker=None)))
 
     def test_search_internal_uses_runtime_select_namespace(self):
         module = __import__('game.operate.search_internal', fromlist=['SearchInternal'])

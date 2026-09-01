@@ -1,4 +1,5 @@
 from . import *
+from core import Unused
 
 @dataclass
 class AttackProperty(PowerProperty):

@@ -376,6 +376,8 @@ class Effect(Object):
                 unregister_after_exec=True,
             )
         elif until_after_event != None:
+            from game.message.message_type import HasPreEventMessage
+
             temp_effects += self.this.effect.RegisterTemp(
                 Ability(
                     AbilityType.Temp2,

@@ -268,6 +268,8 @@ class Ability:
             conditions = [check_peril_card_ability] + conditions
 
         if self.is_like_defense:
+            from game.message import AttackerMessage
+
             def can_defense_attack(effect: 'Effect', message: 'Message2') -> bool:
                 if isinstance(message, AttackerMessage):
                     attacker = message.attacker
