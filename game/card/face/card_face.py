@@ -361,7 +361,10 @@ class CardFace(ModelName, ModelTrait, ModelAction, ModelOnEvent, ModelGain, Mode
         return Cast(face_type, face)
 
     @classmethod
-    def IsType(cls: Type[TF], face: 'CardFace|Effect|None', check_consider: bool=True) -> TypeGuard['TF']:
+    def IsType(cls: Type[TF], face: 'CardFace|Type[CardFace]|Effect|None', check_consider: bool=True) -> TypeGuard['TF']:
+        if isinstance(face, type):
+            if issubclass(face, cls):
+                return True
         if isinstance(face, CardFace):
             if cls.is_final:
                 if type(face) is cls:

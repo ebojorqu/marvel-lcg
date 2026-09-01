@@ -3,6 +3,7 @@ def Unused(*_: object):
 
 import builtins
 import importlib
+import pkgutil
 import sys
 
 try:
@@ -75,6 +76,17 @@ class _PlaceholderMetaBase(ClassNameMeta):
     def _resolve_runtime(self, cls):
         return _resolve_runtime_placeholder(cls.__name__)
 
+    def __new__(mcls, name, bases, namespace, **kwargs):
+        real_bases = []
+        for base in bases:
+            if isinstance(base, _PlaceholderMetaBase):
+                resolved = base._resolve_runtime(base)
+                if resolved is not None and resolved is not base:
+                    real_bases.append(resolved)
+                    continue
+            real_bases.append(base)
+        return super().__new__(mcls, name, tuple(real_bases), namespace, **kwargs)
+
     def __getattr__(cls, name):
         resolved = cls._resolve_runtime(cls)
         if resolved is not None and resolved is not cls:
@@ -88,7 +100,28 @@ class _PlaceholderMetaBase(ClassNameMeta):
         return bases
 
     def __getitem__(cls, item):
+        resolved = cls._resolve_runtime(cls)
+        if resolved is not None and resolved is not cls:
+            try:
+                return resolved[item]
+            except Exception:
+                try:
+                    return getattr(resolved, item)
+                except AttributeError:
+                    pass
         return item
+
+    def __iter__(cls):
+        resolved = cls._resolve_runtime(cls)
+        if resolved is not None and resolved is not cls:
+            return iter(resolved)
+        return iter(())
+
+    def __len__(cls):
+        resolved = cls._resolve_runtime(cls)
+        if resolved is not None and resolved is not cls:
+            return len(resolved)
+        return 0
 
     def __instancecheck__(cls, instance):
         resolved = cls._resolve_runtime(cls)
@@ -128,6 +161,7 @@ def _resolve_runtime_placeholder(name: str):
         "GameArea": "game.world.game_area.game_area",
         "Ability": "game.ability.ability",
         "Condition": "game.ability.condition.condition",
+        "Condition2": "game.ability.condition.condition2",
         "OnEvent": "game.event.on_event",
         "Unit2": "game.card.face.base.unit",
         "Scheme2": "game.card.face.base.scheme",
@@ -191,6 +225,31 @@ def _resolve_runtime_placeholder(name: str):
             if module_name_attr != __name__:
                 return value
 
+    for package_name in (
+        "game.card.face.attribute",
+        "game.card.face.card_type",
+        "game.card.face.base",
+        "game.ability.condition",
+        "game.ability.factory",
+        "game.card.face",
+        "game.player",
+        "game.world",
+    ):
+        try:
+            package = importlib.import_module(package_name)
+        except Exception:
+            continue
+        for _, module_name, _ in pkgutil.walk_packages(getattr(package, "__path__", []), prefix=f"{package_name}."):
+            try:
+                module = importlib.import_module(module_name)
+            except Exception:
+                continue
+            value = getattr(module, name, None)
+            if value is not None and getattr(value, "__name__", None) == name:
+                module_name_attr = getattr(value, "__module__", "")
+                if module_name_attr != __name__:
+                    return value
+
     return None
 
 
@@ -202,6 +261,7 @@ def _make_placeholder(name: str, *, generic: bool = False):
 Message = _make_placeholder("Message")
 User = _make_placeholder("User")
 Player = _make_placeholder("Player")
+Game = _make_placeholder("Game")
 Effect = _make_placeholder("Effect")
 World = _make_placeholder("World")
 Scenario = _make_placeholder("Scenario")
@@ -210,6 +270,7 @@ Deck = _make_placeholder("Deck")
 GameArea = _make_placeholder("GameArea")
 Ability = _make_placeholder("Ability")
 Condition = _make_placeholder("Condition")
+Condition2 = _make_placeholder("Condition2")
 OnEvent = _make_placeholder("OnEvent")
 Unit2 = _make_placeholder("Unit2")
 Scheme2 = _make_placeholder("Scheme2")
@@ -272,6 +333,7 @@ for _name, _value in {
     "Message": Message,
     "User": User,
     "Player": Player,
+    "Game": Game,
     "Effect": Effect,
     "World": World,
     "Scenario": Scenario,
@@ -280,6 +342,7 @@ for _name, _value in {
     "GameArea": GameArea,
     "Ability": Ability,
     "Condition": Condition,
+    "Condition2": Condition2,
     "OnEvent": OnEvent,
     "Unit2": Unit2,
     "Scheme2": Scheme2,

@@ -12,6 +12,8 @@ class HasAssault(HasAttribute):
 
     @override
     def GetAbilities(self) -> List['Ability']:
+        from game.ability.factory import AbilityFactory
+
         def use_atk_instead(effect: 'Effect', message: 'Message.WhenSchemeBeingThwart'):
             unit = message.trigger
             if HasAttack.IsType(unit):

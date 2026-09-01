@@ -1,7 +1,11 @@
-from typing import Final
+from typing import TYPE_CHECKING, Final
 from core import *
-from game.player import *
-from game.card.face import *
+
+if TYPE_CHECKING:
+    from game.card.card_finder import CardFinder
+    from game.card.face.card_face import CardFace
+    from game.player.player import Player
+
 
 class PlayerFinder:
     def __init__(self,\

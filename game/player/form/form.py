@@ -1,8 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Literal, List, get_args
+
 from core import *
-from game.card.face import *
-from game.ability import *
-from game.message import *
-from game.player import *
+
+if TYPE_CHECKING:
+    from game.card.face.card_face import CardFace
+    from game.effect.effect import Effect
+    from game.player.player import Player
+    from game.card.face.card_type.upgrade import Upgrade
 
 
 """

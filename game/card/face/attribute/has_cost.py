@@ -1,4 +1,11 @@
-from . import *
+from __future__ import annotations
+
+from typing import List
+
+from core import override
+from game.card.face.attribute.has_attribute import HasAttribute
+from game.element.cost import Cost
+from game.message import Message
 
 class HasCost(HasAttribute):
 

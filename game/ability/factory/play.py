@@ -9,6 +9,7 @@ class AbilityFactoryPlay:
                                under_any_players_control: bool=False,
                                conditions: ConditionsType[Message.WhenPlayerInTurn]=[],
                                ) -> 'Ability':
+        from game.selector import Select
 
         if under_any_players_control:
             selector = Select.From("Players")

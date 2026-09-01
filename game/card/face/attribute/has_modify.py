@@ -25,6 +25,8 @@ class HasModify(HasAttribute):
 
     @override
     def GetAbilities(self) -> List['Ability']:
+        from game.ability.factory import AbilityFactory
+
         def get_value(num: int) -> int|None:
             if num == 0:
                 return None

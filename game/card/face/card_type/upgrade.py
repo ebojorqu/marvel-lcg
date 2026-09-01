@@ -8,7 +8,7 @@ from game.player import *
 from game.element.damage_property import DamageProperty
 
 @final
-class Upgrade(Asset2, HasModify, HasForm, HasRestricted, HasUses, HasHazard, CanCrisis, HasPermanent, HasTemporary, HasSetup, HasVictory, ClassCard, _FinalType):
+class Upgrade(Asset2, HasModify, HasForm, HasRestricted, HasUses, HasHazard, CanCrisis, HasPermanent, HasTemporary, HasSetup, HasVictory, HasDefense, ClassCard, _FinalType):
     @override
     def GetAbilities(self) -> List['Ability']:
         abilities: List['Ability'] = []

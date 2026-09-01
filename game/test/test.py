@@ -1,8 +1,10 @@
 from core import *
-from game import *
 from engine.log import Log
 from engine.file import FileManager
 from engine.config import ConfigVariables
+
+if TYPE_CHECKING:
+    from game.game import Game
 
 REPLAY_FOLDERS = ConfigVariables.Folders('replay_folders')
 

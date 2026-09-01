@@ -271,6 +271,7 @@ class ModelOnEvent(ModelBase):
                 if_no_entered_play: Callable[[], Any]|None=None,
                 if_entered_play: Callable[[], Any]|None=None
                 ) -> 'Message.WhenPlayerRevealCard|Message.WhenCardRevealed|None':
+        from game.ability.factory import AbilityFactory
         from game.effect.rule import GameRule
         from game.message import Message
         from game.card.face.attribute.can_surge import CanSurge

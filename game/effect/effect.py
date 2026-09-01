@@ -161,6 +161,8 @@ class Effect(Object):
         return result
 
     def SetHasSpellInPhase(self) -> None:
+        from game.message import Message, TriggerNonePlayerMessage
+
         world = self.world
 
         if self.ability.flags.is_rule or self.ability.flags.is_statistics:
@@ -218,6 +220,7 @@ class Effect(Object):
         from game.ability import AbilityType
         from game.operate.effects import Effects
         from game.ability import Ability
+        from game.message import CanBeInstead, Message
 
         self.is_unregister_after_exec = unregister_after_exec
         temp_effects: List['Effect'] = []

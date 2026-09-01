@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Any, Callable, List, Sequence, Type, TypeVar
 
 from core import *
 from game.element.resources import Resources
+from game.selector import Select
 
 if TYPE_CHECKING:
     from game.ability import Ability
@@ -55,6 +56,7 @@ class PlayerAsk:
         return self.AskChooseOneText(item_list2, text_list2)
 
     def AskChooseOneText(self, item_list: Sequence[T], text_list: Sequence[str]|None=None) -> T:
+        from game.ability.factory import AbilityFactory
         from game.card.face.card_face import CardFace
         from game.effect.rule import GameRule
 
@@ -154,6 +156,7 @@ class PlayerAsk:
     ################################################################################
     #
     def ChooseOrder(self, faces: Sequence['TC'], *, prompt: str="") -> List['TC']:
+        from game.ability.factory import AbilityFactory
         from game.effect.rule import GameRule
 
         if len(faces) == 1:
@@ -186,6 +189,8 @@ class PlayerAsk:
                         labels: List['Ability.LABEL']=[],
                         for_second_target: bool=False,
                         ) -> List['CardFace']:
+        from game.ability.factory import AbilityFactory
+
         player = self.GetPlayer()
 
         # Fix "31029", "03010"

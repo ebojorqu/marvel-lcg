@@ -26,6 +26,8 @@ class HasUses(CanPlaceCounter, HasAttribute):
 
     @override
     def GetAbilities(self) -> List['Ability']:
+        from game.ability.factory import AbilityFactory
+
         def return_labor_to_deck(effect: 'Effect', message: 'Message.AfterCardDiscard') -> None:
             from cards.pack.hercules import LABOR_CARD_IDS
             from game.player import Player

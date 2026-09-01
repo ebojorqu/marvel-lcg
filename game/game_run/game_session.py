@@ -1,7 +1,3 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 from core import *
 from core.lib import Time
 from game.world import *
@@ -13,9 +9,11 @@ from engine.log import Log
 # from engine.task.condition import Condition
 from engine.file import FileManager
 from engine.log import Notify
-from game import *
 from engine.config import ConfigVariables
 from game.statistics.session_statistics import SessionStatistics
+
+if TYPE_CHECKING:
+    from game.game import Game
 
 if TYPE_CHECKING:
     from engine.controller.manager import ControllerManager

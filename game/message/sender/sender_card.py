@@ -745,11 +745,10 @@ class SenderCard:
 
         @override
         def GetToPlayer(self) -> 'Player':
-            from game.player import Player
-            if type(self.to_player) is Player:
+            from game.player.player import Player as RuntimePlayer
+            if isinstance(self.to_player, RuntimePlayer) or RuntimePlayer in getattr(type(self.to_player), '__mro__', ()):  # pragma: no branch
                 return self.to_player
-            else:
-                return self.world.GetCurrentPlayer()
+            return self.world.GetCurrentPlayer()
 
     class AfterCardBecomeBoost(TriggerFaceMessage, HasPreEventMessage):
         def __init__(self, face: 'CardFace', message: 'Message.WhenCardBecomeBoost') -> None:

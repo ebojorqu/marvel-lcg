@@ -73,6 +73,7 @@ class AbilityFactoryAttachment:
         from game.operate.faces import Faces
         from game.ability.factory import AbilityFactory
         from game.card.card_finder import CardFinder
+        from game.selector import Select
 
         def check_condition(effect: 'Effect', unit: 'CardFace') -> bool:
             from game.card.face.card_type import Attachment

@@ -120,6 +120,35 @@ class TestMain(unittest.TestCase):
             card_type_module.Upgrade = old_upgrade
             card_type_module.Event = old_event
 
+    def test_message_to_player_accepts_runtime_player_instance_even_if_alias_is_stale(self):
+        import game.player as player_module
+        from game.message.message_type import TriggerNonePlayerMessage
+        from game.player.player import Player
+
+        class FakeController:
+            def __init__(self):
+                self.manager = None
+
+        class FakeScene:
+            def __init__(self):
+                self.players = [type('PlayerInfo', (), {'name': 'Alpha', 'hero': ['31002a'], 'hero_deck': [], 'obligations': [], 'nemesis_set': [], 'player_deck': []})()]
+                self.campaign = type('Campaign', (), {'campaign_log': {}})()
+
+        old_player_alias = player_module.Player
+        stale_alias = type('Player', (), {})
+        try:
+            player_module.Player = stale_alias
+            world = __import__('game.world.world', fromlist=['World']).World
+            # Build the minimal runtime object needed by the message assertion.
+            scene = FakeScene()
+            world_obj = world(scene, [FakeController()])
+            runtime_player = Player('Alpha', world_obj.controller_manager, 0, world_obj)
+            message = TriggerNonePlayerMessage(runtime_player, world=world_obj)
+            self.assertIs(message.GetToPlayer(), runtime_player)
+            self.assertTrue(message.IsToPlayer())
+        finally:
+            player_module.Player = old_player_alias
+
     def test_starting_max_one_per_deck(self):
         from game.card.face.attribute.has_starting import HasStarting
 
@@ -177,6 +206,10 @@ class TestMain(unittest.TestCase):
         self.assertTrue(hasattr(resolved_rule, 'flags'))
         self.assertIs(resolved_rule, __import__('game.ability.ability_type', fromlist=['AbilityType']).AbilityType.Rule)
 
+        timing_priority = namespace['TimingPriority']
+        self.assertEqual(list(timing_priority), list(__import__('game.ability.ability_type', fromlist=['TimingPriority']).TimingPriority))
+        self.assertIs(timing_priority.Rule, __import__('game.ability.ability_type', fromlist=['TimingPriority']).TimingPriority.Rule)
+
         final_type = namespace['FinalType']
         actual_final_type = __import__('game.card.face.base.final_type', fromlist=['FinalType']).FinalType
         self.assertTrue(isinstance(object.__new__(actual_final_type), final_type))
@@ -193,12 +226,118 @@ class TestMain(unittest.TestCase):
         self.assertIn('AbilityFactory', namespace)
         self.assertIs(namespace['AbilityFactory'], __import__('game.ability.factory.ability_factory', fromlist=['AbilityFactory']).AbilityFactory)
 
+    def test_pack_star_import_exposes_condition2_for_card_abilities(self):
+        module = __import__('cards.pack.scw.scarlet_witch.15023', fromlist=['GetAbilities'])
+        abilities = module.GetAbilities()
+        self.assertTrue(abilities)
+        self.assertTrue(hasattr(__import__('game.ability.condition.condition2', fromlist=['Condition2']).Condition2, 'ThisIsTrigger'))
+        self.assertTrue(any(getattr(ability, 'conditions', None) for ability in abilities))
+
+    def test_attribute_star_import_exposes_ability_factory(self):
+        namespace = {}
+        exec('from game.card.face.attribute import *', namespace)
+        self.assertIn('AbilityFactory', namespace)
+        self.assertIs(namespace['AbilityFactory'], __import__('game.ability.factory.ability_factory', fromlist=['AbilityFactory']).AbilityFactory)
+        self.assertIs(namespace['HasCost'], __import__('game.card.face.attribute.has_cost', fromlist=['HasCost']).HasCost)
+        self.assertTrue(callable(namespace['HasCost'].IsType))
+        self.assertTrue(namespace['HasCost'].IsType(__import__('game.card.face.attribute.has_cost', fromlist=['HasCost']).HasCost))
+
+    def test_has_uses_module_has_runtime_ability_factory(self):
+        module = __import__('game.card.face.attribute.has_uses', fromlist=['HasUses'])
+        self.assertIn('AbilityFactory', module.HasUses.GetAbilities.__code__.co_names)
+        self.assertIn('game.ability.factory', module.HasUses.GetAbilities.__code__.co_names)
+
+    def test_set_destroyed_after_uses_runtime_message_namespace(self):
+        from types import SimpleNamespace
+        from game.effect.effect import Effect
+
+        effect = object.__new__(Effect)
+        effect.is_temp = True
+        effect.this = SimpleNamespace(effect=SimpleNamespace(RegisterTemp=lambda *args, **kwargs: []))
+        effect.world = SimpleNamespace(round_id=0)
+        effect.ability = SimpleNamespace(flags=SimpleNamespace())
+
+        self.assertIs(effect.SetDestroyedAfter(False), effect)
+
+    def test_effect_set_has_spell_in_phase_uses_runtime_trigger_message(self):
+        from types import SimpleNamespace
+        from game.effect.effect import Effect
+
+        effect = object.__new__(Effect)
+        effect.ability = SimpleNamespace(
+            flags=SimpleNamespace(
+                is_rule=False,
+                is_statistics=False,
+                is_interrupt=True,
+                is_response=False,
+                is_resource=False,
+                is_when_completed=False,
+                is_when_reveal=False,
+                is_when_defeated=False,
+                is_setup=False,
+                is_boost=False,
+                is_special=False,
+                is_action=False,
+                is_nonkeyword=False,
+            ),
+            when='test_event',
+        )
+        effect.context = SimpleNamespace(bind_message=None)
+        effect.this = SimpleNamespace(effect=SimpleNamespace(global_effects=[], local_effects=[], given_effects=[]))
+        effect.world = SimpleNamespace(rule=SimpleNamespace(disable_limit_once=False), stat=SimpleNamespace(RecordEffect=lambda *args, **kwargs: None, RecordEffectWithPlayer=lambda *args, **kwargs: None))
+        effect.GetBindMessage = lambda event: SimpleNamespace(once_per_event_effects=[])
+
+        self.assertIsNone(effect.SetHasSpellInPhase())
+
+    def test_player_ask_uses_runtime_select_namespace(self):
+        import game.player.model.player_ask as player_ask
+        self.assertTrue(hasattr(player_ask, 'Select'))
+        self.assertTrue(callable(player_ask.Select.From))
+
+    def test_search_internal_uses_runtime_select_namespace(self):
+        module = __import__('game.operate.search_internal', fromlist=['SearchInternal'])
+        self.assertTrue(hasattr(module, 'Select'))
+        self.assertTrue(callable(module.Select.From))
+
     def test_ability_factory_star_import_exposes_cost_func(self):
         namespace = {}
         exec('from game.ability.factory import *', namespace)
 
         self.assertIn('CostFunc', namespace)
         self.assertIs(namespace['CostFunc'], __import__('game.ability.cost_func', fromlist=['CostFunc']).CostFunc)
+
+    def test_ability_factory_resource_module_has_runtime_cost_func_binding(self):
+        module = __import__('game.ability.factory.resources', fromlist=['AbilityFactoryResources'])
+        self.assertTrue(hasattr(module, 'CostFunc'))
+        self.assertIs(module.CostFunc, __import__('game.ability.cost_func', fromlist=['CostFunc']).CostFunc)
+        self.assertTrue(callable(module.CostFunc.Custom))
+
+    def test_upgrade_cards_accept_def_printed_values(self):
+        from cards.paper import Paper
+        from game.card.face.card_type.upgrade import Upgrade
+
+        paper = Paper(
+            card_id='60038',
+            pic_id='',
+            type='Upgrade',
+            is_unique=False,
+            name='Innate Reflexes',
+            subtitle='',
+            desc={'DEF': '1'},
+            traits=[],
+            pack='fne',
+            set_name='Fear No Evil',
+            text='Your hero gets +1 DEF.'
+        )
+        upgrade = Upgrade(paper)
+        upgrade.InitPrintedValue('DEF', '1')
+        self.assertEqual(upgrade.printed_defense, 1)
+
+    def test_attachment_factory_has_runtime_select_namespace(self):
+        module = __import__('game.ability.factory.attachment', fromlist=['AbilityFactoryAttachment'])
+        self.assertTrue(hasattr(module, 'AbilityFactoryAttachment'))
+        self.assertTrue(callable(module.AbilityFactoryAttachment.AttachToFaceWhenPutIntoPlay))
+        self.assertTrue(hasattr(__import__('game.selector', fromlist=['Select']), 'Select'))
 
     def test_cost_func_module_has_runtime_selectors(self):
         module = __import__('game.ability.cost_func', fromlist=['CostFunc'])

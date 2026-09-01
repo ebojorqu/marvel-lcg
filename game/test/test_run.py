@@ -2,7 +2,9 @@ from core import *
 from core.lib.time import Time
 from engine.log import Log
 from engine.config import ConfigVariables
-from game import *
+
+if TYPE_CHECKING:
+    from game.game import Game
 
 CATEGORY_NAME = "TEST"
 

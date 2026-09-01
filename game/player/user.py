@@ -15,11 +15,11 @@ class User(Object):
         super().__init__(name, world)
 
     def __repr__(self) -> str:
-        from game.player import Player
-        from game.player import Scenario
-        assert isinstance(self, Player|Scenario), f"{self=} {type(self)=}"
-        return self.name
-        # return f'[{self.name}]'
+        from game.player.player import Player as RuntimePlayer
+        from game.player.scenario import Scenario as RuntimeScenario
+        if isinstance(self, RuntimePlayer | RuntimeScenario):
+            return self.name
+        return f"{type(self).__module__}.{type(self).__qualname__}({self.name!r})"
 
     @final
     def IsScenario(self) -> bool:

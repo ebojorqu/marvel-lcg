@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from core import *
+from game.ability.cost_func import CostFunc
 from game.element.resources import Resources
 
 

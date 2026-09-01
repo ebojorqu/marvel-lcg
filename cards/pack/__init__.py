@@ -6,8 +6,9 @@ from game.ability import *
 from game.message import *
 
 from game.ability.factory import *
-from game.ability.condition import Condition
+from game.ability.condition import Condition, Condition2
 Unused(Condition)
+Unused(Condition2)
 
 from game.ability.factory.campaign import AbilityFactoryCampaign
 Unused(AbilityFactoryCampaign)

@@ -43,13 +43,16 @@ class TriggerNonePlayerMessage(Message2):
         super().__init__(**kwargs)
 
     def GetToPlayer(self) -> 'Player':
-        from game.player import Player
-        assert type(self.to_player) is Player
-        return self.to_player
+        from game.player.player import Player as RuntimePlayer
+        player_type = type(self.to_player)
+        if isinstance(self.to_player, RuntimePlayer) or RuntimePlayer in getattr(player_type, '__mro__', ()):  # pragma: no branch
+            return self.to_player
+        raise AssertionError(f"Expected Player-like object, got {player_type.__name__}: {self.to_player!r}")
 
     def IsToPlayer(self) -> bool:
-        from game.player import Player
-        return type(self.to_player) is Player
+        from game.player.player import Player as RuntimePlayer
+        player_type = type(self.to_player)
+        return isinstance(self.to_player, RuntimePlayer) or RuntimePlayer in getattr(player_type, '__mro__', ())
 
 class TriggerPlayerMessage(TriggerNonePlayerMessage):
     def __init__(self, player: 'Player', **kwargs: Any) -> None:

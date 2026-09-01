@@ -1,7 +1,17 @@
 from __future__ import annotations
 
-from core import *
+from typing import Callable, Dict, List, Tuple, Type
+
+from core import Unused, final, override
 from game.card.face.card_face import CardFace
+
+Unused(Callable)
+Unused(Dict)
+Unused(List)
+Unused(Tuple)
+Unused(Type)
+Unused(final)
+Unused(override)
 
 class HasAttribute(CardFace):
 

@@ -1,4 +1,5 @@
 from . import *
+from game.selector import Select
 
 @final
 class SearchInternal:
@@ -56,6 +57,8 @@ class SearchInternal:
             x = range[1]
             assert not isinstance(x, str)
             range = (0, x)
+
+        from game.selector import Select
 
         # We use this to do shuffle
         selector = Select.From(faces=select_face,
