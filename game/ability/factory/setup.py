@@ -35,7 +35,7 @@ class AbilityFactorySetup:
                 if operation and put_faces:
                     operation(effect, put_faces)
                 from game.player.element.player_setup import HACK_HERO_ID
-                if names[0].startswith(HACK_HERO_ID):
+                if names and put_faces and names[0].startswith(HACK_HERO_ID):
                     initiator.setup.SetupPlayerAbility(put_faces[0].card.back_faces[0])
 
             RunAt.WhenCardSetup(this, action)

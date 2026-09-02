@@ -39,10 +39,11 @@ class ConditionPlayerType:
         # Attacks are always made against a player. If you choose to defend with an ally, the attack was still against you. It is just defended by your ally. I know that’s not clear with the current rules reference. We’re going to be updating that as soon as our schedule allows.
         if against_player == "You":
             # player = Select.GetYou(effect)
-            if effect.context.ask_player:
-                return effect.context.ask_player == message.against_player
+            ask_player = getattr(effect.context, "ask_player", None)
+            if ask_player:
+                return ask_player == message.against_player
             else:
-                return message.against_player != None
+                return message.against_player is not None
         return ConditionPlayerType.CheckWhichPlayer(against_player, message.against_player, effect)
 
     @staticmethod
@@ -75,7 +76,7 @@ class ConditionPlayerType:
 
         if check_rule == "AnyPlayer":
             return True
-        if check_player == None:
+        if check_player is None:
             return False
         if not isinstance(check_player, Player):
             return False

@@ -18,7 +18,7 @@ def TakeDamageOnCall(targets: Sequence['CardFace'], damage: int, effect: 'Effect
     for target in targets:
         unit = target.CastTo(Unit2)
         message = unit.TakeDamage(this, damage, effect)
-        if message == None:
+        if message  is None:
             return False
         if message.took_damage != damage:
             return False
@@ -122,7 +122,7 @@ class CostFunc:
     #                 effect,
     #                 *abilities
     #             )
-    #             return select_effect != None
+    #             return select_effect  is not None
     #         selector = Select.From("This")
     #         super().__init__(selector, on_call)
 
@@ -131,7 +131,7 @@ class CostFunc:
             self.return_value: Any = None
             def on_call(targets: Sequence['CardFace'], effect: 'Effect', player: 'Player|None'):
                 return call_fn(targets, effect)
-            if selector == None:
+            if selector  is None:
                 selector = Select.From("This")
             elif isinstance(selector, CardFinder):
                 selector = Select.From(selector)
@@ -298,10 +298,10 @@ class CostFunc:
                 do_attack = False
                 for target in targets:
                     if Enemy.IsType(target):
-                        if target.DoAttackYou(player, effect) != None:
+                        if target.DoAttackYou(player, effect)  is not None:
                             do_attack = True
                     elif CanAttack.IsType(target):
-                        if target.BasicAttack([player.GetIdentity()], effect) != None:
+                        if target.BasicAttack([player.GetIdentity()], effect)  is not None:
                             do_attack = True
 
                 return do_attack
@@ -367,7 +367,7 @@ class CostFunc:
                 self.return_damaged_units = []
                 # If dealing damage is a cost, that cost is considered
                 # paid even if some or all of that damage is prevented.
-                if effect.this.DealDamage(targets, value, effect) != None:
+                if effect.this.DealDamage(targets, value, effect)  is not None:
                     for target in targets:
                         if Unit2.IsType(target):
                             self.return_damaged_units.append(target)
@@ -657,7 +657,7 @@ class CostFunc:
                     ),
                     from_where=from_where
                 )
-            # if selector.filter.finder.card_type == None:
+            # if selector.filter.finder.card_type  is None:
             #     selector.filter.AddFinder(CardFinder(card_type=PlayerCard))
             super().__init__(selector, on_call)
 
@@ -802,8 +802,8 @@ class CostFunc:
                     else:
                         result_num = max_size
 
-                    # if Faces.RemoveCountersOn([this], result_num, name, effect, forced=False) == None:
-                    if this.RemoveCountersInternal(result_num, name, effect, forced=False) == None:
+                    # if Faces.RemoveCountersOn([this], result_num, name, effect, forced=False)  is None:
+                    if this.RemoveCountersInternal(result_num, name, effect, forced=False)  is None:
                         self.return_remove_counter = 0
                         return False
                     else:
@@ -830,7 +830,7 @@ class CostFunc:
                 Unused(this)
 
                 value = Faces.PlaceCountersOn(targets, num, name, effect) 
-                if value == None:
+                if value  is None:
                     return False
                 return value >= num
 
@@ -849,7 +849,7 @@ class CostFunc:
 
             def on_call(targets: Sequence['CardFace'], effect: 'Effect', player: 'Player|None') -> bool:
                 value = Faces.PlaceTokensOn(targets, num, name, effect)
-                if value == None:
+                if value  is None:
                     return False
                 return value >= num
 
@@ -896,7 +896,7 @@ class CostFunc:
                     else:
                         result_num = max_size
 
-                    if this.RemoveTokensInternal(result_num, name, effect, forced=False) == None:
+                    if this.RemoveTokensInternal(result_num, name, effect, forced=False)  is None:
                         self.return_removed_tokens = 0
                         return False
                     else:
@@ -926,7 +926,7 @@ class CostFunc:
                 for target in targets:
                     this = target.CastTo(CanPlaceCounter)
                     value = Faces.RemoveCountersOn([this], "All", name, effect)
-                    if value != None:
+                    if value  is not None:
                         self.return_remove_counter = value
                 return True
 
@@ -964,7 +964,7 @@ class CostFunc:
                     card_type = finder
                     card_finder = None
 
-                if encounter_deck_top != None:
+                if encounter_deck_top  is not None:
                     faces = Search.SearchForCards(
                         effect,
                         player,
@@ -991,7 +991,7 @@ class CostFunc:
                     if do_what == "PutIntoPlayEngagedYou":
                         do_ok = face.PutIntoPlay(player, effect)
                     elif do_what == "Reveal":
-                        do_ok = face.Reveal(player, effect) != None
+                        do_ok = face.Reveal(player, effect)  is not None
 
                 if do_ok:
                     self.searched_faces = faces
@@ -1019,7 +1019,7 @@ class CostFunc:
 
                 if face:
                     self.return_discard_card = face
-                    if do_what == None:
+                    if do_what  is None:
                         return True
                     elif do_what == "PutIntoPlayEngagedYou" or do_what == "PutIntoPlayUnderYourControl":
                         return face.PutIntoPlay(player, effect)
@@ -1031,7 +1031,7 @@ class CostFunc:
                         TODO: If there was a card out there that cancelled the “revealing” of a treachery card, then it would also cancel the 5 damage from Return the Favor.
                         NOTE: I don't think we can use "Enhanced Spider-Sense" to cancel it, it is from encounter discard pile, not from encounter deck
                         """
-                        return face.Reveal(player, effect) != None
+                        return face.Reveal(player, effect)  is not None
                     assert False, f"{do_what=}"
                 return False
 
@@ -1084,12 +1084,14 @@ class CostFunc:
                 if not player:
                     return False
                 if res == "Target":
+                    if not effect.targets:
+                        return False
                     that_ally = effect.targets[0].CastTo(HasCost)
                     # If that ally’s aspect matches that of The Power of [Aspect] card, then The Power of [Aspect] card will generate 2 resources. However, if that ally’s aspect does not match, The Power of [Aspect] card will only generate 1 resource.
                     paid_res = player.PayCardPrintCost(that_ally, effect)
                 else:
                     paid_res = player.AskSpendResourcesInternal(res, effect)
-                if paid_res != None:
+                if paid_res  is not None:
                     self.return_paid_resources = paid_res
                     return True
                 return False
@@ -1106,7 +1108,7 @@ class CostFunc:
             def on_call(targets: Sequence['CardFace'], effect: 'Effect', player: 'Player|None') -> bool:
                 this = effect.this
                 removed = this.RemoveThreatFromSchemes(targets, value, effect, ignore_crisis=ignore_crisis)
-                return removed != None and removed > 0
+                return removed  is not None and removed > 0
 
             if isinstance(target, Selector):
                 target = target

@@ -13,7 +13,10 @@ def TreatAsMinion(face: 'CardFace', as_card_name: str, engage_player: 'Player', 
     this = effect.this
     Unused(this)
 
-    paper = CardFactory.FindCardPapers(as_card_name)[0]
+    papers = CardFactory.FindCardPapers(as_card_name)
+    if not papers:
+        return False
+    paper = papers[0]
     minion = CardFactory.CreateFace(paper, effect.world)
 
     if (Ally.IsType(face) or Hero.IsType(face)) and Minion.IsType(minion):
@@ -163,7 +166,10 @@ class AbilityFactoryTreat:
                 player = face.GetControlByPlayer()
                 face = face.CastTo(which_card)
 
-                paper = CardFactory.FindCardPapers(as_card_name)[0]
+                papers = CardFactory.FindCardPapers(as_card_name)
+                if not papers:
+                    return
+                paper = papers[0]
                 minion = CardFactory.CreateFace(paper, effect.world)
                 minion.pic_id = face.paper.card_id
                 minion.SetName(face.printed_name)

@@ -70,7 +70,7 @@ class AbilityFactory(AbilityFactorySetup, AbilityFactoryTurnPhase, AbilityFactor
         def check_which_card(effect: 'Effect', message: 'Message.CheckIfFaceApplyUniqueRule') -> bool:
             if which_card == "This":
                 return effect.this == message.which_face
-            if name != None:
+            if name  is not None:
                 return message.which_face.IsName(name)
             assert False
 
@@ -252,7 +252,7 @@ class AbilityFactory(AbilityFactorySetup, AbilityFactoryTurnPhase, AbilityFactor
                 message.trigger.GainSurge(+1, effect)
 
         def check_each_phase(effect: 'Effect', message: 'Message.WhenPlayerRevealCard|Message.WhenCardRevealed') -> bool:
-            if each_phase_round == None or each_phase_round == "Phase" or each_phase_round == "Round":
+            if each_phase_round  is None or each_phase_round == "Phase" or each_phase_round == "Round":
                 return True
             if each_phase_round == "VillainPhase":
                 return effect.world.phase.IsVillainPhase()
@@ -454,17 +454,17 @@ class AbilityFactory(AbilityFactorySetup, AbilityFactoryTurnPhase, AbilityFactor
         from game.deck import Deck2, DeckType
 
         def check_face(effect: 'Effect', message: 'Message.WhenCountingResourcesOnCards') -> bool:
-            if face == None:
+            if face  is None:
                 return True
             return Condition.CheckWhichCard(face, message.face, effect)
 
         def check_from_where(effect: 'Effect', message: 'Message.WhenCountingResourcesOnCards') -> bool:
-            if from_where == None:
+            if from_where  is None:
                 return True
             if isinstance(from_where, Deck2):
                 return from_where == message.from_deck
             if isinstance(from_where, DeckType):
-                return message.from_deck != None and message.from_deck.deck_type == from_where
+                return message.from_deck  is not None and message.from_deck.deck_type == from_where
             else:
                 return from_where(effect) == message.from_deck
 
@@ -637,7 +637,7 @@ class AbilityFactory(AbilityFactorySetup, AbilityFactoryTurnPhase, AbilityFactor
             return trait in message.traits
 
         def check_gives_by_revealed(effect: 'Effect', message: Message.AfterCardGainTrait) -> bool:
-            if gives_by_revealed == None:
+            if gives_by_revealed  is None:
                 return True
             check_message = message.by_effect.bind_message
             assert isinstance(check_message, Message.AfterCardEnterPlay|Message.WhenCardEnterPlay)

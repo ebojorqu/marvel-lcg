@@ -37,7 +37,7 @@ class AbilityFactoryResources:
 
             res = this.printed_resource
             paying_for_card = message.paying_for_card
-            if paying_for_card != None and \
+            if paying_for_card  is not None and \
                 HasCost.IsType(paying_for_card) and \
                 for_card.Check(paying_for_card) and \
                 res.val <= message.cost.val:
@@ -79,7 +79,9 @@ class AbilityFactoryResources:
             resources_fn,
             for_card,
             spend_this_only_in_hero_form=spend_this_only_in_hero_form,
-            bind_ability=lambda face: face.effect.Find(func_name="DiscardPay")[0],
+            bind_ability=lambda face: (
+                found[0] if (found := face.effect.Find(func_name="DiscardPay")) else None
+            ),
             conditions=[check_can_pay]
         ).SetFuncName("CheckThisCanDropPay")
 
@@ -92,13 +94,13 @@ class AbilityFactoryResources:
                             for_card_from_hand: bool|None=None,
                             is_play_card: bool|None=None,
                             who_trigger_this_effect: Literal["You"]|None=None,
-                            bind_ability: 'Callable[[CardFace], Effect]',
+                            bind_ability: 'Callable[[CardFace], Effect|None]',
                             conditions: ConditionsType[Message.CheckPlayerCanPayCost]=[],
                             ) -> 'Ability':
         from game.card.face.base import ClassCard
         from game.card.face.card_type import Identity
 
-        if resources_fn == None:
+        if resources_fn  is None:
             def action(effect: 'Effect', message: 'Message2'):
                 if ClassCard.IsType(effect.this):
                     return effect.this.printed_resource
@@ -116,39 +118,40 @@ class AbilityFactoryResources:
             return effect.this != messsage.paying_for_target
 
         def check_spend_this_only_in_hero_form(effect: 'Effect', messsage: 'Message.CheckPlayerCanPayCost') -> bool:
-            if spend_this_only_in_hero_form == None:
+            if spend_this_only_in_hero_form  is None:
                 return True
             return effect.GetInitiator().IsHero()
 
         def check_for_card(effect: 'Effect', message: 'Message.CheckPlayerCanPayCost') -> bool:
-            if for_card == None:
+            if for_card  is None:
                 return True
             # `for_card` restrictions apply only when paying for an actual card.
             paying_for_card = message.paying_for_card
-            if paying_for_card == None:
+            if paying_for_card  is None:
                 return False
             return for_card.Check(paying_for_card)
 
         def check_for_ability(effect: 'Effect', message: 'Message.CheckPlayerCanPayCost') -> bool:
-            if for_ability == None:
+            if for_ability  is None:
                 return True
             return for_ability == message.paying_for_effect.ability.name
 
         def check_for_card_from_hand(effect: 'Effect', message: 'Message.CheckPlayerCanPayCost') -> bool:
-            if for_card_from_hand == None:
+            if for_card_from_hand  is None:
                 return True
             return for_card_from_hand == message.paying_for_effect.this.IsLikeInHand()
 
         def check_is_play_card(effect: 'Effect', message: 'Message.CheckPlayerCanPayCost') -> bool:
-            if is_play_card == None:
+            if is_play_card  is None:
                 return True
             return is_play_card ==  message.paying_for_effect.ability.is_play
 
         def check_who_trigger_this_effect(effect: 'Effect', message: 'Message.CheckPlayerCanPayCost') -> bool:
-            if who_trigger_this_effect == None:
+            if who_trigger_this_effect  is None:
                 return True
             if who_trigger_this_effect == "You":
                 return effect.initiator == message.GetToPlayer()
+            return False
 
         def check_generate_resources_type(effect: 'Effect', message: 'Message.CheckPlayerCanPayCost'):
             if effect.ability.IsFunction("CanGenerateResources"):
@@ -189,7 +192,7 @@ class AbilityFactoryResources:
             effect.context.initiator = player
 
             res = resources_fn(effect, message)
-            if res != None:
+            if res  is not None:
                 res_message = Message.CheckEffectGeneratedResources(effect, message, res)
                 res_message.Send()
                 res = res_message.res
@@ -201,8 +204,10 @@ class AbilityFactoryResources:
                     #     )
                     # else:
                     bind_effect = bind_ability(effect.this)
+                    if bind_effect is None:
+                        return
                     def repeat():
-                        if effect.ability.available_times_fn == None:
+                        if effect.ability.available_times_fn  is None:
                             return [bind_effect]
                         else:
                             return [bind_effect] * effect.ability.available_times_fn(effect, message)
@@ -254,8 +259,8 @@ class AbilityFactoryResources:
                             ) -> 'Ability':
         from game.card.face.card_type import Event
 
-        if resources_fn == None:
-            assert resources != None
+        if resources_fn  is None:
+            assert resources  is not None
             resources_fn = lambda effect, message: resources
 
         def check_can_pay(effect: 'Effect', message: 'Message.CheckPlayerCanPayCost') -> bool:
@@ -287,7 +292,9 @@ class AbilityFactoryResources:
             for_card_from_hand=from_hand,
             is_play_card=is_play_card,
             who_trigger_this_effect=who_trigger_this_effect,
-            bind_ability=lambda face: face.effect.Find(func_name="DoGenerateResources")[0]
+            bind_ability=lambda face: (
+                found[0] if (found := face.effect.Find(func_name="DoGenerateResources")) else None
+            )
         ).SetFuncName("CanGenerateResources") \
         .SetSecondType(ability_type) \
         .SetGenerateResourcesExOperation(ex_operation)
@@ -423,7 +430,7 @@ class AbilityFactoryResources:
             message.IgnoreResourceCost(effect)
 
         def check_your_identity_has_trait(effect: 'Effect', message: 'Message2') -> bool:
-            if your_identity_has_trait == None:
+            if your_identity_has_trait  is None:
                 return True
             initiator = effect.GetInitiator()
             identity = initiator.GetIdentity()
@@ -448,9 +455,9 @@ class AbilityFactoryResources:
             message.UpdateCost(update_cost, effect)
         
         def check_which_card(effect: 'Effect', message: 'Message.WhenCalculateEffectCost') -> bool:
-            if which_card == None:
+            if which_card  is None:
                 return True
-            # assert message.check_effect.this != None
+            # assert message.check_effect.this  is not None
             return which_card.IsType(message.check_effect.this)
 
         return AbilityFactoryResources.WhenCalculateEffectCost(
@@ -458,7 +465,7 @@ class AbilityFactoryResources:
             act_update_cost,
             conditions=[
                 lambda effect, message:
-                    effect.this.bind_face != None and \
+                    effect.this.bind_face  is not None and \
                     message.is_play and \
                     effect.this.GetBindFace().GetControlBy() == message.GetToPlayer(),
                 check_which_card,
@@ -479,19 +486,25 @@ class AbilityFactoryResources:
             return effect.this in message.faces
 
         def check_is_in_hero_from(effect: 'Effect', message: 'Message.AfterCardsBeSpendAsResource') -> bool:
-            if is_in_hero_from == None:
+            if is_in_hero_from  is None:
                 return True
             return Condition.YouAreInHeroFrom(effect, is_in_hero_from)
 
         def check_identity_has_trait(effect: 'Effect', message: 'Message.AfterCardsBeSpendAsResource') -> bool:
-            if identity_has_trait == None:
+            if identity_has_trait  is None:
                 return True
-            return effect.GetInitiator().GetRoleCharacter().HasTrait(identity_has_trait)
+            initiator = effect.GetInitiator()
+            if not initiator:
+                return False
+            role_character = initiator.GetRoleCharacter()
+            if not role_character:
+                return False
+            return role_character.HasTrait(identity_has_trait)
 
         def check_to_pay_card(effect: 'Effect', message: 'Message.AfterCardsBeSpendAsResource') -> bool:
-            if to_pay_card == None:
+            if to_pay_card  is None:
                 return True
-            return message.pay_for_card != None and to_pay_card.Check(message.pay_for_card)
+            return message.pay_for_card  is not None and to_pay_card.Check(message.pay_for_card)
 
         return Ability(
             ability_type,
@@ -513,9 +526,9 @@ class AbilityFactoryResources:
                                    to_pay_card: 'CardFinder|None'=None,
                                    ) -> 'Ability':
         def check_played_card(effect: 'Effect', message: 'Message.WhenCardBeSpendAsResource') -> bool:
-            if to_pay_card == None:
+            if to_pay_card  is None:
                 return True
-            return message.pay_for_card != None and to_pay_card.Check(message.pay_for_card)
+            return message.pay_for_card  is not None and to_pay_card.Check(message.pay_for_card)
 
         return Ability(
             ability_type,
@@ -656,7 +669,7 @@ class AbilityFactoryResources:
             return Condition.CheckWhichCard(which_card, message.check_effect.this, effect)
 
         def check_which_effect(effect: 'Effect', message: 'Message.WhenCalculateEffectCost') -> bool:
-            if which_effect == None:
+            if which_effect  is None:
                 return True
             return which_effect == message.check_effect
 
@@ -673,7 +686,7 @@ class AbilityFactoryResources:
             return which_player == message.to_player
 
         def check_is_play(effect: 'Effect', message: 'Message.WhenCalculateEffectCost') -> bool:
-            if is_play == None:
+            if is_play  is None:
                 return True
             return is_play == message.is_play
 

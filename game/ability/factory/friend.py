@@ -200,12 +200,14 @@ class AbilityFactoryFriend:
         def check_defender(effect: 'Effect', message: 'Message.WhenUnitBeingAttack') -> Any:
             if message.has_declare_defender:
                 return False
-            if message.defender == None:
+            if message.defender  is None:
                 return True
             return effect.this == message.defender
 
         def check_must_defend_with_ally(effect: 'Effect', message: 'Message.WhenUnitBeingAttack') -> Any:
             assert effect.context.is_must_choose == False
+            if message.would_atk_message is None:
+                return True
             if message.would_atk_message.property.other_characters_cannot_defend:
                 if effect.this != message.trigger:
                     return False
@@ -252,15 +254,15 @@ class AbilityFactoryFriend:
             return Condition.CheckWhichCard(which_ally, message.trigger, effect)
 
         def check_from_performing(effect: 'Effect', message: 'Message.AfterAllyTakeConsequentialDamage') -> bool:
-            if from_performing == None:
+            if from_performing  is None:
                 return True
             if from_performing == "Attack":
-                return message.atk_message != None
+                return message.atk_message  is not None
             if from_performing == "Thwart":
-                return message.thw_message != None
+                return message.thw_message  is not None
 
         def check_defeated_face(effect: 'Effect', message: 'Message.AfterAllyTakeConsequentialDamage') -> bool:
-            if defeated_face == None:
+            if defeated_face  is None:
                 return True
             if message.atk_message:
                 targets: List['Unit2'] = []
@@ -271,9 +273,9 @@ class AbilityFactoryFriend:
             return False
 
         def check_is_from_thwart(effect: 'Effect', message: 'Message.AfterAllyTakeConsequentialDamage') -> bool:
-            if is_from_thwart == None:
+            if is_from_thwart  is None:
                 return True
-            return message.thw_message != None
+            return message.thw_message  is not None
 
         return Ability(
             ability_type,
@@ -351,7 +353,7 @@ class AbilityFactoryFriend:
             return Condition.CheckWhichCard(rule, message.trigger, effect)
 
         def check_control_by(effect: 'Effect', message: 'Message.WhenUnitUseBasicPower') -> bool:
-            if control_by == None:
+            if control_by  is None:
                 return True
             return effect.initiator == message.trigger.GetControlBy()
 
@@ -395,7 +397,7 @@ class AbilityFactoryFriend:
             return Condition.CheckBasicPower(powers, message)
 
         def check_use_message(effect: 'Effect', message: 'Message.AfterUnitUseBasicPower') -> bool:
-            if use_message == None:
+            if use_message  is None:
                 return True
             return use_message == message.pre_message
 
@@ -428,7 +430,7 @@ class AbilityFactoryFriend:
 
         def check_after_after_attacking_minion(effect: 'Effect', message: 'Message.WhenAllyWouldTakeConsequentialDamage') -> bool:
             if after_attacking_minion:
-                if message.atk_message == None:
+                if message.atk_message  is None:
                     return False
                 for target in message.atk_message.attacked_targets:
                     if Minion.IsType(target):
@@ -438,7 +440,7 @@ class AbilityFactoryFriend:
 
         def check_after_thwart_side_scheme(effect: 'Effect', message: 'Message.WhenAllyWouldTakeConsequentialDamage') -> bool:
             if after_thwart_side_scheme:
-                if message.thw_message == None:
+                if message.thw_message  is None:
                     return False
                 from game.operate.filter import Filter
                 return not not Filter.ByType(message.thw_message.schemes, SchemeSide2)

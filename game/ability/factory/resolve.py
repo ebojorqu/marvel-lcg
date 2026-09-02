@@ -55,7 +55,7 @@ class AbilityFactoryResolve:
             return Condition.CheckWhichPlayer(card_control_by, message.control_by, effect)
 
         def check_ability_name(effect: 'Effect', message: Message.WhenEffectWouldResolve) -> bool:
-            if ability_name == None:
+            if ability_name  is None:
                 return True
             return ability_name == message.effect.ability.name
 
@@ -63,12 +63,12 @@ class AbilityFactoryResolve:
             ability = message.effect.ability
             if ability.flags.is_nonkeyword:
                 return False
-            if which_abilities == None:
+            if which_abilities  is None:
                 return True
             return Condition.CheckWhichAbility(which_abilities, ability)
 
         def check_label(effect: 'Effect', message: 'Message.WhenEffectWouldResolve') -> bool:
-            if label == None:
+            if label  is None:
                 return True
             return message.effect.ability.IsOneOfLabel(label)
 
@@ -114,10 +114,10 @@ class AbilityFactoryResolve:
             ability = message.effect.ability
             if ability.flags.is_nonkeyword:
                 return False
-            if which_abilities == None:
+            if which_abilities  is None:
                 return True
             return Condition.CheckWhichAbility(which_abilities, ability)
-            # if which_abilities == None:
+            # if which_abilities  is None:
             #     return True
             # ability = message.effect.ability
             # for ability_type in which_abilities:
@@ -136,13 +136,13 @@ class AbilityFactoryResolve:
             # return False
 
         def check_ability_name(effect: 'Effect', message: Message.AfterEffectResolved) -> bool:
-            if ability_name == None:
+            if ability_name  is None:
                 return True
             ability = message.effect.ability
             return ability.name == ability_name
 
         def check_which_effect(effect: 'Effect', message: Message.AfterEffectResolved) -> bool:
-            if which_effect == None:
+            if which_effect  is None:
                 return True
             return message.effect == which_effect
 

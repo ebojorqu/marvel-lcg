@@ -80,18 +80,18 @@ class AbilityFactoryAttachment:
             from game.card.face.base import Asset2
             this = effect.this.CastTo(Attachment)
             def check_without_another_copy():
-                if without_another_copy == None:
+                if without_another_copy  is None:
                     return True
-                if unit.GetInventoryDeck().FindCard(name=effect.this.name, card_type=type(effect.this)) == None:
+                if unit.GetInventoryDeck().FindCard(name=effect.this.name, card_type=type(effect.this))  is None:
                     return True
                 return False
 
             return check_without_another_copy() and this.CastTo(Asset2).CanAttachTo(unit)
 
-        if if_cannot_attach_to == None and otherwise_attach_to != None:
+        if if_cannot_attach_to  is None and otherwise_attach_to  is not None:
             if_cannot_attach_to = otherwise_attach_to
 
-        if if_cannot_attach_to == None:
+        if if_cannot_attach_to  is None:
             otherwise_selector = None
         elif isinstance(if_cannot_attach_to, Selector):
             otherwise_selector = if_cannot_attach_to

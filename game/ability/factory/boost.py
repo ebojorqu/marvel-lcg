@@ -19,10 +19,10 @@ class AbilityFactoryBoost:
             return Condition.CheckWhichCard(which_card, message.trigger, effect)
 
         def check_undefended_attack(effect: 'Effect', message: 'Message.WhenCardBecomeBoost') -> bool:
-            if is_undefended_attack != None:
+            if is_undefended_attack  is not None:
                 if not isinstance(message.being_message, Message.WhenUnitBeingAttack):
                     return False
-                return is_undefended_attack == (message.being_message.would_atk_message.GetDefender() == None)
+                return is_undefended_attack == (message.being_message.would_atk_message.GetDefender()  is None)
             return True
 
         def check_attacker(effect: 'Effect', message: 'Message.WhenCardBecomeBoost') -> bool:
@@ -38,7 +38,7 @@ class AbilityFactoryBoost:
             return Condition.CheckWhichCard(activating_enemy, message.activating_enemy, effect)
 
         def check_you_are_in_hero_from(effect: 'Effect', message: 'Message.WhenCardBecomeBoost') -> bool:
-            if you_are_in_hero_from != None:
+            if you_are_in_hero_from  is not None:
                 player = message.GetToPlayer()
                 if you_are_in_hero_from:
                     return player.IsHero()
@@ -201,12 +201,12 @@ class AbilityFactoryBoost:
 
 
         def check_while_attack(effect: 'Effect', message: 'Message.WhenBoostCardWouldTurnedFaceUp') -> bool:
-            if while_attack == None:
+            if while_attack  is None:
                 return True
             return while_attack == message.being_message.IsAttack()
 
         def check_while_scheme(effect: 'Effect', message: 'Message.WhenBoostCardWouldTurnedFaceUp') -> bool:
-            if while_scheme == None:
+            if while_scheme  is None:
                 return True
             return while_scheme == message.being_message.IsScheme()
 
@@ -251,12 +251,12 @@ class AbilityFactoryBoost:
                                   ) -> 'Ability':
 
         def check_while_attack(effect: 'Effect', message: 'Message.WhenBoostCardTurnedFaceUp') -> bool:
-            if while_attack == None:
+            if while_attack  is None:
                 return True
             return while_attack == message.being_message.IsAttack()
 
         def check_while_scheme(effect: 'Effect', message: 'Message.WhenBoostCardTurnedFaceUp') -> bool:
-            if while_scheme == None:
+            if while_scheme  is None:
                 return True
             return while_scheme == message.being_message.IsScheme()
 
@@ -274,12 +274,12 @@ class AbilityFactoryBoost:
             return Condition.CheckWhichCard(activate_target, targets, effect)
 
         def check_activate_message(effect: 'Effect', message: 'Message.WhenBoostCardTurnedFaceUp') -> bool:
-            if activate_message == None:
+            if activate_message  is None:
                 return True
             return activate_message == message.would_message
 
         def check_canbe_cancel(effect: 'Effect', message: 'Message.WhenBoostCardTurnedFaceUp') -> bool:
-            if canbe_cancel == None:
+            if canbe_cancel  is None:
                 return True
             if canbe_cancel == "BoostIcons":
                 return not message.cancel_boost_icons and message.boost_icons > 0

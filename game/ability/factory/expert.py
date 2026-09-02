@@ -34,17 +34,17 @@ class AbilityFactoryExpert:
             from game.card.face.base import Scheme2
             diff = 1
             this = effect.this
-            if incite != None:
+            if incite  is not None:
                 assert Treachery.IsType(this)
                 this.GainIncite(diff * incite, effect)
-            if surge != None:
+            if surge  is not None:
                 assert Treachery.IsType(this)
                 this.GainSurge(diff * surge, effect)
-            if hinder!= None:
+            if hinder is not None:
                 assert Scheme2.IsType(this)
                 value = Worlds.ConvertPerPlayerIconToInt(hinder, effect)
                 this.GainHinder(value, effect)
-            # if toughness != None and Unit2.IsType(this):
+            # if toughness  is not None and Unit2.IsType(this):
             #     this.GainToughness(diff * toughness, effect)
 
         return Ability(

@@ -42,32 +42,32 @@ class AbilityFactoryAsset:
         abilities: List['Ability'] = []
         def only_ignore_flip() -> bool:
             return \
-                trait == None and \
-                attack == None and \
-                defense == None and \
-                thwart == None and \
-                scheme == None and \
-                retaliate == None and \
-                hand_size == None and \
-                stalwart == None and \
-                recover == None and \
-                guard == None and \
-                patrol == None and \
-                steady == None and \
-                treat_as_blank == None and \
-                target_threat == None and \
-                control_additional_restricted == None and \
-                attack_consequential_damage == None and \
-                thwart_consequential_damage == None and \
-                assault == None and \
-                have_res_icon == None and \
-                apply == None and \
+                trait  is None and \
+                attack  is None and \
+                defense  is None and \
+                thwart  is None and \
+                scheme  is None and \
+                retaliate  is None and \
+                hand_size  is None and \
+                stalwart  is None and \
+                recover  is None and \
+                guard  is None and \
+                patrol  is None and \
+                steady  is None and \
+                treat_as_blank  is None and \
+                target_threat  is None and \
+                control_additional_restricted  is None and \
+                attack_consequential_damage  is None and \
+                thwart_consequential_damage  is None and \
+                assault  is None and \
+                have_res_icon  is None and \
+                apply  is None and \
                 ( \
-                    health != None or \
-                    considered_at_least_hp != None \
+                    health  is not None or \
+                    considered_at_least_hp  is not None \
                 )
         # if multiple_player_icon:
-        #     assert get_new_value == None
+        #     assert get_new_value  is None
         #     get_new_value = lambda effect, face: Worlds.GetPlayerNumIcon(effect)
         from game.ability.factory.asset_helper import GiveKeywordToAttachWhenApplyThisInternal
 
@@ -101,7 +101,7 @@ class AbilityFactoryAsset:
                     ex_change_on_event=ex_change_on_event,
                 )
             )
-        if health != None or considered_at_least_hp != None:
+        if health  is not None or considered_at_least_hp  is not None:
             abilities.append(
                 GiveKeywordToAttachWhenApplyThisInternal(
                     card_finder,

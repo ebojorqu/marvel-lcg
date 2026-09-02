@@ -18,7 +18,7 @@ class AbilityFactoryDoScheme:
             return Condition.CheckAgainstPlayer(against_player, message, effect)
 
         def check_by_effect(effect: 'Effect', message: 'Message.WhenUnitWouldScheme') -> bool:
-            if by_effect == None:
+            if by_effect  is None:
                 return True
             return by_effect == message.by_effect
 
@@ -170,7 +170,7 @@ class AbilityFactoryDoScheme:
             [
                 check_this,
                 lambda effect, message:
-                    get_scheme(effect) != None,
+                    get_scheme(effect)  is not None,
             ],
             action,
             is_local=True

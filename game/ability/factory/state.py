@@ -169,7 +169,7 @@ class AbilityFactoryState:
     #                            *,
     #                            condition: ConditionType[Send.WhenCardLeavePlay|Send.WhenCardFlip]|None=None,
     #                            ) -> 'Ability':
-    #     if condition == None:
+    #     if condition  is None:
     #         condition = lambda effect, message: True
 
     #     return Ability(
@@ -201,7 +201,7 @@ class AbilityFactoryState:
             return Condition.CheckWhichPlayer(control_by, message.trigger.GetControlBy(), effect)
 
         def check_is_by_effect_face(effect: 'Effect', message: Message.WhenCardWouldReady) -> bool:
-            if by_effect_face == None:
+            if by_effect_face  is None:
                 return True
             if isinstance(message.by_effect, DebugRule):
                 return False
@@ -236,7 +236,7 @@ class AbilityFactoryState:
         #     return Condition.CheckWhichCard(which_card, message.which_face, effect)
 
         # def check_is_by_effect_face(effect: 'Effect', message: Message.CheckCanBeReadied) -> bool:
-        #     if by_effect_face == None:
+        #     if by_effect_face  is None:
         #         return True
         #     if isinstance(message.by_effect, DebugRule):
         #         return False

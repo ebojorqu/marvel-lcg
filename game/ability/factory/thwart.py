@@ -19,7 +19,7 @@ class AbilityFactoryThwart:
             return Condition.CheckWhichCard(which_card_be_thwart, message.scheme, effect)
 
         def check_is_basic_thwart(effect: 'Effect', message: 'Message.WhenSchemeBeingThwart') -> bool:
-            if is_basic_thwart == None:
+            if is_basic_thwart  is None:
                 return True
             return is_basic_thwart == message.IsBasicThwart()
 
@@ -73,7 +73,7 @@ class AbilityFactoryThwart:
             return Condition.CheckWhichCard(against_scheme, message.schemes, effect)
 
         def check_is_basic_thwart(effect: 'Effect', message: 'Message.WhenUnitWouldThwart') -> bool:
-            if is_basic_thwart == None:
+            if is_basic_thwart  is None:
                 return True
             return is_basic_thwart == message.IsBasicThwart()
 
@@ -109,17 +109,17 @@ class AbilityFactoryThwart:
             return Condition.CheckWhichCard(target_scheme, message.scheme, effect)
 
         def check_remove_threat(effect: 'Effect', message: 'Message.AfterUnitThwartScheme') -> bool:
-            if remove_threat == None:
+            if remove_threat  is None:
                 return True
             return message.remove_threat > 0
 
         # def check_remove_all_threat_from(effect: 'Effect', message: 'Message.AfterUnitThwartScheme') -> bool:
-        #     if remove_all_threat == None:
+        #     if remove_all_threat  is None:
         #         return True
         #     return message.scheme.threat == 0
 
         def check_is_basic_thwart(effect: 'Effect', message: 'Message.AfterUnitThwartScheme') -> bool:
-            if is_basic_thwart == None:
+            if is_basic_thwart  is None:
                 return True
             return is_basic_thwart == message.IsBasicThwart()
 
@@ -190,7 +190,7 @@ class AbilityFactoryThwart:
             return Condition.CheckWhichCard(rule, message.trigger, effect)
 
         def check_is_basic_thwart(effect: 'Effect', message: 'Message.AfterUnitThwartEnd') -> bool:
-            if is_basic_thwart == None:
+            if is_basic_thwart  is None:
                 return True
             return is_basic_thwart == message.IsBasicThwart()
 
@@ -241,7 +241,7 @@ class AbilityFactoryThwart:
                 return Condition.CheckWhichCard(cannot_thwart, message.scheme, effect)
 
             def check_can_only_thwart(effect: 'Effect', message: 'Message.CheckIfSchemeCanBeThwartBy') -> bool:
-                if can_only_thwart == None:
+                if can_only_thwart  is None:
                     return True
                 return not Condition.CheckWhichCard(can_only_thwart, message.scheme, effect)
 

@@ -17,7 +17,7 @@ class AbilityFactoryActivate:
             return Condition.CheckWhichCard(which_enemy, message.trigger, effect)
 
         def check_power(effect: 'Effect', message: 'Message.WhenEnemyWouldActivate') -> bool:
-            if power == None:
+            if power  is None:
                 return True
             return power == message.power
 
@@ -56,7 +56,7 @@ class AbilityFactoryActivate:
             Message.WhenEnemyActivateAgainstYou,
             [
                 lambda effect, message:
-                    message.to_player != None,
+                    message.to_player  is not None,
                 check_which_enemy,
                 *conditions
             ],
@@ -92,7 +92,7 @@ class AbilityFactoryActivate:
             return Condition.CheckWhichCard(which_enemy, message.trigger, effect)
 
         def check_against_you(effect: 'Effect', message: 'Message.AfterEnemyActivationEnd') -> bool:
-            if is_against_you == None:
+            if is_against_you  is None:
                 return True
             return is_against_you == Condition.AgainstYou(effect, message.activate_message)
 

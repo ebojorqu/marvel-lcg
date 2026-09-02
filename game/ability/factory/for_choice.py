@@ -12,7 +12,7 @@ class AbilityFactoryForChoice:
                                  ) -> 'Ability':
         from game.ability.cost_func import CostFunc
 
-        if operation == None:
+        if operation  is None:
             operation = lambda targets, res, ability: None
 
         def action(effect: 'Effect', message: 'Message.WhenPlayerChooseAbility'):
@@ -31,7 +31,7 @@ class AbilityFactoryForChoice:
             action
         ).SetName(name).NoOutOfPlayLimit()
 
-        if res != None:
+        if res  is not None:
             ability.SetCost(res, is_choose_ability=True)
 
         return ability
@@ -45,7 +45,7 @@ class AbilityFactoryForChoice:
                         ) -> 'Ability':
         def check_condition(effect: 'Effect', message: 'Message.WhenPlayerChooseAbility') -> bool:
             return condition
-        if operation == None:
+        if operation  is None:
             operation = lambda targets: None
         return AbilityFactoryForChoice.ForChoiceAbilityInternal(
             name,
@@ -64,7 +64,7 @@ class AbilityFactoryForChoice:
                         ) -> 'Ability':
         def check_condition(effect: 'Effect', message: 'Message.WhenPlayerChooseAbility') -> bool:
             return condition
-        if operation == None:
+        if operation  is None:
             operation = lambda targets, effect: None
         return AbilityFactoryForChoice.ForChoiceAbilityInternal(
             name,
@@ -82,7 +82,7 @@ class AbilityFactoryForChoice:
                         ) -> 'Ability':
         def check_condition(effect: 'Effect', message: 'Message.WhenPlayerChooseAbility') -> bool:
             return condition
-        if operation == None:
+        if operation  is None:
             operation = lambda targets, ability: None
         return AbilityFactoryForChoice.ForChoiceAbilityInternal(
             name,
@@ -113,10 +113,10 @@ class AbilityFactoryForChoice:
                                  *,
                                  conditions: ConditionsType[Message.WhenPlayerChooseAbility]=[],
                                  ) -> 'Ability':
-        if operation == None:
+        if operation  is None:
             operation = lambda targets, res: None
 
-        if name == None:
+        if name  is None:
             name = f"Spend {cost.GetSpendText()}"
 
         return AbilityFactoryForChoice.ForChoiceAbilityInternal(

@@ -31,7 +31,7 @@ class AbilityTokenFactory:
                     size = at_least
                 else:
                     size = at_least(effect)
-                assert token_name != None
+                assert token_name  is not None
                 return this.GetTokens(token_name) >= size
             return True
 

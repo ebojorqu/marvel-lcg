@@ -34,7 +34,7 @@ class AbilityFactoryPlay:
         from game.ability.factory import AbilityFactory
         from game.player import Player
 
-        if selector == None:
+        if selector  is None:
             selector = Select.From("YourIdentity")
 
         def max_per_unit(effect: 'Effect', target: 'CardFace') -> bool:
@@ -47,6 +47,8 @@ class AbilityFactoryPlay:
 
         def move_this_card(effect: 'Effect', message: 'Message.WhenPlayerInTurn') -> None:
             this = effect.this.CastTo(Support)
+            if not effect.targets:
+                return
             target = effect.targets[0]
             this.PutIntoPlay(target.GetControlByPlayer(), effect)
 
@@ -75,7 +77,7 @@ class AbilityFactoryPlay:
         from game.ability.factory import AbilityFactory
         from game.card.face.card_type import Upgrade
 
-        if target == None:
+        if target  is None:
             selector = None
         elif isinstance(target, type):
             selector = Select.From(CardFinder(card_type=target))
@@ -111,13 +113,13 @@ class AbilityFactoryPlay:
 
         # if isinstance(select, Selector):
         #     pass
-        # elif select == None:
+        # elif select  is None:
         #     select = Select(None, CardFinder(card_type=Identity)))
         # elif isinstance(select, str):
         #     select = Select(select)
         # else:
         #     select = Select(None, CardFinder(card_type=select))
-        if selector == None:
+        if selector  is None:
             selector = Select.From("YourIdentity")
 
         def max_per_unit(effect: 'Effect', target: 'CardFace') -> bool:
@@ -144,6 +146,8 @@ class AbilityFactoryPlay:
         from game.ability.factory import AbilityFactory
         def put_into_play(effect: 'Effect', message: 'Message.WhenPlayerInTurn') -> None:
             this = effect.this.CastTo(Ally)
+            if not effect.targets:
+                return
             target = effect.targets[0]
             this.PutIntoPlay(target.GetControlByPlayer(), effect)
             # this.card.MoveToArea(target.GetControlByPlayer().allies, effect)
@@ -238,7 +242,7 @@ class AbilityFactoryPlay:
             return Condition.CheckWhichPlayer(which_player, message.to_player, effect)
 
         def check_played_card(effect: 'Effect', message: 'Message.WhenPlayerPlayCard') -> bool:
-            if played_card == None:
+            if played_card  is None:
                 return True
             return played_card.Check(message.played_face)
 
@@ -248,12 +252,12 @@ class AbilityFactoryPlay:
             return message.played_effect.ability.IsLabel(label)
 
         def check_targets(effect: 'Effect', message: 'Message.WhenPlayerPlayCard') -> bool:
-            if targets == None:
+            if targets  is None:
                 return True
             return Condition.CheckWhichCard(targets, message.played_effect.targets, effect)
 
         def check_using_res(effect: 'Effect', message: 'Message.WhenPlayerPlayCard') -> bool:
-            if using_res == None:
+            if using_res  is None:
                 return True
             return message.paid_resources.HasColor(using_res)
 
@@ -353,7 +357,7 @@ class AbilityFactoryPlay:
             return Condition.CheckWhichCard(which_card, message.which_face, effect)
 
         def check_from_where(effect: 'Effect', message: 'Message.CheckIfFaceIsLikeInHand') -> bool:
-            if from_where == None:
+            if from_where  is None:
                 return True
 
             face = message.which_face
@@ -366,7 +370,7 @@ class AbilityFactoryPlay:
             return False
 
         def check_during(effect: 'Effect', message: 'Message.CheckIfFaceIsLikeInHand') -> bool:
-            if during == None:
+            if during  is None:
                 return True
             if during == "YourTurn":
                 return effect.GetInitiator() == effect.world.GetTurnPlayer()
@@ -428,7 +432,12 @@ class AbilityFactoryPlay:
             by_effect = message.effect
             if Event.IsType(by_effect.this):
                 # by_effect.ability.IsSubType('Attack') or by_effect.ability.IsSubType('Thwart'):
-                by_face = message.effect.this.GetControlByOrOwner().GetRoleCharacter()
+                controller = message.effect.this.GetControlByOrOwner()
+                if not controller:
+                    return False
+                by_face = controller.GetRoleCharacter()
+                if not by_face:
+                    return False
             elif Upgrade.IsType(by_effect.this):
                 by_face = by_effect.this.GetBindFace()
             else:

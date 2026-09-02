@@ -8,7 +8,7 @@ class AbilityFactoryForm:
     #                             *,
     #                             condition: ConditionType[Send.AfterIdentityChangeFormEnd]|None=None,
     #                             ) -> 'Ability':
-    #     if condition == None:
+    #     if condition  is None:
     #         condition = [ True
 
     #     return Ability(
@@ -42,22 +42,22 @@ class AbilityFactoryForm:
             # effect.GetInitiator().GetIdentity() == message.trigger
 
         def check_to_this_form(effect: 'Effect', message: 'Message.AfterUnitChangeForm') -> bool:
-            if to_this_form == None:
+            if to_this_form  is None:
                 return True
-            return effect.this == message.trigger and message.to_additional_form == None
+            return effect.this == message.trigger and message.to_additional_form  is None
 
         def check_to_this_additional_form(effect: 'Effect', message: 'Message.AfterUnitChangeForm') -> bool:
-            if to_this_additional_form == None:
+            if to_this_additional_form  is None:
                 return True
             return effect.this == message.to_additional_form
 
         def check_is_change_additional_form(effect: 'Effect', message: 'Message.AfterUnitChangeForm') -> bool:
-            if is_change_additional_form == None:
+            if is_change_additional_form  is None:
                 return True
-            return is_change_additional_form == (message.to_additional_form != None)
+            return is_change_additional_form == (message.to_additional_form  is not None)
 
         def check_to_form(effect: 'Effect', message: 'Message.AfterUnitChangeForm') -> bool:
-            if to_form == None:
+            if to_form  is None:
                 return True
             # Fix "04093" "21001b"
             if Condition.CheckWhichCard(to_form, message.would_change_message.from_form, effect):
@@ -114,7 +114,7 @@ class AbilityFactoryForm:
             )
             pass
 
-        if from_form != None:
+        if from_form  is not None:
             return AbilityFactoryForm.WhenUnitWouldChangeForm(
                 AbilityType.DelayAbility,
                 which_unit,
@@ -158,7 +158,7 @@ class AbilityFactoryForm:
             # effect.GetInitiator().GetIdentity() == message.trigger
 
         def check_to_hero_form(effect: 'Effect', message: 'Message.WhenUnitWouldChangeForm') -> bool:
-            if to_form == None:
+            if to_form  is None:
                 return True
             # Fix "04093" "21001b"
             if Condition.CheckWhichCard(to_form, message.from_form, effect):
@@ -166,14 +166,14 @@ class AbilityFactoryForm:
             return Condition.CheckWhichCard(to_form, message.to_form, effect)
 
         def check_during_your_turn(effect: 'Effect', message: 'Message.WhenUnitWouldChangeForm') -> bool:
-            if during_your_turn == None:
+            if during_your_turn  is None:
                 return True
             return effect.world.phase.IsPlayerPhase(message.trigger.GetControlByPlayer())
 
         # def check_is_change_additional_form(effect: 'Effect', message: 'Send.WhenIdentityWouldChangeForm') -> bool:
-        #     if is_change_additional_form == None:
+        #     if is_change_additional_form  is None:
         #         return True
-        #     return is_change_additional_form == (message.to_additional_form != None)
+        #     return is_change_additional_form == (message.to_additional_form  is not None)
 
         return Ability(
             ability_type,

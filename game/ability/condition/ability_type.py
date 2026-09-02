@@ -8,11 +8,10 @@ class ConditionAbilityType:
 
     @staticmethod
     def CheckWhichAbility(check_rule: 'ABILITY_TYPE', ability: 'Ability') -> bool:
-        from game.ability.condition import Condition
-        if check_rule == None:
+        if check_rule is None:
             return True
 
-        def invoke_check(ability_type: 'Condition.ONE_ABILITY_TYPE') -> bool:
+        def invoke_check(ability_type: 'ConditionAbilityType.ONE_ABILITY_TYPE') -> bool:
             if ability_type == "TriggeredAbility":
                 return ability.flags.is_action or \
                     ability.flags.is_interrupt or \
@@ -38,6 +37,7 @@ class ConditionAbilityType:
                 return ability.flags.IsType(AbilityType.NonKeyword) or \
                     ability.flags.IsType(AbilityType.NonKeywordBold) or \
                     ability.flags.IsType(AbilityType.NonKeywordStar)
+            return False
 
         if isinstance(check_rule, str):
             return invoke_check(check_rule)

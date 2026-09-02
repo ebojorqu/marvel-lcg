@@ -84,7 +84,7 @@ def GiveKeywordToInPlayWhenApplyThisInternal(
     def new_condition(effect: 'Effect') -> bool:
         if works_in_the_victory_display and not effect.this.card.area.flags.is_victory_display:
             return False
-        if condition != None:
+        if condition  is not None:
             if not condition(effect):
                 return False
         if if_each_of_your_characters_has_trait:
@@ -169,7 +169,7 @@ def GiveKeywordToInPlayWhenApplyThisInternal(
         from game.card.face.card_type import Minion
         from game.ability.condition import Condition
 
-        if card_finder == None:
+        if card_finder  is None:
             pass
         if not Condition.CheckWhichCard(card_finder, face, effect):
             return StoreValue(0, [])

@@ -66,7 +66,7 @@ class Ability:
         self.const_condition: List[Callable[['Effect', when], bool]] = conditions
         self.conditions: List[Callable[['Effect', when], bool]] = conditions
 
-        if is_local == None:
+        if is_local  is None:
             is_local = False
             for condition in conditions:
                 if condition == Condition2.ThisIsTrigger:
@@ -103,7 +103,7 @@ class Ability:
 
     @property
     def second_type(self) -> AbilityType:
-        assert self.second_type_internal != None
+        assert self.second_type_internal  is not None
         return self.second_type_internal
 
     @staticmethod
@@ -238,7 +238,7 @@ class Ability:
         if not self.ignore.game_area and not isinstance(self.on_event, OnEvent.GameArea): # Fix for "11004"
             def check_game_area(effect: 'Effect', message: 'Message2') -> bool:
                 # Fix "43021" in Kang stage 2
-                if isinstance(message, TriggerPlayerMessage) and message.to_player != None:
+                if isinstance(message, TriggerPlayerMessage) and message.to_player  is not None:
                     return effect.this.card.GetGameArea() == message.GetToPlayer().GetGameArea() or \
                         effect.this.card.area.flags.is_removed
                 if isinstance(message, TriggerMessage):
@@ -306,7 +306,7 @@ class Ability:
             not self.flags.is_action and \
             not self.is_play and \
             not self.IsFunction("Change Form", "REC") and \
-            self.cost_fn == None:
+            self.cost_fn  is None:
             # and \
             # self.IsFunction("Change Form", "Basic Recover", "Basic Defense"):
             self.selectors.append(Select.From("This", not_move=True, not_shuffle=True))
@@ -353,7 +353,7 @@ class Ability:
     def NeedCost(self) -> bool:
         if self.flags.is_delay_ability:
             return False
-        return self.cost_fn != None or self.play_cost != None
+        return self.cost_fn  is not None or self.play_cost  is not None
 
     def CheckAnyPlayerCanTriggerThis(self, effect: 'Effect') -> bool:
         if self.any_player_can_trigger_this_when:
@@ -475,11 +475,11 @@ class Ability:
                     ) -> 'Ability':
         from game.card.card_finder import CardFinder2
 
-        if only_if_your_identity_has_trait == None and \
+        if only_if_your_identity_has_trait  is None and \
             hero_form_only == False and \
             alter_ego_form_only == False and \
-            only_if_your_identity_has_at_least_printed_hp == None and \
-            only_if_you_control_trait == None and \
+            only_if_your_identity_has_at_least_printed_hp  is None and \
+            only_if_you_control_trait  is None and \
             only_if_your_identity_has_one_of_traits == []:
             assert self.selectors == [], f"Please call this before SetTarget"
 
@@ -536,11 +536,11 @@ class Ability:
         if only_if_you_control_face:
             def check_only_if_you_control_face(effect: 'Effect', message: 'Message2') -> bool:
                 initiator = effect.GetInitiator()
-                return initiator.GetIdentity().GetInventoryDeck().FindCard(only_if_you_control_face) != None
+                return initiator.GetIdentity().GetInventoryDeck().FindCard(only_if_you_control_face)  is not None
 
             self.conditions = [check_only_if_you_control_face] + self.conditions
 
-        if only_if_your_identity_has_one_of_traits != None:
+        if only_if_your_identity_has_one_of_traits  is not None:
             def check_if_your_identity_has_one_of_traits(effect: 'Effect', message: 'Message2') -> bool:
                 initiator = effect.GetInitiator()
                 identity = initiator.GetIdentity()
@@ -550,42 +550,42 @@ class Ability:
                 return False
             self.conditions = [check_if_your_identity_has_one_of_traits] + self.conditions
 
-        if you_have_played_another_card_this_phase != None:
+        if you_have_played_another_card_this_phase  is not None:
             def check_you_have_played_another_card_this_phase(effect: 'Effect', message: 'Message2') -> bool:
                 initiator = effect.GetInitiator()
                 first_played_card = initiator.stat.GetThisPhasePlayedCard(0)
                 if you_have_played_another_card_this_phase:
-                    return first_played_card != None
+                    return first_played_card  is not None
                 else:
-                    return first_played_card == None
+                    return first_played_card  is None
             self.conditions = [check_you_have_played_another_card_this_phase] + self.conditions
 
-        if only_if_there_is_side_scheme_in_victory != None:
+        if only_if_there_is_side_scheme_in_victory  is not None:
             def check_only_if_there_is_side_scheme_in_victory(effect: 'Effect', message: 'Message2') -> bool:
                 from game.card.face.base import SchemeSide2
                 side_scheme = effect.world.victory_display.FindCard(card_type=SchemeSide2)
                 if only_if_there_is_side_scheme_in_victory:
-                    return side_scheme != None
+                    return side_scheme  is not None
                 else:
-                    return side_scheme == None
+                    return side_scheme  is None
             self.conditions = [check_only_if_there_is_side_scheme_in_victory] + self.conditions
 
-        if only_if_you_are_in_additional_from != None:
+        if only_if_you_are_in_additional_from  is not None:
             def check_only_if_you_are_in_additionnal_from(effect: 'Effect', message: 'Message2') -> bool:
                 initiator = effect.GetInitiator()
                 return initiator.form.IsFormInternal(only_if_you_are_in_additional_from)
             self.conditions = [check_only_if_you_are_in_additionnal_from] + self.conditions
 
-        if only_if_you_are_the_player != None:
+        if only_if_you_are_the_player  is not None:
             def check_only_if_you_are_the_player(effect: 'Effect', message: 'Message2') -> bool:
                 initiator = effect.GetInitiator()
                 return initiator.IsName(*only_if_you_are_the_player)
             self.conditions = [check_only_if_you_are_the_player] + self.conditions
 
-        if each_your_characters_has_trait != None:
+        if each_your_characters_has_trait  is not None:
             def check_each_your_characters_has_trait(effect: 'Effect', message: 'Message2') -> bool:
                 initiator = effect.GetInitiator()
-                assert each_your_characters_has_trait != None
+                assert each_your_characters_has_trait  is not None
                 return all(x.HasTrait(each_your_characters_has_trait) for x in initiator.GetControlCharacters())
             self.conditions = [check_each_your_characters_has_trait] + self.conditions
 
@@ -865,7 +865,7 @@ class Ability:
                 'cost_equal_or_greater' : cost_equal_or_greater,
                 'check_effect_fn'       : check_fn,
             }
-            if [x for x in kwargs.values() if x!=None]:
+            if [x for x in kwargs.values() if x is not None]:
                 finder = CardFinder(**kwargs)
 
         if not is_second_internal:

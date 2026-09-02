@@ -28,7 +28,7 @@ class Condition(ConditionCardType, ConditionPlayerType, ConditionAbilityType, Co
         if Obligation.IsType(this):
             return this.GetBindFace() == to_face
         if CanAttach.IsType(this):
-            return this.card.area.bind_card != None and \
+            return this.card.area.bind_card is not None and \
                 this.card.area.bind_card == to_face.card # Check card for "46002"
             # return this.attached_card != None and \
             #     this.attached_card.face == to_face
@@ -103,7 +103,7 @@ class Condition(ConditionCardType, ConditionPlayerType, ConditionAbilityType, Co
         if effect.IsPlayerInitiator():
             return effect.initiator == player
         else:
-            return player != None
+            return player is not None
 
     @staticmethod
     def FieldHasNotThisUniqueType(face: 'CardFace', effect: 'Effect') -> bool:
@@ -122,7 +122,7 @@ class Condition(ConditionCardType, ConditionPlayerType, ConditionAbilityType, Co
         from game.card.face.card_type import Minion
         from game.card.face.base import Villain
 
-        if powers == None:
+        if powers is None:
             if Ally.IsType(message.trigger):
                 basic_powers = ["ATK", "THW"]
             elif AlterEgo.IsType(message.trigger):
@@ -135,8 +135,5 @@ class Condition(ConditionCardType, ConditionPlayerType, ConditionAbilityType, Co
                 basic_powers = []
         else:
             basic_powers = powers
-        for name in basic_powers:
-            if name == message.power:
-                return True
-        return False
+        return message.power in basic_powers
 

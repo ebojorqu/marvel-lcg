@@ -415,8 +415,10 @@ class TestMain(unittest.TestCase):
             def SetSkipTo(self, value):
                 self.skip_to = value
 
-        replay = SimpleNamespace(history_inputs=[1, 2, 3, 4], current_step_id=4)
+        replay = SimpleNamespace(history_inputs=[1, 2, 3, 4], current_step_id=4, replay_step_id=4, is_updated=False, calculated_crc=[])
         replay.Clear = lambda: None
+        replay.SetReplayInputs = lambda inputs: setattr(replay, 'replay_inputs', list(inputs))
+        replay.Clean = lambda: None
         game = SimpleNamespace()
         game.controller_manager = SimpleNamespace(
             replay=replay,
@@ -433,8 +435,37 @@ class TestMain(unittest.TestCase):
         session.Undo(1)
 
         self.assertEqual(game.controller_manager.replay.history_inputs, [1, 2, 3])
+        self.assertEqual(game.controller_manager.replay.current_step_id, 3)
+        self.assertEqual(game.controller_manager.replay.replay_step_id, 3)
         self.assertEqual(game.scene.inputs, [1, 2, 3])
         self.assertEqual(game.controller_manager.skip.skip_to, 3)
+
+    def test_set_scene_resets_replay_state(self):
+        from types import SimpleNamespace
+
+        replay = SimpleNamespace(
+            history_inputs=[1, 2, 3],
+            replay_inputs=[1, 2, 3],
+            current_step_id=3,
+            replay_step_id=3,
+            is_updated=True,
+            calculated_crc=['x'],
+        )
+        replay.Clean = lambda: setattr(replay, 'history_inputs', []) or setattr(replay, 'current_step_id', 0) or setattr(replay, 'replay_step_id', 0) or setattr(replay, 'is_updated', False) or setattr(replay, 'calculated_crc', [])
+        replay.SetReplayInputs = lambda inputs: setattr(replay, 'replay_inputs', list(inputs))
+        game = SimpleNamespace(
+            controller_manager=SimpleNamespace(replay=replay),
+            state=SimpleNamespace(SetStartState=lambda _state: None),
+        )
+        session = __import__('game.game_run.game_session', fromlist=['GameSession']).GameSession(game)
+        scene = SimpleNamespace(version='1.0', inputs=[9, 10])
+
+        session.SetScene(scene, 'New')
+
+        self.assertEqual(replay.current_step_id, 0)
+        self.assertEqual(replay.replay_step_id, 0)
+        self.assertEqual(replay.history_inputs, [])
+        self.assertEqual(replay.replay_inputs, [9, 10])
 
     def test_present_force_no_wait_clears_skip_flag(self):
         from types import SimpleNamespace

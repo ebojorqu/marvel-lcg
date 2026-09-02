@@ -345,7 +345,7 @@ class AbilityFactoryEnhanceSelf:
 
             this = effect.this
             assert EncounterNonVillainCard.IsType(this)
-            if incite != None:
+            if incite  is not None:
                 diff = check_fn(effect)
                 this.GainIncite(diff * incite, effect)
 

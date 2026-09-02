@@ -66,7 +66,7 @@ class AbilityFactoryScheme:
             return Condition.CheckWhichCard(who_make_thwart, message.by_effect.this, effect)
 
         def check_thwart_event(effect: 'Effect', message: 'Message.WhenSchemeWouldRemoveThreat') -> bool:
-            if thwart_event == None:
+            if thwart_event  is None:
                 return True
             return thwart_event == message.would_thw_message
 
@@ -100,7 +100,7 @@ class AbilityFactoryScheme:
             return Condition.CheckWhichCard(which_scheme, message.trigger, effect)
 
         def check_has_threat(effect: 'Effect', message: 'Message.AfterSchemePlaceThreat') -> bool:
-            if has_at_least_threat == None:
+            if has_at_least_threat  is None:
                 return True
             if isinstance(has_at_least_threat, int):
                 check_threat = has_at_least_threat
@@ -138,22 +138,22 @@ class AbilityFactoryScheme:
             return Condition.CheckWhichCard(which_scheme, message.trigger, effect)
 
         def check_by_who(effect: 'Effect', message: 'Message.AfterSchemeRemoveThreat') -> bool:
-            if by_who == None:
+            if by_who  is None:
                 return True
             return Condition.CheckWhichCard(by_who, message.would_remove_message.by_face, effect)
 
         def check_by_thwart(effect: 'Effect', message: 'Message.AfterSchemeRemoveThreat') -> bool:
-            if by_thwart == None:
+            if by_thwart  is None:
                 return True
             if isinstance(by_thwart, bool):
                 if by_thwart:
-                    return message.would_thw_message != None
+                    return message.would_thw_message  is not None
                 else:
-                    return message.would_thw_message == None
+                    return message.would_thw_message  is None
             return message.would_thw_message == by_thwart
 
         def check_last_threat(effect: 'Effect', message: 'Message.AfterSchemeRemoveThreat') -> bool:
-            if last_threat == None:
+            if last_threat  is None:
                 return True
             return message.trigger.CastTo(Scheme2).threat == 0
 
@@ -427,25 +427,25 @@ class AbilityFactoryScheme:
             return Condition.CheckWhichCard(from_where, message.trigger, effect)
 
         # def check_card_name(effect: 'Effect', message: 'Send.WhenSchemeWouldRemoveThreat') -> bool:
-        #     if from_card_name == None:
+        #     if from_card_name  is None:
         #         return True
         #     return message.trigger.IsName(from_card_name)
 
         def check_from_thwart(effect: 'Effect', message: 'Message.WhenSchemeWouldRemoveThreat') -> bool:
-            if by_thwarting == None:
+            if by_thwarting  is None:
                 return True
             if by_thwarting:
-                return message.would_thw_message != None
+                return message.would_thw_message  is not None
             else:
-                return message.would_thw_message == None
+                return message.would_thw_message  is None
 
         def check_by_character(effect: 'Effect', message: 'Message.WhenSchemeWouldRemoveThreat') -> bool:
-            if by_character == None:
+            if by_character  is None:
                 return True
             return by_character.Check(message.by_face)
 
         def check_while_who_is_in_play(effect: 'Effect', message: 'Message.WhenSchemeWouldRemoveThreat') -> bool:
-            if while_face_is_in_play == None:
+            if while_face_is_in_play  is None:
                 return True
             for face in Worlds.GetOnFieldCards(effect):
                 if while_face_is_in_play.Check(face):
@@ -488,7 +488,7 @@ class AbilityFactoryScheme:
             return Condition.CheckWhichCard(which_scheme, message.trigger, effect)
 
         def check_stage(effect: 'Effect', message: 'Message.WhenMainSchemeWouldAdvance'):
-            if stage == None:
+            if stage  is None:
                 return True
             return message.scheme.printed_stage == stage
 

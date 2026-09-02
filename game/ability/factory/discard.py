@@ -17,11 +17,11 @@ class AbilityFactoryDiscard:
             return Condition.CheckWhichCard(which_card, message.trigger, effect)
 
         def check_from_player_deck(effect: 'Effect', message: Message.WhenCardWouldDiscard) -> bool:
-            if from_player_deck == None:
+            if from_player_deck  is None:
                 return True
             controller = message.trigger.card.GetController()
             return message.trigger.card.area.flags.is_player_deck == from_player_deck and \
-                (controller == None or not controller.is_eliminated)
+                (controller  is None or not controller.is_eliminated)
 
         return Ability(
             ability_type,
@@ -50,7 +50,7 @@ class AbilityFactoryDiscard:
             return Condition.CheckWhichCard(which_card, message.trigger, effect)
 
         def check_from_where(effect: 'Effect', message: Message.AfterCardDiscard) -> bool:
-            if from_where == None:
+            if from_where  is None:
                 return True
 
             from_area = message.from_area
@@ -60,10 +60,10 @@ class AbilityFactoryDiscard:
                 # return from_area.flags.is_player_deck and \
                 #     message.discard_message.is_top
             elif from_where == "PlayerArea":
-                return from_area.play_area != None
+                return from_area.play_area  is not None
             elif from_where == "UnderIdentity":
                 return from_area.flags.is_place_card_area and \
-                    from_area.bind_card != None and \
+                    from_area.bind_card  is not None and \
                     Identity.IsType(from_area.bind_card.face)
             elif from_where == "EncounterDeckTop":
                 return from_area.flags.is_encounter_deck and \
@@ -76,7 +76,7 @@ class AbilityFactoryDiscard:
             return Condition.CheckWhichCard(by_effect_face, message.by_effect.this, effect)
 
         # def check_is_in_discard_pile(effect: 'Effect', message: Message.AfterCardDiscard) -> bool:
-        #     if is_in_discard_pile == None:
+        #     if is_in_discard_pile  is None:
         #         return True
         #     return message.trigger.card.area.IsDiscards()
 

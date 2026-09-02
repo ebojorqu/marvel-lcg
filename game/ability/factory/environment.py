@@ -126,7 +126,7 @@ class AbilityFactoryEnvironment:
             # assert isinstance(change_on_event, OnEvent.Trait)
 
         if change_on_event == OnEvent.NONE and isinstance(card_finder, CardFinder):
-            if card_finder.trait != None:
+            if card_finder.trait  is not None:
                 # assert isinstance(change_on_event, OnEvent.Trait)
                 assert len(card_finder.params) == 2
                 change_on_event = OnEvent.Trait(card_finder.card_type)
@@ -141,41 +141,41 @@ class AbilityFactoryEnvironment:
 
         abilities: List['Ability'] = []
 
-        if trait != None or \
-            teamwork != None or \
-            attack != None or \
-            defense != None or \
-            thwart != None or \
-            scheme != None or \
-            retaliate != None or \
-            hand_size != None or \
-            stalwart != None or \
-            health != None or \
-            recover != None or \
-            guard != None or \
-            steady != None or \
-            treat_as_blank != None or \
-            quickstrike != None or \
-            attack_consequential_damage != None or \
-            thwart_consequential_damage != None or \
-            patrol != None or \
-            surge != None or \
-            acceleration_icon != None or \
-            hazard != None or \
-            toughness != None or \
-            peril != None or \
-            incite != None or \
-            temporary != None or \
-            permanent != None or \
-            villainous != None or \
-            target_threat != None or \
-            additional_cost_for_basic_attack != None or \
-            additional_cost_for_basic_thwart != None or \
-            additional_cost_for_basic_defend != None or \
-            base_sch != None or \
-            base_atk != None or \
-            base_health != None or \
-            apply != None:
+        if trait  is not None or \
+            teamwork  is not None or \
+            attack  is not None or \
+            defense  is not None or \
+            thwart  is not None or \
+            scheme  is not None or \
+            retaliate  is not None or \
+            hand_size  is not None or \
+            stalwart  is not None or \
+            health  is not None or \
+            recover  is not None or \
+            guard  is not None or \
+            steady  is not None or \
+            treat_as_blank  is not None or \
+            quickstrike  is not None or \
+            attack_consequential_damage  is not None or \
+            thwart_consequential_damage  is not None or \
+            patrol  is not None or \
+            surge  is not None or \
+            acceleration_icon  is not None or \
+            hazard  is not None or \
+            toughness  is not None or \
+            peril  is not None or \
+            incite  is not None or \
+            temporary  is not None or \
+            permanent  is not None or \
+            villainous  is not None or \
+            target_threat  is not None or \
+            additional_cost_for_basic_attack  is not None or \
+            additional_cost_for_basic_thwart  is not None or \
+            additional_cost_for_basic_defend  is not None or \
+            base_sch  is not None or \
+            base_atk  is not None or \
+            base_health  is not None or \
+            apply  is not None:
 
             abilities.append(GiveKeywordToInPlayWhenApplyThisInternal(
                 card_finder=card_finder,
@@ -227,7 +227,7 @@ class AbilityFactoryEnvironment:
                 change_on_event=change_on_event
             ))
 
-        if ally_limit != None or flag != None:
+        if ally_limit  is not None or flag  is not None:
             abilities.append(GiveKeywordToInPlayWhenApplyThisInternal(
                 card_finder=card_finder,
                 control_by=control_by,

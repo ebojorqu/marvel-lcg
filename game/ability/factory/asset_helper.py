@@ -169,7 +169,7 @@ def GiveKeywordToAttachWhenApplyThisInternal(
     new_card_finder: CardFinder|None = None
     card_rule: CardType|None = None
 
-    if card_finder == None:
+    if card_finder  is None:
         pass
     elif isinstance(card_finder, CardFinder):
         new_card_finder = card_finder
@@ -186,7 +186,7 @@ def GiveKeywordToAttachWhenApplyThisInternal(
         # this = effect.this
         # face = this.GetBindFace()
 
-        if name != None:
+        if name  is not None:
             if not face.IsName(name):
                 return 0
 

@@ -135,7 +135,7 @@ class AbilityFactoryTurnPhase:
                        ) -> 'Ability':
 
         def check_phase_name(effect: 'Effect', message: 'Message.WhenPhaseBegin') -> bool:
-            if phase_name == None:
+            if phase_name  is None:
                 return True
             if phase_name == "Player":
                 return phase_name == message.phase_name
@@ -144,7 +144,7 @@ class AbilityFactoryTurnPhase:
             return phase_name == message.phase_id
 
         def check_round_id(effect: 'Effect', message: 'Message.WhenPhaseBegin') -> bool:
-            if round_id == None:
+            if round_id  is None:
                 return True
             return round_id == message.round_id
 
@@ -198,7 +198,7 @@ class AbilityFactoryTurnPhase:
                 return phase_name == message.phase_name
             if phase_name == "Villain":
                 return phase_name == message.phase_name
-            if phase_name == None:
+            if phase_name  is None:
                 return True
             return phase_name == message.phase_id
 
@@ -238,7 +238,7 @@ class AbilityFactoryTurnPhase:
                 return phase_name == message.phase_name
             if phase_name == "Villain":
                 return phase_name == message.phase_name
-            if phase_name == None:
+            if phase_name  is None:
                 return True
             # if phase_name == "ThisPlayer":
             #     return effect.initiator == message.to_player
@@ -288,7 +288,7 @@ class AbilityFactoryTurnPhase:
                     ) -> 'Ability':
 
         def check_round_id(effect: 'Effect', message: 'Message.WhenRoundEnd') -> bool:
-            if round_id == None:
+            if round_id  is None:
                 return True
             return round_id == message.round_id
 
@@ -307,7 +307,7 @@ class AbilityFactoryTurnPhase:
     #                  operation: ActionFuncType[Send.WhenRoundEnd],
     #                  condition: ConditionType[Send.WhenRoundEnd]|None=None,
     #                  ) -> 'Ability':
-    #     if condition == None:
+    #     if condition  is None:
     #         condition = lambda effect, message: True
 
     #     return Ability(
@@ -331,7 +331,7 @@ class AbilityFactoryTurnPhase:
                 return phase_name == message.phase_name
             if phase_name == "Villain":
                 return phase_name == message.phase_name
-            if phase_name == None:
+            if phase_name  is None:
                 return True
             return phase_name == message.phase_id
 

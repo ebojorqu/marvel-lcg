@@ -51,12 +51,12 @@ class AbilityFactoryDoAttack:
             return Condition.CheckWhichCard(attack_targets, message.attacked_targets, effect)
 
         def check_is_basic_attack(effect: 'Effect', message: 'Message.WhenUnitWouldAttack') -> bool:
-            if is_basic_attack == None:
+            if is_basic_attack  is None:
                 return True
             return is_basic_attack == message.IsBasicAttack()
 
         def check_by_effect(effect: 'Effect', message: 'Message.WhenUnitWouldAttack') -> bool:
-            if by_effect == None:
+            if by_effect  is None:
                 return True
             return by_effect == message.by_effect
 
@@ -112,7 +112,7 @@ class AbilityFactoryDoAttack:
             return Condition.CheckWhichCard(rule, message.attacker, effect)
 
         def check_is_basic_attack(effect: 'Effect', message: 'Message.WhenUnitMakeKeyWordAttack') -> bool:
-            if is_basic_attack == None:
+            if is_basic_attack  is None:
                 return True
             return is_basic_attack == message.IsBasicAttack()
 
@@ -189,7 +189,7 @@ class AbilityFactoryDoAttack:
             return Condition.CheckWhichCard(who_be_attacked, message.target, effect)
 
         def check_is_basic_attack(effect: 'Effect', message: 'Message.WhenUnitWouldAttackUnit') -> bool:
-            if is_basic_attack == None:
+            if is_basic_attack  is None:
                 return True
             # `AfterUnitDefeatedUnit` will also call this function because of `CopyForDelay`
             # return is_basic_attack == message.would_atk_message.property.is_basic_power
@@ -239,20 +239,22 @@ class AbilityFactoryDoAttack:
         from game.card.face.card_type import Hero
 
         def check_who_defense(effect: 'Effect', message: 'Message.WhenUnitWouldDefend') -> bool:
+            initiator = effect.GetInitiator()
+            initiator_identity = initiator.GetIdentity() if initiator else None
             if who_defense == "You":
                 return Condition.ThisIsYou(effect, message.trigger) and \
-                    effect.GetInitiator().GetIdentity() == message.trigger
+                    initiator_identity == message.trigger
             if who_defense == "YourHero":
                 return Condition.ThisIsYou(effect, message.trigger) and \
                     Hero.IsType(message.trigger) and \
-                    effect.GetInitiator().GetIdentity() == message.trigger
+                    initiator_identity == message.trigger
             return Condition.CheckWhichCard(who_defense, message.trigger, effect)
 
         def check_against_who(effect: 'Effect', message: 'Message.WhenUnitWouldDefend') -> bool:
             return Condition.CheckWhichCard(against_who, message.attacker, effect)
 
         def check_is_basic_defense(effect: 'Effect', message: 'Message.WhenUnitWouldDefend') -> bool:
-            if is_basic_defense == None:
+            if is_basic_defense  is None:
                 return True
             return is_basic_defense == message.IsBasicDefense()
 
@@ -296,7 +298,7 @@ class AbilityFactoryDoAttack:
                                      ) -> 'Ability':
 
         def check_who_defense(effect: 'Effect', message: 'Message.AfterUnitDefendEnd') -> bool:
-            # if message.defender == None:
+            # if message.defender  is None:
             #     return False
             rule = Condition.GetYouRule(who_defense, identity=True)
             return Condition.CheckWhichCard(rule, message.defender, effect)
@@ -305,12 +307,12 @@ class AbilityFactoryDoAttack:
             return Condition.CheckWhichCard(attacker, message.attacker, effect)
 
         def check_against_attack(effect: 'Effect', message: 'Message.AfterUnitDefendEnd') -> bool:
-            if against_which_attack == None:
+            if against_which_attack  is None:
                 return True
             return against_which_attack == message.would_atk_message
 
         def check_take_no_damage(effect: 'Effect', message: 'Message.AfterUnitDefendEnd') -> bool:
-            if take_no_damage == None:
+            if take_no_damage  is None:
                 return True
             return message.taken_damage == 0
 
@@ -318,7 +320,7 @@ class AbilityFactoryDoAttack:
             ability_type,
             Message.AfterUnitDefendEnd,
             [
-                # message.defender != None and \
+                # message.defender  is not None and \
                 check_who_defense,
                 check_attacker,
                 check_against_attack,
@@ -385,10 +387,10 @@ class AbilityFactoryDoAttack:
             attacks you,” “you” refers to the attacked player, even
             if that player defended with an ally.
             """
-            return message.attacker != None and attacker.IsType(message.attacker)
+            return message.attacker  is not None and attacker.IsType(message.attacker)
 
         def check_atk_message(effect: 'Effect', message: 'Message.AfterUnitAttackUnit') -> bool:
-            if atk_message == None:
+            if atk_message  is None:
                 return True
             return atk_message == message.would_atk_unit_message
 
@@ -400,14 +402,14 @@ class AbilityFactoryDoAttack:
             if who_be_attacked == "You":
                 if dealt_damage:
                     if ClassCard.IsType(effect.this):
-                        return message.to_player != None and \
+                        return message.to_player  is not None and \
                             effect.initiator == message.to_player
                     else:
-                        return message.to_player != None and \
+                        return message.to_player  is not None and \
                             message.attacked.GetControlBy() == message.to_player and \
                             Identity.IsType(message.attacked)
                 else:
-                    if message.attacked_you == None:
+                    if message.attacked_you  is None:
                         return False
                     if EncounterCard.IsType(effect.this):
                         return True
@@ -415,42 +417,42 @@ class AbilityFactoryDoAttack:
                     # if effect.IsPlayerInitiator():
                     #     return effect.initiator == message.to_player
                     # else:
-                    #     return message.to_player != None
+                    #     return message.to_player  is not None
                     #     # message.target.GetController() == message.to_player
             return Condition.CheckWhichCard(who_be_attacked, message.attacked, effect)
 
         def check_use_atk(effect: 'Effect', message: 'Message.AfterUnitAttackUnit') -> bool:
-            if use_atk == None:
+            if use_atk  is None:
                 return True
             return use_atk == message.would_atk_message.IsBasicAttack()
 
         def check_dealt_damage(effect: 'Effect', message: 'Message.AfterUnitAttackUnit') -> bool:
-            if dealt_damage == None:
+            if dealt_damage  is None:
                 return True
             return message.dealt_damage > 0
 
         def check_dealt_more_than_damage(effect: 'Effect', message: 'Message.AfterUnitAttackUnit') -> bool:
-            if dealt_more_than_damage == None:
+            if dealt_more_than_damage  is None:
                 return True
             return message.dealt_damage >= dealt_more_than_damage
 
         def check_target_took_damage(effect: 'Effect', message: 'Message.AfterUnitAttackUnit') -> bool:
-            if target_took_damage == None:
+            if target_took_damage  is None:
                 return True
             rule = Condition.GetYouRule(who_be_attacked, identity=True)
             return Condition.CheckWhichCard(rule, message.attacked, effect) and \
                 message.taken_damage > 0
 
         def check_is_undefended_attack(effect: 'Effect', message: 'Message.AfterUnitAttackUnit') -> bool:
-            if is_undefended_attack == None:
+            if is_undefended_attack  is None:
                 return True
             if is_undefended_attack:
-                return message.defender == None
+                return message.defender  is None
             else:
-                return message.defender != None
+                return message.defender  is not None
 
         def check_who_is_target(effect: 'Effect', message: 'Message.AfterUnitAttackUnit') -> bool:
-            if who_is_target == None:
+            if who_is_target  is None:
                 return True
             return who_is_target.card.face == message.attacked
 
@@ -493,12 +495,12 @@ class AbilityFactoryDoAttack:
         #     control_by_player = True
 
         def check_target_in_play(effect: 'Effect', message: 'Message.AfterUnitAttackUnit') -> bool:
-            if target_in_play == None:
+            if target_in_play  is None:
                 return True
             return message.attacked.IsInPlay()
 
         # def check_control_by_player(effect: 'Effect', message: 'Message.AfterUnitAttackUnit') -> bool:
-        #     if control_by_player == None:
+        #     if control_by_player  is None:
         #         return True
         #     return Player.IsType(message.attacked.GetControlBy())
 
@@ -587,7 +589,7 @@ class AbilityFactoryDoAttack:
                     finder = None
                     Player.IsType(message.target.GetControlBy())
                 else:
-                    assert who_be_attacked == None or isinstance(who_be_attacked, CardFinder)
+                    assert who_be_attacked  is None or isinstance(who_be_attacked, CardFinder)
                     finder = who_be_attacked
 
                 if not finder or finder.Check(target):
@@ -631,23 +633,23 @@ class AbilityFactoryDoAttack:
                            ) -> 'Ability':
 
         def check_is_basic_attack(effect: 'Effect', message: 'Message.AfterUnitAttackEnd') -> bool:
-            if is_basic_attack == None:
+            if is_basic_attack  is None:
                 return True
             return is_basic_attack == message.IsBasicAttack()
 
         def check_against_who(effect: 'Effect', message: 'Message.AfterUnitAttackEnd') -> bool:
-            if against_who == None:
+            if against_who  is None:
                 return True
             if against_who == "You":
                 against_player = message.GetAgainstPlayer()
                 if against_who:
-                    return against_player != None
+                    return against_player  is not None
                 else:
-                    return against_player == None
+                    return against_player  is None
             return Condition.CheckWhichCard(against_who, message.attacked_targets, effect)
 
         def check_damage_who(effect: 'Effect', message: 'Message.AfterUnitAttackEnd') -> bool:
-            if damaged_who == None:
+            if damaged_who  is None:
                 return True
             return Condition.CheckWhichCard(damaged_who, message.damaged_targets, effect)
 
@@ -656,7 +658,7 @@ class AbilityFactoryDoAttack:
             return Condition.CheckWhichCard(rule, message.attacker, effect)
 
         def check_would_atk_message(effect: 'Effect', message: 'Message.AfterUnitAttackEnd') -> bool:
-            if would_atk_message == None:
+            if would_atk_message  is None:
                 return True
             return would_atk_message in message.would_atk_messages
 
@@ -747,8 +749,13 @@ class AbilityFactoryDoAttack:
             #     value = calc_fn
             # else:
             #     value = calc_fn(effect, message)
-
-            message.effect.initiator.GetRoleCharacter().TemporaryGain(effect, message, attack=value)
+            initiator = message.effect.initiator
+            if not initiator:
+                return
+            role_character = initiator.GetRoleCharacter()
+            if not role_character:
+                return
+            role_character.TemporaryGain(effect, message, attack=value)
 
         return [
             AbilityFactory.WhenCardWouldResolveAbility(
@@ -800,7 +807,7 @@ class AbilityFactoryDoAttack:
             # assert False
 
         def check_target(effect: 'Effect', message: 'Message.WhenRecalculateAttackDamage') -> bool:
-            if target == None:
+            if target  is None:
                 return True
             return Condition.CheckWhichCard(target, message.target, effect)
 
@@ -808,9 +815,9 @@ class AbilityFactoryDoAttack:
             return message.would_atk_message.IsBasicAttack()
 
         def check_is_undefended_attack(effect: 'Effect', message: 'Message.WhenRecalculateAttackDamage') -> bool:
-            if is_undefended_attack == None:
+            if is_undefended_attack  is None:
                 return True
-            return is_undefended_attack == (message.would_atk_message.GetDefender() == None)
+            return is_undefended_attack == (message.would_atk_message.GetDefender()  is None)
 
         return Ability(
             ability_type,
@@ -859,7 +866,7 @@ class AbilityFactoryDoAttack:
             return Condition.CheckWhichCard(target, message.targets, effect)
 
         def check_is_basic_attack(effect: 'Effect', message: 'Message.CheckIfAttackMessageHasKeyword') -> bool:
-            if is_basic_attack == None:
+            if is_basic_attack  is None:
                 return True
             return is_basic_attack == message.IsBasicAttack()
 
@@ -892,7 +899,7 @@ class AbilityFactoryDoAttack:
             if who_be_attacked == "Attached":
                 # Condition.ThisAttachedToTrigger,
                 return isinstance(effect.this, Attachment|Upgrade) and \
-                    effect.this.bind_face != None and \
+                    effect.this.bind_face  is not None and \
                     message.HasTarget(effect.this.bind_face)
             return Condition.CheckWhichCard(who_be_attacked, message.attacked_targets, effect)
 
@@ -956,17 +963,17 @@ class AbilityFactoryDoAttack:
             return Condition.CheckWhichCard(attacker, message.attacker, effect)
 
         def check_has_defender(effect: 'Effect', message: Message.WhenUnitBeingAttack) -> bool:
-            if has_defender == None:
+            if has_defender  is None:
                 return True
-            return has_defender == (message.defender != None)
+            return has_defender == (message.defender  is not None)
 
         def check_is_basic_attack(effect: 'Effect', message: 'Message.WhenUnitBeingAttack') -> bool:
-            if is_basic_attack == None:
+            if is_basic_attack  is None:
                 return True
             return is_basic_attack == message.IsBasicAttack()
 
         def check_atk_message(effect: 'Effect', message: 'Message.WhenUnitBeingAttack') -> bool:
-            if would_atk_message == None:
+            if would_atk_message  is None:
                 return True
             return would_atk_message == message.would_atk_message
 
@@ -1026,7 +1033,7 @@ class AbilityFactoryDoAttack:
             return Condition.CheckWhichCard(cannot_attack, message.being_attack, effect)
 
         def check_can_only_attack(effect: 'Effect', message: 'Message.CheckIfUnitCanBeAttackBy') -> bool:
-            if can_only_attack == None:
+            if can_only_attack  is None:
                 return True
             return not Condition.CheckWhichCard(can_only_attack, message.being_attack, effect)
 
@@ -1150,7 +1157,7 @@ class AbilityFactoryDoAttack:
                             ) -> 'Ability':
 
         def check_is_basic_power(effect: 'Effect', message: 'Message.AfterUnitAttackEnd|Message.AfterUnitThwartEnd') -> bool:
-            if is_basic_power == None:
+            if is_basic_power  is None:
                 return True
             if isinstance(message, Message.AfterUnitAttackEnd):
                 return is_basic_power == message.IsBasicAttack()
@@ -1183,7 +1190,7 @@ class AbilityFactoryDoAttack:
                             ) -> 'Ability':
 
         def check_is_basic_power(effect: 'Effect', message: 'Message.AfterUnitAttackEnd|Message.AfterUnitDefendEnd') -> bool:
-            if is_basic_power == None:
+            if is_basic_power  is None:
                 return True
             if isinstance(message, Message.AfterUnitAttackEnd):
                 return is_basic_power == message.IsBasicAttack()
@@ -1219,7 +1226,7 @@ class AbilityFactoryDoAttack:
                                     ) -> 'Ability':
 
         def check_is_basic_power(effect: 'Effect', message: 'Message.WhenUnitWouldAttack|Message.WhenUnitWouldThwart') -> bool:
-            if is_basic_power == None:
+            if is_basic_power  is None:
                 return True
             if isinstance(message, Message.WhenUnitWouldAttack):
                 return is_basic_power == message.IsBasicAttack()
@@ -1252,12 +1259,12 @@ class AbilityFactoryDoAttack:
                                 ) -> 'Ability':
 
         def check_by_face(effect: 'Effect', message: 'Message.AfterUnitBecomeDefender') -> bool:
-            if by_effect_face == None:
+            if by_effect_face  is None:
                 return True
             return Condition.CheckWhichCard(by_effect_face, message.by_effect.this, effect)
 
         # def check_on_event(effect: 'Effect', message: 'Send.AfterUnitBecomeDefender') -> bool:
-        #     if on_event == None:
+        #     if on_event  is None:
         #         return True
         #     return isinstance(message.on_event, on_event)
 

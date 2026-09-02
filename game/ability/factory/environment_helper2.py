@@ -208,7 +208,7 @@ def WhenFaceApplyThisInternal(card_finder: CardTypeMin,
                 pass
 
             # update = False
-            if abilities != None:
+            if abilities  is not None:
                 # Fix for "50070"
                 if OnEvent.Faceup in message.on_events:
                     assert isinstance(message, TriggerMessage)
@@ -261,7 +261,7 @@ def WhenFaceApplyThisInternal(card_finder: CardTypeMin,
 
         def new_condition(check_effect: 'Effect', message: 'Message2'):
             # Not from `Operation.FaceGain`
-            # message.by_message != None and \
+            # message.by_message  is not None and \
             # check_effect != message.by_effect and \
             return not this.is_treat_as_if_blank and \
                 check_this_is_in_play() and \

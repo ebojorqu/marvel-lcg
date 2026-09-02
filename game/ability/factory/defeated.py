@@ -17,12 +17,12 @@ class AbilityFactoryDefeated:
             return Condition.CheckWhichCard(check_unit, message.trigger, effect)
 
         def check_by_consequential_damage(effect: 'Effect', message: 'Message.WhenUnitWouldBeDefeated') -> bool:
-            if by_consequential_damage == None:
+            if by_consequential_damage  is None:
                 return True
             return by_consequential_damage == message.IsByConsequentialDamage()
 
         # def check_by_overkill(effect: 'Effect', message: 'Message.WhenUnitWouldBeDefeated') -> bool:
-        #     if by_overkill == None:
+        #     if by_overkill  is None:
         #         return True
         #     return by_overkill == message
 
@@ -61,32 +61,32 @@ class AbilityFactoryDefeated:
             return Condition.CheckWhichCard(which_unit, message.trigger, effect)
 
         def check_has_defeated_player(effect: 'Effect', message: 'Message.WhenUnitBeDefeated') -> bool:
-            if has_defeating_player == None:
+            if has_defeating_player  is None:
                 return True
-            return has_defeating_player == (message.defeating_player != None)
+            return has_defeating_player == (message.defeating_player  is not None)
 
         def check_by_attack(effect: 'Effect', message: 'Message.WhenUnitBeDefeated') -> bool:
-            if by_attack == None:
+            if by_attack  is None:
                 return True
             if isinstance(by_attack, Message.WhenUnitWouldAttack):
                 return message.would_atk_message == by_attack
             if isinstance(by_attack, Message.WhenUnitBeingAttack):
                 return message.being_atk_message == by_attack
             if by_attack:
-                return message.being_atk_message != None
+                return message.being_atk_message  is not None
             else:
-                return message.being_atk_message == None
+                return message.being_atk_message  is None
 
         def check_by_source(effect: 'Effect', message: 'Message.WhenUnitBeDefeated') -> bool:
             return Condition.CheckWhichCard(by_source, message.killer, effect)
 
         def check_by_onsequential(effect: 'Effect', message: 'Message.WhenUnitBeDefeated') -> bool:
-            if by_consequential == None:
+            if by_consequential  is None:
                 return True
             return message.IsByConsequential() == by_consequential
 
         def check_excess_damage_more_than_zero(effect: 'Effect', message: 'Message.WhenUnitBeDefeated') -> bool:
-            if took_excess_damage == None:
+            if took_excess_damage  is None:
                 return True
             return took_excess_damage == bool(message.excess_damage > 0)
 
@@ -121,7 +121,7 @@ class AbilityFactoryDefeated:
                            conditions: ConditionsType[Message.WhenUnitBeDefeated]=[],
                            ) -> 'Ability':
 
-        if took_excess_damage == None and without_excess_damage != None:
+        if took_excess_damage  is None and without_excess_damage  is not None:
             if not without_excess_damage:
                 took_excess_damage = True
             else:
@@ -242,16 +242,16 @@ class AbilityFactoryDefeated:
             return Condition.CheckWhichCard(who_be_defeated, message.target, effect)
 
         def check_would_message(effect: 'Effect', message: 'Message.AfterUnitDefeatedUnit') -> bool:
-            if would_message == None:
+            if would_message  is None:
                 return True
             return would_message.would_atk_message == message.would_atk_message
 
         def check_is_from_attack(effect: 'Effect', message: 'Message.AfterUnitDefeatedUnit') -> bool:
-            if is_from_attack == None:
+            if is_from_attack  is None:
                 return True
             return is_from_attack == message.IsFromAttack()
             # if is_from_attack:
-            #     if message.would_atk_message == None:
+            #     if message.would_atk_message  is None:
             #         return False
             #     if who_killer == "This":
             #         return effect.this == message.would_atk_message.attacker
@@ -259,10 +259,10 @@ class AbilityFactoryDefeated:
             #         return Condition.ThisIsYou(effect, message.would_atk_message.attacker)
             #     return True
             # else:
-            #     return message.would_atk_message == None
+            #     return message.would_atk_message  is None
 
         def check_has_excess_damage(effect: 'Effect', message: 'Message.AfterUnitDefeatedUnit') -> bool:
-            if has_excess_damage == None:
+            if has_excess_damage  is None:
                 return True
             return has_excess_damage == bool(message.excess_damage > 0)
 
@@ -353,20 +353,20 @@ class AbilityFactoryDefeated:
             return Condition.CheckWhichCard(who_be_defeated, message.trigger, effect)
 
         def check_by_consequential(effect: 'Effect', message: 'Message.AfterUnitBeDefeated') -> bool:
-            if by_consequential == None:
+            if by_consequential  is None:
                 return True
             return message.IsByConsequential() == by_consequential
 
         def check_attacker(effect: 'Effect', message: 'Message.AfterUnitBeDefeated') -> bool:
-            if attacker == None:
+            if attacker  is None:
                 return True
             return Condition.CheckWhichCard(attacker, message.attacker, effect)
 
         def check_by_attack(effect: 'Effect', message: 'Message.AfterUnitBeDefeated') -> bool:
-            if by_attack == None:
+            if by_attack  is None:
                 return True
             # return by_attack == message.by_effect.ability.is_like_attack
-            return by_attack == (message.would_atk_message != None)
+            return by_attack == (message.would_atk_message  is not None)
 
         return Ability(
             ability_type,
@@ -450,9 +450,9 @@ class AbilityFactoryDefeated:
             return Condition.CheckWhichCard(which_scheme, message.trigger, effect)
 
         def check_has_defeated_player(effect: 'Effect', message: 'Message.WhenSchemeBeDefeated') -> bool:
-            if has_defeating_player == None:
+            if has_defeating_player  is None:
                 return True
-            return has_defeating_player == (message.defeating_player != None)
+            return has_defeating_player == (message.defeating_player  is not None)
 
         return Ability(
             # Don't try to use "AbilityType.WhenDefeated", see "11033"
@@ -528,7 +528,7 @@ class AbilityFactoryDefeated:
         from game.card.face.base import Unit2
         from game.operate.worlds import Worlds
 
-        if condition == None:
+        if condition  is None:
             condition = lambda effect: True
 
         def while_this_be_defeated(effect: 'Effect', message: 'Message2') -> None:
@@ -571,13 +571,13 @@ class AbilityFactoryDefeated:
                 #     if Condition.CheckWhichCard(which_card, face, effect):
                 #         found = face
                 #         break
-                # if found == None:
+                # if found  is None:
                 #     return False
                 # if found.CastTo(Unit2).health > 0:
                 #     return False
                 if not condition(effect):
                     return False
-                if while_card_is_in_play == None:
+                if while_card_is_in_play  is None:
                     return True
                 return not Condition.CheckWhichCard(while_card_is_in_play, Worlds.GetOnFieldCards(effect), effect)
 

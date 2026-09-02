@@ -55,7 +55,7 @@ class AbilityFactoryCampaign:
         def action(effect: 'Effect', message: 'Message.WhenCampaignSetup'):
             card = CardFactory.GenerateCard(card_id, None, effect.world)
             face = card.face
-            face.PutIntoPlay("FirstPlayer", effect, under_control=under_control != None)
+            face.PutIntoPlay("FirstPlayer", effect, under_control=under_control  is not None)
         return AbilityFactoryCampaign.WhenCampaignSetup(action)
 
     @staticmethod

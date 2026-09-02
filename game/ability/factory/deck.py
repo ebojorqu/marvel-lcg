@@ -60,12 +60,12 @@ class AbilityFactoryDeck:
                         ) -> 'Ability':
 
         def check_deck(effect: 'Effect', message: 'Message.AfterDeckReset') -> bool:
-            if deck == None:
+            if deck  is None:
                 return True
             return deck(effect) == message.deck
 
         def check_is_player_deck(effect: 'Effect', message: 'Message.AfterDeckReset') -> bool:
-            if is_player_deck == None:
+            if is_player_deck  is None:
                 return True
             return is_player_deck == message.deck.flags.is_player_deck
 
@@ -92,7 +92,7 @@ class AbilityFactoryDeck:
         def check_only_during_player_phase(effect: 'Effect', message: 'Message.AfterCardsMoved|Message.AfterDeckShuffle|Message.AfterUnitChangeForm|Message.WhenUnitWouldChangeForm') -> bool:
             if only_during_player_phase == False:
                 return True
-            assert ex_operation == None # HACK
+            assert ex_operation  is None # HACK
             return effect.world.phase.IsPlayerPhase("AnyPlayer")
 
         def magik(effect: 'Effect', message: 'Message.AfterCardsMoved|Message.AfterDeckShuffle|Message.AfterUnitChangeForm|Message.WhenUnitWouldChangeForm|Message.WhenPhaseBegin') -> None:

@@ -29,9 +29,9 @@ class AbilityFactoryCardMove:
         def check_under_where(effect: 'Effect', message: 'Message.WhenCardWouldMoveToArea') -> bool:
             if not message.into_area.flags.is_place_card_area:
                 return False
-            if message.into_area.bind_card == None:
+            if message.into_area.bind_card  is None:
                 return False
-            if under_where == None:
+            if under_where  is None:
                 return True
             return Condition.CheckWhichCard(under_where, message.into_area.bind_card.face, effect)
 
@@ -60,17 +60,17 @@ class AbilityFactoryCardMove:
             return Condition.CheckWhichCard(which_card, message.trigger, effect)
 
         def check_into_play(effect: 'Effect', message: 'Message.WhenCardWouldMoveToArea') -> bool:
-            if into_play == None:
+            if into_play  is None:
                 return True
             return into_play == message.into_area.flags.is_in_play
 
         def check_from_play(effect: 'Effect', message: 'Message.WhenCardWouldMoveToArea') -> bool:
-            if from_play == None:
+            if from_play  is None:
                 return True
             return from_play == message.from_area.flags.is_in_play
 
         def check_into_discard_pile(effect: 'Effect', message: 'Message.WhenCardWouldMoveToArea') -> bool:
-            if into_discard_pile == None:
+            if into_discard_pile  is None:
                 return True
             return into_discard_pile == message.into_area.flags.is_discards
 
@@ -118,7 +118,7 @@ class AbilityFactoryCardMove:
                            conditions: ConditionsType[Message.AfterCardEnterPlay]=[],
                            ) -> 'Ability':
         def check_under_your_control(effect: 'Effect', message: 'Message.AfterCardEnterPlay') -> bool:
-            if under_your_control == None:
+            if under_your_control  is None:
                 return True
             return message.trigger.GetControlBy() == effect.initiator
 
@@ -302,10 +302,10 @@ class AbilityFactoryCardMove:
                         ) -> 'Ability':
 
         def check_which_card(effect: 'Effect', message: 'Message.AfterCardsMoved') -> bool:
-            return message.IsIncludeFace(which_card, effect) != None
+            return message.IsIncludeFace(which_card, effect)  is not None
 
         def check_by_shuffle(effect: 'Effect', message: 'Message.AfterCardsMoved'):
-            if by_shuffle == None:
+            if by_shuffle  is None:
                 return True
             return by_shuffle == message.by_shuffle
 

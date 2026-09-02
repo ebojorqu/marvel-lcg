@@ -99,7 +99,7 @@ class ConditionCardType:
             return True
 
         def invoke_check_card(check_rule: 'ConditionCardType.CARD_TYPE', face: 'CardFace') -> bool:
-            if check_rule == None:
+            if check_rule is None:
                 return True
             if isinstance(check_rule, CardFinder):
                 if check_rule:
@@ -224,6 +224,7 @@ class ConditionCardType:
                 return Leader.IsType(face)
 
             if isinstance(check_rule, tuple) and \
+                len(check_rule) == 2 and \
                 not isinstance(check_rule, str):
                 ex_prefix, ex_finder = check_rule
 
@@ -283,9 +284,9 @@ class ConditionCardType:
                 return True
             return check_rule.IsType(face)
 
-        if check_rule_param == None:
+        if check_rule_param is None:
             return True
-        if check_faces == None:
+        if check_faces is None:
             return False
         if isinstance(check_faces, CardFace):
             if size != 1:

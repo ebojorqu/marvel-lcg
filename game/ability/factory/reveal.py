@@ -54,7 +54,7 @@ class AbilityFactoryReveal:
 
         def check_from_encounter(effect: 'Effect', message: 'Message.WhenPlayerRevealCard') -> bool:
             # Only work when reveal from encounter deck, not from discard pile
-            if from_encounter != None:
+            if from_encounter  is not None:
                 if from_encounter:
                     return message.IsFromEncounterDeck()
                 else:
@@ -97,7 +97,7 @@ class AbilityFactoryReveal:
                          ) -> 'Ability':
 
         def check_which_card(effect: 'Effect', message: 'Message.WhenCardRevealed') -> bool:
-            if which_card == None:
+            if which_card  is None:
                 return True
             if which_card == "This":
                 return effect.this == message.trigger
@@ -122,7 +122,7 @@ class AbilityFactoryReveal:
                 return message.GetToPlayer().IsAlterEgo()
             if condition == "Hero":
                 return message.GetToPlayer().IsHero()
-            if condition == None:
+            if condition  is None:
                 return True
             return condition(effect, message)
 
@@ -218,7 +218,7 @@ class AbilityFactoryReveal:
 
         # def check_from_encounter(effect: 'Effect', message: 'Send.AfterCardRevealedEnd') -> bool:
         #     # Only work when reveal from encounter deck, not from discard pile
-        #     if from_encounter != None:
+        #     if from_encounter  is not None:
         #         if from_encounter:
         #             return message.IsFromEncounterDeck()
         #         else:

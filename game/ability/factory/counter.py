@@ -42,7 +42,7 @@ class AbilityFactoryCounter:
             return Condition.CheckWhichCard(which_card, message.trigger, effect)
     
         def check_is_last_counter(effect: 'Effect', message: 'Message.AfterCardRemovedCounter') -> bool:
-            if is_last_counter == None:
+            if is_last_counter  is None:
                 return True
             left_counter = message.trigger.CastTo(CanPlaceCounter).GetCounters(message.counter_name)
             if is_last_counter:
@@ -51,7 +51,7 @@ class AbilityFactoryCounter:
                 return left_counter != 0
 
         def check_counter_name(effect: 'Effect', message: 'Message.AfterCardRemovedCounter') -> bool:
-            if counter_name == None:
+            if counter_name  is None:
                 return True
             return message.counter_name == counter_name
 
@@ -123,7 +123,7 @@ class AbilityFactoryCounter:
                     counter = at_least
                 else:
                     counter = at_least(effect)
-                assert counter_name != None
+                assert counter_name  is not None
                 return this.GetCounters(counter_name) >= counter
             return True
 
@@ -184,7 +184,7 @@ class AbilityFactoryCounter:
                                      ) -> 'Ability':
 
         def check_to_where(effect: 'Effect', message: Message.WhenCardWouldBePlacedCounter) -> bool:
-            if which_face == None:
+            if which_face  is None:
                 return True
             elif which_face == "Another":
                 return effect.this != message.trigger

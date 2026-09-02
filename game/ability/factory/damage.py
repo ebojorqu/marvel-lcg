@@ -24,40 +24,40 @@ class AbilityFactoryDamage:
             return Condition.CheckWhichCard(rule, message.trigger, effect)
 
         def check_is_from_attack(effect: 'Effect', message: 'Message.WhenUnitWouldTakeDamage') -> bool:
-            if is_from_attack == None:
+            if is_from_attack  is None:
                 return True
             if isinstance(is_from_attack, Message2):
                 return is_from_attack == message.would_atk_message
             return is_from_attack == message.IsFromAttack()
 
         # def check_is_from_overkill(effect: 'Effect', message: 'Message.WhenUnitWouldTakeDamage') -> bool:
-        #     if include_overkill == None:
+        #     if include_overkill  is None:
         #         return True
         #     return include_overkill == message.would_deal_damage_message.IsOverkill()
 
         def check_is_consequential_damage(effect: 'Effect', message: 'Message.WhenUnitWouldTakeDamage') -> bool:
-            if is_consequential_damage == None:
+            if is_consequential_damage  is None:
                 return True
             from game.effect.rule import Consequential
             return type(message.would_deal_damage_message.by_effect) is Consequential
 
         def check_while_defending(effect: 'Effect', message: 'Message.WhenUnitWouldTakeDamage') -> bool:
-            if while_defending == None:
+            if while_defending  is None:
                 return True
             if while_defending == True:
-                return message.being_atk_message != None and \
+                return message.being_atk_message  is not None and \
                     message.trigger == message.being_atk_message.defender
             else:
-                return message.being_atk_message == None or \
+                return message.being_atk_message  is None or \
                     message.trigger != message.being_atk_message.defender
 
         def check_control_by(effect: 'Effect', message: 'Message.WhenUnitWouldTakeDamage') -> bool:
-            if control_by == None:
+            if control_by  is None:
                 return True
             return control_by == message.trigger.GetControlBy()
 
         def check_not_include_this_effect(effect: 'Effect', message: 'Message.WhenUnitWouldTakeDamage') -> bool:
-            if not_include_this_effect == None:
+            if not_include_this_effect  is None:
                 return True
             assert not_include_this_effect == True
             return effect != message.by_effect
@@ -103,7 +103,7 @@ class AbilityFactoryDamage:
             return Condition.CheckWhichCard(rule, message.trigger, effect)
 
         def check_is_from_attack(effect: 'Effect', message: 'Message.AfterUnitTookDamage') -> bool:
-            if is_from_attack == None:
+            if is_from_attack  is None:
                 return True
             if isinstance(is_from_attack, Message2):
                 return is_from_attack == message.would_atk_message
@@ -113,7 +113,7 @@ class AbilityFactoryDamage:
             return Condition.CheckWhichCard(who_dealt_damage, message.source, effect)
 
         def check_is_indirect_damage(effect: 'Effect', message: 'Message.AfterUnitTookDamage') -> bool:
-            if is_indirect_damage == None:
+            if is_indirect_damage  is None:
                 return True
             return is_indirect_damage == message.IsIndirectDamage()
 
@@ -272,11 +272,11 @@ class AbilityFactoryDamage:
         from game.operate.worlds import Worlds
 
         if cannot_take_more_than_damage:
-            assert is_damage_more_than == None
+            assert is_damage_more_than  is None
             is_damage_more_than = cannot_take_more_than_damage
 
         def cannot_take_damage(effect: 'Effect', message: 'Message.WhenUnitWouldTakeDamage') -> None:
-            if cannot_take_more_than_damage != None:
+            if cannot_take_more_than_damage  is not None:
                 if isinstance(cannot_take_more_than_damage, int):
                     value = cannot_take_more_than_damage
                 else:
@@ -286,7 +286,7 @@ class AbilityFactoryDamage:
                 message.PreventDamage("All", effect)
 
         def check_while_face_is_in_play(effect: 'Effect', message: 'Message.WhenUnitWouldTakeDamage') -> bool:
-            if while_face_is_in_play == None:
+            if while_face_is_in_play  is None:
                 return True
 
             for face in Worlds.GetOnFieldCards(effect):
@@ -295,7 +295,7 @@ class AbilityFactoryDamage:
             return False
 
         def check_is_damage_more_than(effect: 'Effect', message: 'Message.WhenUnitWouldTakeDamage') -> bool:
-            if is_damage_more_than == None:
+            if is_damage_more_than  is None:
                 return True
             if isinstance(is_damage_more_than, int):
                 value = is_damage_more_than
@@ -307,7 +307,7 @@ class AbilityFactoryDamage:
         #     return effect.this != message.by_effect.this
 
         def check_damage_from(effect: 'Effect', message: 'Message.WhenUnitWouldTakeDamage') -> bool:
-            if damage_from == None:
+            if damage_from  is None:
                 return True
             return Condition.CheckWhichCard(damage_from, message.by_effect.this, effect)
 
@@ -371,7 +371,7 @@ class AbilityFactoryDamage:
                                     conditions: ConditionsType[Message.WhenUnitWouldTakeDamage]=[],
                                     ) -> 'Ability':
         def check_attached_unit_only(effect: 'Effect', message: 'Message.WhenUnitWouldTakeDamage') -> bool:
-            if this_attached_unit_only == None:
+            if this_attached_unit_only  is None:
                 return True
             return Condition.ThisAttachedTo(effect, message.trigger)
 
@@ -414,7 +414,7 @@ class AbilityFactoryDamage:
                 # Ally attack should also trigger
                 # if not message.by_effect.ability.is_play:
                 #     return False
-                if by_face == None:
+                if by_face  is None:
                     return True
                 return by_face.Check(message.by_effect.this)
             return False
@@ -435,7 +435,7 @@ class AbilityFactoryDamage:
                                 deal_damage_to: CardType=None,
                                 update_damage_rule: Literal["Double"]|int=0) -> 'Ability':
         def check_with_piercing(effect: 'Effect', message: 'Message.WhenRecalculateAttackDamage') -> bool:
-            if with_piercing != None:
+            if with_piercing  is not None:
                 return with_piercing == message.would_atk_message.property.piercing
             return True
 
@@ -515,12 +515,12 @@ class AbilityFactoryDamage:
             return Condition.CheckWhichCard(rule, message.target, effect)
 
         def check_is_from_attack(effect: 'Effect', message: 'Message.WhenFaceWouldDealDamage') -> bool:
-            if from_attack == None:
+            if from_attack  is None:
                 return check_is_from_overkill(effect, message)
-            return from_attack == (message.would_atk_message != None)
+            return from_attack == (message.would_atk_message  is not None)
 
         def check_by_which_effect(effect: 'Effect', message: 'Message.WhenFaceWouldDealDamage') -> bool:
-            if by_which_effect == None:
+            if by_which_effect  is None:
                 return True
             return by_which_effect == message.by_effect
 
@@ -531,7 +531,7 @@ class AbilityFactoryDamage:
             return not message.IsOverkill()
 
         def check_by_play_card(effect: 'Effect', message: 'Message.WhenFaceWouldDealDamage') -> bool:
-            if by_play_card == None:
+            if by_play_card  is None:
                 return True
             # if isinstance(message.by_effect, GameRule):
             if message.by_effect.is_rule:
@@ -549,11 +549,11 @@ class AbilityFactoryDamage:
                 return message.damage > 0
 
         def check_is_undefended_attack(effect: 'Effect', message: 'Message.WhenFaceWouldDealDamage') -> bool:
-            if is_undefended_attack == None:
+            if is_undefended_attack  is None:
                 return True
-            if message.would_atk_message == None:
+            if message.would_atk_message  is None:
                 return False
-            return is_undefended_attack == (message.would_atk_message.defender == None)
+            return is_undefended_attack == (message.would_atk_message.defender  is None)
 
         return Ability(
             ability_type,
@@ -585,25 +585,25 @@ class AbilityFactoryDamage:
                             conditions: ConditionsType[Message.AfterFaceDealDamage]=[],
                             ) -> 'Ability':
         def check_is_from_attack(effect: 'Effect', message: 'Message.AfterFaceDealDamage') -> bool:
-            if is_from_attack == None:
+            if is_from_attack  is None:
                 return True
             return is_from_attack == message.IsFromAttack()
     
         def check_who(effect: 'Effect', message: 'Message.AfterFaceDealDamage') -> bool:
-            if which_face_dealt_damage == None:
+            if which_face_dealt_damage  is None:
                 return True
             # Comment out this for "16037" and "16032"
-            # if message.attacker == None:
+            # if message.attacker  is None:
             #     return False
             return Condition.CheckWhichCard(which_face_dealt_damage, message.trigger, effect)
 
         def check_dealt_to_who(effect: 'Effect', message: 'Message.AfterFaceDealDamage') -> bool:
-            if dealt_to_who == None:
+            if dealt_to_who  is None:
                 return True
             return Condition.CheckWhichCard(dealt_to_who, message.who_took_damage, effect)
 
         def check_dealt_more_than_damage(effect: 'Effect', message: 'Message.AfterFaceDealDamage') -> bool:
-            if dealt_more_than_damage == None:
+            if dealt_more_than_damage  is None:
                 return True
             return message.dealt_damage >= dealt_more_than_damage
 
@@ -665,7 +665,7 @@ class AbilityFactoryDamage:
                                 ) -> 'Ability':
 
         def check_is_from_attack(effect: 'Effect', message: 'Message.AfterDamageBePrevented') -> bool:
-            if is_from_attack == None:
+            if is_from_attack  is None:
                 return True
             return is_from_attack == message.IsFromAttack()
     
@@ -676,7 +676,7 @@ class AbilityFactoryDamage:
             return Condition.CheckWhichCard(prevent_by, message.prevent_by_effect.this, effect)
 
         def check_damage_more_than(effect: 'Effect', message: 'Message.AfterDamageBePrevented') -> bool:
-            if damage_more_than == None:
+            if damage_more_than  is None:
                 return True
             return message.prevent_damage >= damage_more_than
 

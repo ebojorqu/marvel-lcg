@@ -24,7 +24,7 @@ class AbilityFactoryPlayer:
         #             return Condition.ThisAttachedTo(effect, message.check_effect.initiator.GetRoleCharacter(), True)
         #         else:
         #             return False
-        #     if on_while == None:
+        #     if on_while  is None:
         #         return True
 
         return Ability(
@@ -77,7 +77,7 @@ class AbilityFactoryPlayer:
             return Condition.CheckWhichPlayer(which_player, message.trigger.GetControlBy(), effect)
         
         def check_exclude(effect: 'Effect', message: 'Message.WhenUnitWouldChangeForm') -> bool:
-            if exclude == None:
+            if exclude  is None:
                 return True
             return not Condition.CheckWhichCard(exclude, message.by_effect.this, effect)
 
@@ -107,12 +107,12 @@ class AbilityFactoryPlayer:
             return Condition.CheckWhichPlayer(which_player, message.trigger.GetControlBy(), effect)
 
         def check_from_form(effect: 'Effect', message: 'Message.WhenUnitWouldChangeForm') -> bool:
-            if from_form == None:
+            if from_form  is None:
                 return True
             return from_form.IsType(message.from_form)
 
         def check_to_form(effect: 'Effect', message: 'Message.WhenUnitWouldChangeForm') -> bool:
-            if to_form == None:
+            if to_form  is None:
                 return True
             return to_form.IsType(message.to_form)
 
@@ -157,7 +157,7 @@ class AbilityFactoryPlayer:
             return Condition.CheckWhichAbility(which_ability, ability)
 
         def check_label(effect: 'Effect', message: 'Message.CheckEffectCondition') -> bool:
-            if label == None:
+            if label  is None:
                 return True
             ability = message.check_effect.ability
             return ability.IsLabel(label)
@@ -166,7 +166,7 @@ class AbilityFactoryPlayer:
             return Condition.CheckWhichCard(on_which_card, message.check_effect.this, effect)
 
         def check_during(effect: 'Effect', message: 'Message.CheckEffectCondition') -> bool:
-            if during == None:
+            if during  is None:
                 return True
             if during == "YourTurn":
                 player = effect.world.GetCurrentPlayer()
@@ -329,7 +329,7 @@ class AbilityFactoryPlayer:
             Faces.ExhaustAll([message.trigger], effect)
 
         def check_which_player(effect: 'Effect', message: 'Message.WhenCardEnterPlay') -> bool:
-            if which_player == None:
+            if which_player  is None:
                 return True
             return Condition.CheckWhichPlayer(which_player, message.trigger.GetControlBy(), effect)
 

@@ -45,12 +45,12 @@ class ConditionOncePer:
     @staticmethod
     def LimitOncePerEvent(effect: 'Effect', message: 'Message2') -> bool:
         ability = GetForDelayAbility(effect)
-        return ability not in [x.ability for x in message.once_per_event_effects]
+        return not any(x.ability == ability for x in message.once_per_event_effects)
 
     @staticmethod
     def LimitOnceCardNamePerEvent(effect: 'Effect', message: 'Message2') -> bool:
         ability = GetForDelayAbility(effect)
-        if ability == None:
+        if ability is None:
             return True
-        return ability.paper not in [x.ability.paper for x in message.once_per_event_effects]
+        return not any(x.ability.paper == ability.paper for x in message.once_per_event_effects)
 

@@ -15,7 +15,7 @@ class AbilityFactoryStatus:
             return Condition.CheckWhichCard(place_on_who, message.trigger, effect)
 
         def check_status(effect: 'Effect', message: 'Message.AfterStatusCardPlaceOn') -> bool:
-            if status == None:
+            if status  is None:
                 return True
             if not isinstance(status, list):
                 check_status = [status]

@@ -14,7 +14,7 @@ class AbilityFactoryMinion:
             return Condition.CheckWhichCard(which_minion, message.trigger, effect)
 
         def check_engage_to_who(effect: 'Effect', message: 'Message.WhenMinionWouldEngagePlayer') -> bool:
-            if engage_to_who == None:
+            if engage_to_who  is None:
                 return True
             player = message.would_engaged_player
             if engage_to_who == "You" or engage_to_who == "YourHero":
@@ -25,6 +25,7 @@ class AbilityFactoryMinion:
                         return effect.GetInitiator() == player
                 else:
                     return True
+            return False
 
         return Ability(
             ability_type,
@@ -52,7 +53,7 @@ class AbilityFactoryMinion:
             return Condition.CheckWhichCard(which_minion, message.trigger, effect)
 
         def check_engage_to_who(effect: 'Effect', message: 'Message.WhenMinionEngagePlayer') -> bool:
-            if engage_to_who == None:
+            if engage_to_who  is None:
                 return True
             # Fix 06001a vs 21143
             player = message.engaged_player
@@ -64,6 +65,7 @@ class AbilityFactoryMinion:
                         return effect.GetInitiator() == player
                 else:
                     return True
+            return False
 
         return Ability(
             ability_type,
@@ -106,7 +108,7 @@ class AbilityFactoryMinion:
             return Condition.CheckWhichCard(which_minion, message.trigger, effect)
 
         def check_engage_to_who(effect: 'Effect', message: 'Message.AfterMinionEngagePlayer') -> bool:
-            if engage_to_who == None:
+            if engage_to_who  is None:
                 return True
             # Fix 06001a vs 21143
             player = message.engaged_player
@@ -121,6 +123,7 @@ class AbilityFactoryMinion:
                         return player.IsHero()
                     else:
                         return True
+            return False
 
         return Ability(
             ability_type,

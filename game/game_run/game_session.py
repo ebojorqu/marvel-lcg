@@ -55,6 +55,11 @@ class GameSession:
         self.version = Ver(scene.version)
         self.game_id += 1
         self.start_time = Time.GetTime()
+
+        replay = self.game.controller_manager.replay
+        replay.Clean()
+        replay.SetReplayInputs(scene.inputs)
+
         self.game.state.SetStartState(state)
 
     ################################################################################
@@ -203,15 +208,22 @@ class GameSession:
             self.world.game_over.SetUndo()
         self.ExitWait()
 
-        history_inputs = self.game.controller_manager.replay.history_inputs[:]
+        replay = self.game.controller_manager.replay
+        history_inputs = replay.history_inputs[:]
         keep_count = max(len(history_inputs) - undo, 0)
-        self.game.controller_manager.replay.history_inputs = history_inputs[:keep_count]
+        trimmed_history = history_inputs[:keep_count]
 
-        skip_to = keep_count
-        self.game.scene.inputs = self.game.controller_manager.replay.history_inputs[:]
+        replay.history_inputs = trimmed_history
+        replay.current_step_id = keep_count
+        replay.replay_step_id = keep_count
+        replay.is_updated = False
+        replay.calculated_crc = []
+        replay.SetReplayInputs(trimmed_history)
+
+        self.game.scene.inputs = trimmed_history[:]
         self.game.ApplyHistoryInput()
-        self.game.controller_manager.skip.SetSkipTo(skip_to)
-        self.game.controller_manager.replay.Clear()
+        self.game.controller_manager.skip.SetSkipTo(keep_count)
+        replay.Clear()
         self.game.state.SetStartState('Undo')
         self.start_time = Time.GetTime()
         # game.controller_manager.replay.SetIsSkipping()
