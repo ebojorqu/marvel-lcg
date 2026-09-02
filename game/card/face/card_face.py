@@ -385,6 +385,11 @@ class CardFace(ModelName, ModelTrait, ModelAction, ModelOnEvent, ModelGain, Mode
 
     def IsTypeOld(self, face_type: Type[TF]) -> bool:
         card_types = Types.UnionTypeExtract(face_type)
+        if not card_types:
+            if not isinstance(face_type, type):
+                return False
+            return face_type.IsType(self)
+
         def is_list_of_types(x: List[Any]) -> TypeGuard[List[Type[CardFace]]]:
             return all(isinstance(item, type) for item in x)
         assert is_list_of_types(card_types)

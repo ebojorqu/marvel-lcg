@@ -13,17 +13,30 @@ class SetupCards:
                     name: str|None=None,
                     trait: "CardFace.TRAITS|None"=None,
                     card_type: Type['TC']|CardFace=CardFace,
-                    from_where: List[Literal["SetAside"]]=[], # TODO: Add this
+                    from_where: List[Literal["SetAside"]]=[],
                     **kwargs: Unpack['CardFinder.KWArgs'],
                     ) -> 'TC|None':
-        faces = SearchInternal.FindCards(
-            by_effect,
-            finder=finder,
-            name=name,
-            trait=trait,
-            card_type=card_type,
-            include_in_play=False,
-            **kwargs)
+        from game.operate.worlds import Worlds
+
+        if "SetAside" in from_where:
+            faces = Worlds.GetSetAsideAreaCards(
+                by_effect,
+                CardFinder(
+                    name=name,
+                    trait=trait,
+                    card_type=card_type,
+                    **kwargs,
+                ) & finder,
+            )
+        else:
+            faces = SearchInternal.FindCards(
+                by_effect,
+                finder=finder,
+                name=name,
+                trait=trait,
+                card_type=card_type,
+                include_in_play=False,
+                **kwargs)
         put_faces: List['Any'] = []
         for face in faces:
             if flip_to_trait or flip_to_name:

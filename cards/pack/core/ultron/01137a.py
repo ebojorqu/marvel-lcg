@@ -12,6 +12,7 @@ def GetAbilities() -> Sequence['Ability']:
             effect,
             name="Ultron Drones",
             card_type=Environment,
+            from_where=["SetAside"],
         )
 
     return [

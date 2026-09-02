@@ -196,10 +196,19 @@ class GameSession:
     ################################################################################
     #
     def Undo(self, undo: int):
+        if undo <= 0:
+            return
+
         if self.world:
             self.world.game_over.SetUndo()
         self.ExitWait()
-        skip_to = self.game.controller_manager.replay.current_step_id - undo
+
+        history_inputs = self.game.controller_manager.replay.history_inputs[:]
+        keep_count = max(len(history_inputs) - undo, 0)
+        self.game.controller_manager.replay.history_inputs = history_inputs[:keep_count]
+
+        skip_to = keep_count
+        self.game.scene.inputs = self.game.controller_manager.replay.history_inputs[:]
         self.game.ApplyHistoryInput()
         self.game.controller_manager.skip.SetSkipTo(skip_to)
         self.game.controller_manager.replay.Clear()

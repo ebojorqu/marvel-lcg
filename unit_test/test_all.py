@@ -135,6 +135,64 @@ class TestMain(unittest.TestCase):
             card_type_module.Ally = old_ally
             card_type_module.Event = old_event
 
+    def test_card_finder_and_conflicting_filters_are_handled_without_asserting(self):
+        from game.card.card_finder.finder import CardFinder
+        from game.card.card_finder.finder import CardFinder2
+
+        finder = CardFinder(name="Ultron Drones", card_type=__import__('game.card.face.card_type', fromlist=['Environment']).Environment)
+        other = CardFinder(name="Ultron Drones", card_type=__import__('game.card.face.card_type', fromlist=['Minion']).Minion)
+
+        merged = finder & other
+        self.assertTrue(hasattr(merged, 'always_false'))
+        self.assertTrue(merged.always_false)
+        self.assertTrue(bool(merged))
+
+        ultron_finder = CardFinder2("DRONE", __import__('game.card.face.card_type', fromlist=['Minion']).Minion)
+        self.assertEqual(len(ultron_finder.params), 2)
+
+    def test_setup_cards_put_into_play_honors_set_aside_source_without_prompting(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+
+        from game.operate.setup_cards import SetupCards
+        from game.operate.worlds import Worlds
+        from game.operate.search_internal import SearchInternal
+
+        class FakeFace:
+            def __init__(self):
+                self.card = SimpleNamespace(face=self)
+            def PutIntoPlay(self, *args, **kwargs):
+                return True
+
+        fake_face = FakeFace()
+        fake_effect = SimpleNamespace(world=SimpleNamespace(GetFirstPlayer=lambda: object()))
+
+        with patch.object(Worlds, 'GetSetAsideAreaCards', return_value=[fake_face]) as get_set_aside, \
+             patch.object(SearchInternal, 'FindCards', side_effect=AssertionError('generic search should not be used')):
+            result = SetupCards.PutIntoPlay(
+                fake_effect,
+                name='Ultron Drones',
+                card_type=__import__('game.card.face.card_type', fromlist=['Environment']).Environment,
+                from_where=['SetAside'],
+            )
+
+        self.assertIs(result, fake_face)
+        get_set_aside.assert_called_once()
+
+    def test_final_card_type_matching_allows_leadership_event_target_selection(self):
+        from cards.database import CardsDB
+        from game.card.card_finder import CardFinder
+        from game.card.face.card_type import Event
+
+        CardsDB.Initialize()
+        paper = CardsDB.FindCardPaper('01069')
+        face = Event(paper)
+        face.Initialize(0)
+
+        self.assertTrue(face.IsTypeOld(Event))
+        self.assertTrue(CardFinder(card_type=Event).Check(face, None))
+        self.assertTrue(CardFinder(card_type=Event, card_class='Leadership').Check(face, None))
+
     def test_message_to_player_accepts_runtime_player_instance_even_if_alias_is_stale(self):
         import game.player as player_module
         from game.message.message_type import TriggerNonePlayerMessage
@@ -244,7 +302,7 @@ class TestMain(unittest.TestCase):
         ally = FakeAlly('Professor X', deck)
         later = FakeFace('Later', deck)
         deck.cards = [later, ally, energy]
-        deck.Get = lambda from_top=False: list(deck.cards)
+        deck.Get = lambda from_top=False: list(reversed(deck.cards)) if from_top else list(deck.cards)
         deck.GetSize = lambda: len(deck.cards)
 
         with patch('game.message.Message.AfterCardsMoved') as after_cards_moved:
@@ -299,6 +357,84 @@ class TestMain(unittest.TestCase):
         self.assertIs(found, ally)
         self.assertEqual(other_faces, [])
         self.assertTrue(ally.discarded)
+
+    def test_discard_until_checks_top_card_before_discarding_it(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+
+        from game.deck.deck import Deck2
+
+        class FakeFace:
+            def __init__(self, name, deck, *, is_ally=False):
+                self.name = name
+                self.deck = deck
+                self.is_ally = is_ally
+                self.discarded = False
+            def IsName(self, name):
+                return self.name == name
+            def IsSubName(self, name):
+                return False
+            def HasTrait(self, *traits):
+                return False
+            def IsTypeOld(self, card_type):
+                return self.is_ally and issubclass(card_type, FakeAlly)
+            def DiscardInternal(self, by_effect):
+                self.discarded = True
+                self.deck.cards = [c for c in self.deck.cards if c is not self]
+
+        class FakeAlly(FakeFace):
+            def __init__(self, name, deck):
+                super().__init__(name, deck, is_ally=True)
+
+        deck = object.__new__(Deck2)
+        deck.flags = SimpleNamespace(is_deck=True, is_discards=False, is_player_deck=False)
+        deck.cards = []
+        other = FakeFace('Energy', deck)
+        ally = FakeAlly('Professor X', deck)
+        later = FakeFace('Later', deck)
+        deck.cards = [later, ally, other]
+        deck.Get = lambda from_top=False: list(reversed(deck.cards)) if from_top else list(deck.cards)
+        deck.GetSize = lambda: len(deck.cards)
+
+        with patch('game.message.Message.AfterCardsMoved') as after_cards_moved:
+            after_cards_moved.return_value.Send = lambda: None
+            found, other_faces = deck.DiscardUntil(object(), name=None, trait=None, card_type=FakeAlly)
+
+        self.assertIs(found, ally)
+        self.assertEqual([face.name for face in other_faces], ['Energy'])
+        self.assertTrue(ally.discarded)
+        self.assertTrue(other.discarded)
+        self.assertFalse(later.discarded)
+
+    def test_undo_keeps_only_the_last_valid_history(self):
+        from types import SimpleNamespace
+
+        class DummySkip:
+            def __init__(self):
+                self.skip_to = 0
+            def SetSkipTo(self, value):
+                self.skip_to = value
+
+        replay = SimpleNamespace(history_inputs=[1, 2, 3, 4], current_step_id=4)
+        replay.Clear = lambda: None
+        game = SimpleNamespace()
+        game.controller_manager = SimpleNamespace(
+            replay=replay,
+            skip=DummySkip(),
+        )
+        game.scene = SimpleNamespace(inputs=[1, 2, 3, 4])
+        game.state = SimpleNamespace(SetStartState=lambda _state: None)
+        game.ApplyHistoryInput = lambda: None
+
+        session = __import__('game.game_run.game_session', fromlist=['GameSession']).GameSession(game)
+        session.world = SimpleNamespace(game_over=SimpleNamespace(SetUndo=lambda: None))
+        session.ExitWait = lambda: None
+
+        session.Undo(1)
+
+        self.assertEqual(game.controller_manager.replay.history_inputs, [1, 2, 3])
+        self.assertEqual(game.scene.inputs, [1, 2, 3])
+        self.assertEqual(game.controller_manager.skip.skip_to, 3)
 
     def test_present_force_no_wait_clears_skip_flag(self):
         from types import SimpleNamespace

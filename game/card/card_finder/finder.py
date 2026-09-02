@@ -312,6 +312,7 @@ class CardFinder(metaclass=Tracker.Meta):
         CardFinder.Checks = Checks
         CardFinder.Checks2 = Checks2
 
+        self.always_false: bool = False
         self.is_empty = not self.params
 
     def Check(self, face: 'CardFace', effect: 'Effect|None'=None) -> bool:
@@ -336,17 +337,40 @@ class CardFinder(metaclass=Tracker.Meta):
             return self
         if self.is_empty:
             return other
-        params = self.params
+        if self.always_false or other.always_false:
+            self.always_false = True
+            self.is_empty = False
+            return self
+
+        merged = self
+        params = merged.params
         for key, value in other.params.items():
             if key in params:
-                if issubclass(params[key], value):
-                    value = params[key]
-                elif issubclass(value, params[key]):
-                   value = value
-                else:
-                    assert False
-            setattr(self, key, value)
-        return self
+                current_value = params[key]
+                if current_value == value:
+                    continue
+                if isinstance(current_value, type) and isinstance(value, type):
+                    if issubclass(current_value, value):
+                        value = current_value
+                    elif issubclass(value, current_value):
+                        value = value
+                    else:
+                        merged.always_false = True
+                        merged.is_empty = False
+                        return merged
+                elif isinstance(current_value, list) and isinstance(value, list):
+                    overlap = [item for item in value if item in current_value]
+                    if not overlap:
+                        merged.always_false = True
+                        merged.is_empty = False
+                        return merged
+                    value = overlap
+                elif current_value != value:
+                    merged.always_false = True
+                    merged.is_empty = False
+                    return merged
+            setattr(merged, key, value)
+        return merged
 
     def __or__(self, other: 'CardFinder|None') -> 'CardFinder':
         if other == None or other.is_empty:
@@ -358,7 +382,18 @@ class CardFinder(metaclass=Tracker.Meta):
 
     @property
     def params(self) -> Dict[str, Any]:
-        return {key: value for key, value in self.__dict__.items() if value != None and value != [] and key != 'is_empty'}
+        internal_keys = {
+            'is_empty',
+            'always_false',
+            'or_finders',
+            'check_face_fns',
+            'check_effect_fns',
+        }
+        return {
+            key: value
+            for key, value in self.__dict__.items()
+            if key not in internal_keys and value is not None and value != []
+        }
 
     def __repr__(self) -> str:
         return f"{self.params}"

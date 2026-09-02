@@ -37,6 +37,8 @@ from game.player import Player
 @Tracker.count_calls
 def Check(self: 'CardFinder', face: 'CardFace', effect: 'Effect|None'=None) -> bool:
     assert not self.is_empty
+    if self.always_false:
+        return False
 
     if self.or_finders:
         for finder in self.or_finders:
@@ -487,6 +489,8 @@ def Check(self: 'CardFinder', face: 'CardFace', effect: 'Effect|None'=None) -> b
 @Tracker.count_calls
 def Checks(self: 'CardFinder', faces: Sequence['CardFace'], effect: 'Effect|None'=None) -> Sequence['CardFace']:
     assert not self.is_empty
+    if self.always_false:
+        return []
 
     checked: List['CardFace'] = []
     for face in faces:

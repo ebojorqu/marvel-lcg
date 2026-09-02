@@ -462,14 +462,17 @@ class Deck2(Generic[TC], Object):
         found_face = None
 
         other_discard_faces: List['CardFace'] = []
-        for face in self.Get()[::-1]:
-            face.DiscardInternal(by_effect)
-            if finder is None or finder.Check(face):
-                found_face = face
-                break
-            other_discard_faces.append(face)
+        for face in self.Get(True):
+            if finder is not None and not finder.Check(face):
+                face.DiscardInternal(by_effect)
+                other_discard_faces.append(face)
+                continue
 
-        moved_faces = other_discard_faces + [found_face] if found_face else []
+            found_face = face
+            face.DiscardInternal(by_effect)
+            break
+
+        moved_faces = other_discard_faces + ([found_face] if found_face else [])
         from game.message import Message
         message = Message.AfterCardsMoved({x: self for x in moved_faces}, by_discard=True)
         message.Send()

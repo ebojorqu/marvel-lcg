@@ -104,6 +104,7 @@ lsof -nP -iTCP:2345 -sTCP:LISTEN
 If a stale Python process is still holding the port, clean it up before restarting:
 ```
 pkill -f 'python.*main.py' || pkill -f 'python3.*main.py' || true
+kill -9 (31752)
 ```
 
 If needed, run from macOS Terminal (outside restricted/sandboxed runner).
