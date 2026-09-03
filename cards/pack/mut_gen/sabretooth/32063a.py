@@ -10,8 +10,10 @@ def GetAbilities() -> Sequence['Ability']:
 
         scheme = SetupCards.PutIntoPlay(
             effect,
-            name="Find the Senator",
-            card_type=SchemeSide2
+            finder=CardFinder(card_ids=["32065a", "32065b"]),
+            card_type=SchemeSide2,
+            from_where=["SetAside"],
+            flip_to_name="Find the Senator",
         )
         if scheme:
             SetupCards.AttachTo(

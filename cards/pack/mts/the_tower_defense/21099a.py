@@ -10,8 +10,10 @@ def GetAbilities() -> Sequence['Ability']:
 
         face = SetupCards.PutIntoPlay(
             effect,
-            name="Avengers Tower",
-            card_type=Environment
+            finder=CardFinder(card_ids=["21100a", "21100b"]),
+            card_type=Environment,
+            from_where=["SetAside"],
+            flip_to_trait="STRONGHOLD",
         )
         if face:
             face.FlipTo(effect, trait="STRONGHOLD")

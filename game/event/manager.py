@@ -388,16 +388,19 @@ class EventManager:
                 not check_is_resources(first_effect) and \
                 not first_effect.ability.flags.is_delay_ability:
                 first_player = self.world.GetFirstPlayer()
-                faces = [x.this for x in forced_effects if not x.ability.flags.is_delay_ability]
+                non_delay_effects = [x for x in forced_effects if not x.ability.flags.is_delay_ability]
+                faces = [x.this for x in non_delay_effects]
                 is_on_the_same_card = all(x.card == faces[0].card for x in faces)
                 if is_on_the_same_card:
                     face = faces[0]
                 else:
-                    face = first_player.AskChooseFace(faces, Ties("Forced abilities would initiate at the same moment", world=self.world), forced=True)
-                    if face == None:
-                        face = faces[0]
+                    face = self.TryAutoPickForcedAttackTieFace(message, non_delay_effects, faces)
+                    if face is None:
+                        face = first_player.AskChooseFace(faces, Ties("Forced abilities would initiate at the same moment", world=self.world), forced=True)
+                        if face == None:
+                            face = faces[0]
                 assert face
-                effect = forced_effects[faces.index(face)]
+                effect = non_delay_effects[faces.index(face)]
             else:
                 effect = first_effect
 
@@ -420,6 +423,45 @@ class EventManager:
         if isinstance(message, CanBeInstead) and message.is_be_instead:
             return True
         return False
+
+    def TryAutoPickForcedAttackTieFace(self, message: 'Message2', forced_effects: List['Effect'], faces: List['CardFace']) -> 'CardFace|None':
+        # Generic UX optimization:
+        # when a tie is only between attacker and attacked hero forced responses
+        # after a damaging attack, auto-pick attacker first to avoid redundant prompt.
+        if not isinstance(message, Message.AfterUnitAttackUnit):
+            return None
+
+        if len(faces) != 2:
+            return None
+
+        attacker = message.trigger
+        attacked = message.attacked
+        if attacker is None or attacked is None:
+            return None
+
+        attacker_index = next((i for i, face in enumerate(faces) if face.card == attacker.card), None)
+        attacked_index = next((i for i, face in enumerate(faces) if face.card == attacked.card), None)
+        if attacker_index is None or attacked_index is None:
+            return None
+
+        attacker_effect = forced_effects[attacker_index]
+        attacked_effect = forced_effects[attacked_index]
+
+        def is_targetless(effect: 'Effect') -> bool:
+            return effect.context.target_range == (0, 0)
+
+        def has_cost(effect: 'Effect') -> bool:
+            return effect.ability.cost_fn is not None or len(effect.ability.cost_funcs) > 0
+
+        if not is_targetless(attacker_effect) or not is_targetless(attacked_effect):
+            return None
+        if has_cost(attacker_effect) or has_cost(attacked_effect):
+            return None
+
+        if Enemy.IsType(attacker) and Hero.IsType(attacked):
+            return faces[attacker_index]
+
+        return None
 
     ################################################################################
     #

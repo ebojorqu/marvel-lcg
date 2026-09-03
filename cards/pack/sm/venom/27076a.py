@@ -11,8 +11,10 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name="Bell Tower",
-            card_type=Environment
+            finder=CardFinder(card_ids=["27077a", "27077b"]),
+            card_type=Environment,
+            from_where=["SetAside"],
+            flip_to_trait="QUIET",
         )
 
     def campaign_expert(effect: 'Effect', message: 'Message.WhenCampaignSetup'):

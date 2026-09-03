@@ -34,8 +34,10 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name="Light at the End",
-            card_type=SchemeSide2
+            finder=CardFinder(card_ids=["27102a", "27102b"]),
+            card_type=SchemeSide2,
+            from_where=["SetAside"],
+            flip_to_trait="TRAP!",
         )
         # if face:
         #     # The easiest solution would be to errata Sinister Synchronization 1A to “Reveal the Light at the End side scheme, Trap! side faceup. – Boggs (Facebook)

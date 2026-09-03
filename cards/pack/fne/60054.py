@@ -5,12 +5,8 @@ from . import *
 def GetAbilities() -> Sequence['Ability']:
 
     def stand_alone(effect: 'Effect', message: 'Message.WhenUnitWouldAttack') -> None:
-        this = effect.this.CastTo(Upgrade)
-        Unused(this)
-
         initiator = effect.GetInitiator()
         hero = initiator.GetHero()
-        this.Exhaust(effect)
         Faces.ReadyAll([hero], effect)
 
     return [

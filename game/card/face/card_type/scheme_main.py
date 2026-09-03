@@ -114,6 +114,7 @@ class MainScheme(Scheme2, HasStage, EncounterCard, _FinalType):
         from game.message import Message
         from game.effect.rule import MainSchemePhasePlaceThreat
         from game.operate.worlds import Worlds
+        from engine.log import Notify
 
         acceleration_icons: List['HasAccelerationIcon'] = []
         acceleration_tokens: List['CanAccelerationToken'] = []
@@ -135,6 +136,8 @@ class MainScheme(Scheme2, HasStage, EncounterCard, _FinalType):
 
         message = Message.CalcMainSchemeEscalation(self, self.escalation_threat, acceleration_icons, acceleration_tokens)
         message.Send()
+
+        Notify.Game(f"Main Scheme Phase threat: {self.name} +{message.escalation_threat}")
 
         self.PlaceThreatInternal(message.escalation_threat, MainSchemePhasePlaceThreat(self))
 

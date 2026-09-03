@@ -16,8 +16,9 @@ def GetAbilities() -> Sequence['Ability']:
 
         env = SetupCards.PutIntoPlay(
             effect,
-            name="Alert Level",
+            finder=CardFinder(card_ids=["50090a", "50090b"]),
             card_type=Environment,
+            from_where=["SetAside"],
             flip_to_trait="LOW"
         )
 

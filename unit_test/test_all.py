@@ -179,6 +179,206 @@ class TestMain(unittest.TestCase):
         self.assertIs(result, fake_face)
         get_set_aside.assert_called_once()
 
+    def test_setup_callbacks_force_double_sided_set_aside_cards_to_intended_face(self):
+        from types import SimpleNamespace
+        from importlib import import_module
+        from unittest.mock import patch
+
+        class _StopAfterCapture(Exception):
+            pass
+
+        class FakeThis:
+            def CastTo(self, _type):
+                return self
+
+        class FakeVillain:
+            def __init__(self):
+                self.card = SimpleNamespace(
+                    area=SimpleNamespace(
+                        flags=SimpleNamespace(is_set_aside=True)
+                    )
+                )
+
+            def PutIntoPlay(self, *_args, **_kwargs):
+                return True
+
+        fake_effect = SimpleNamespace(this=FakeThis(), world=SimpleNamespace())
+        fake_message = SimpleNamespace()
+
+        cases = [
+            {
+                'module_path': 'cards.pack.gob.risky_business.02004a',
+                'calls': [
+                    {
+                        'card_ids': ['02006a', '02006b'],
+                        'from_where': ['SetAside'],
+                        'flip_to_name': 'Criminal Enterprise',
+                    }
+                ],
+            },
+            {
+                'module_path': 'cards.pack.aos.batroc.50087a',
+                'calls': [
+                    {
+                        'card_ids': ['50090a', '50090b'],
+                        'from_where': ['SetAside'],
+                        'flip_to_trait': 'LOW',
+                    }
+                ],
+                'extra_patches': lambda module: [
+                    patch.object(module.SetupCards, 'SetAsideCards', return_value=[])
+                ],
+            },
+            {
+                'module_path': 'cards.pack.gmw.collector_2.16082a',
+                'calls': [
+                    {
+                        'card_ids': ['16085a', '16085b'],
+                        'from_where': ['SetAside'],
+                        'flip_to_name': 'Library Labyrinth',
+                    }
+                ],
+            },
+            {
+                'module_path': 'cards.pack.mojo.magog.39002a',
+                'calls': [
+                    {
+                        'card_ids': ['39003a', '39003b'],
+                        'from_where': ['SetAside'],
+                        'flip_to_trait': 'BOOING CROWD',
+                    },
+                    {
+                        'card_ids': ['39004a', '39004b'],
+                        'from_where': ['SetAside'],
+                        'flip_to_trait': 'BOOING CROWD',
+                    },
+                ],
+            },
+            {
+                'module_path': 'cards.pack.mojo.mojo.39025a',
+                'calls': [
+                    {
+                        'card_ids': ['39026a', '39026b'],
+                        'from_where': ['SetAside'],
+                        'flip_to_trait': 'SPINNING',
+                    }
+                ],
+            },
+            {
+                'module_path': 'cards.pack.mts.the_tower_defense.21099a',
+                'when_names': ['WhenCardRevealed'],
+                'calls': [
+                    {
+                        'card_ids': ['21100a', '21100b'],
+                        'from_where': ['SetAside'],
+                        'flip_to_trait': 'STRONGHOLD',
+                    }
+                ],
+            },
+            {
+                'module_path': 'cards.pack.mut_gen.sabretooth.32063a',
+                'calls': [
+                    {
+                        'card_ids': ['32065a', '32065b'],
+                        'from_where': ['SetAside'],
+                        'flip_to_name': 'Find the Senator',
+                    }
+                ],
+            },
+            {
+                'module_path': 'cards.pack.sm.sinister_six.27100a',
+                'calls': [
+                    {
+                        'card_ids': ['27102a', '27102b'],
+                        'from_where': ['SetAside'],
+                        'flip_to_trait': 'TRAP!',
+                    }
+                ],
+                'extra_patches': lambda module: [
+                    patch.object(module.Worlds, 'GetFirstPlayer', return_value=object()),
+                    patch.object(module.Worlds, 'GetSetAsideAreaCards', return_value=[FakeVillain(), FakeVillain(), FakeVillain()]),
+                    patch.object(module.Worlds, 'GetPlayerNum', return_value=2),
+                    patch.object(module.Worlds, 'GetVillains', return_value=[]),
+                    patch.object(module.Villain, 'IsType', return_value=True),
+                    patch.object(module.Rand, 'RandomChoice', side_effect=lambda seq, _effect: seq[0]),
+                    patch.object(module, 'PlaceActiveCounterOnLowestActivationOrder', return_value=None),
+                ],
+            },
+            {
+                'module_path': 'cards.pack.sm.venom.27076a',
+                'calls': [
+                    {
+                        'card_ids': ['27077a', '27077b'],
+                        'from_where': ['SetAside'],
+                        'flip_to_trait': 'QUIET',
+                    }
+                ],
+            },
+        ]
+
+        for case in cases:
+            module = import_module(case['module_path'])
+            when_names = case.get('when_names', ['WhenCardSetup'])
+            setup_abilities = [ab for ab in module.GetAbilities() if ab.when.__name__ in when_names]
+            self.assertTrue(setup_abilities, msg=f"No matching setup/reveal ability in {case['module_path']}")
+            operation = setup_abilities[0].operation
+
+            captured_calls = []
+            expected_calls = case['calls']
+
+            def capture_put_into_play(*args, **kwargs):
+                captured_calls.append((args, kwargs))
+                if len(captured_calls) >= len(expected_calls):
+                    raise _StopAfterCapture()
+                return SimpleNamespace(FlipTo=lambda *_a, **_k: None)
+
+            patchers = [
+                patch.object(module.SetupCards, 'PutIntoPlay', side_effect=capture_put_into_play),
+                patch.object(module.SetupCards, 'SetAsideCards', return_value=[]),
+                patch.object(module.SetupCards, 'AttachTo', return_value=None),
+                patch.object(module.SetupCards, 'Reveal', return_value=None),
+                patch.object(module.Worlds, 'FindVillain', return_value=object()),
+                patch.object(module.Worlds, 'GetFirstPlayer', return_value=object()),
+                patch.object(module.Worlds, 'GetPlayers', return_value=[]),
+                patch.object(module.Worlds, 'IsExpert', return_value=False),
+            ]
+            if 'extra_patches' in case:
+                patchers.extend(case['extra_patches'](module))
+
+            with patchers[0], patchers[1], patchers[2], patchers[3], patchers[4], patchers[5], patchers[6], patchers[7]:
+                extra_contexts = patchers[8:]
+                if extra_contexts:
+                    from contextlib import ExitStack
+                    with ExitStack() as stack:
+                        for p in extra_contexts:
+                            stack.enter_context(p)
+                        try:
+                            operation(fake_effect, fake_message)
+                        except _StopAfterCapture:
+                            pass
+                else:
+                    try:
+                        operation(fake_effect, fake_message)
+                    except _StopAfterCapture:
+                        pass
+
+            self.assertEqual(
+                len(captured_calls),
+                len(expected_calls),
+                msg=f"Unexpected SetupCards.PutIntoPlay call count in {case['module_path']}"
+            )
+
+            for idx, expected in enumerate(expected_calls):
+                _args, kwargs = captured_calls[idx]
+                self.assertIn('finder', kwargs, msg=f"Missing finder in call {idx + 1} ({case['module_path']})")
+                finder = kwargs['finder']
+                self.assertEqual(getattr(finder, 'card_ids', []), expected['card_ids'])
+                self.assertEqual(kwargs.get('from_where'), expected['from_where'])
+                if 'flip_to_name' in expected:
+                    self.assertEqual(kwargs.get('flip_to_name'), expected['flip_to_name'])
+                if 'flip_to_trait' in expected:
+                    self.assertEqual(kwargs.get('flip_to_trait'), expected['flip_to_trait'])
+
     def test_final_card_type_matching_allows_leadership_event_target_selection(self):
         from cards.database import CardsDB
         from game.card.card_finder import CardFinder
@@ -439,6 +639,190 @@ class TestMain(unittest.TestCase):
         self.assertEqual(game.controller_manager.replay.replay_step_id, 3)
         self.assertEqual(game.scene.inputs, [1, 2, 3])
         self.assertEqual(game.controller_manager.skip.skip_to, 3)
+
+    def test_auto_selected_effect_updates_undo_checkpoint(self):
+        from types import SimpleNamespace
+        import game.player.action.player_action as player_action_module
+        from game.player.action.player_action import PlayerAction
+        from engine import Engine
+
+        class DummyPlayer(PlayerAction):
+            def __init__(self):
+                self.world = SimpleNamespace(is_game_over=False)
+                self.is_eliminated = False
+
+            def GetPlayer(self):
+                return self
+
+            def ResolveEffect(self, effect, message):
+                return True
+
+        class FakeMessageType:
+            class WhenPlayerInTurn:
+                pass
+            class WhenPlayerChooseAbility:
+                pass
+            class WhenUnitBeingAttack:
+                pass
+            class WhenPlayerRevealCard:
+                pass
+
+        class FakePhase:
+            class State:
+                PlayerTurnEnd = "PlayerTurnEnd"
+                EnemyActivation = "EnemyActivation"
+                RevealsEncounterCards = "RevealsEncounterCards"
+                ResolveMulligans = "ResolveMulligans"
+
+        undo_calls = []
+        undo = SimpleNamespace(
+            PushNewStep=lambda step: undo_calls.append(("push", step)),
+            UpdateLastStep=lambda: undo_calls.append(("update", None)),
+        )
+        replay = SimpleNamespace(current_step_id=77)
+        Engine.game = SimpleNamespace(controller_manager=SimpleNamespace(undo=undo, replay=replay))
+
+        effect = SimpleNamespace(
+            context=SimpleNamespace(
+                only_work_when_no_other_options=False,
+                target_range=(0, 0),
+                all_legal_targets=[],
+                targets_internal=[],
+            ),
+            must_choose=False,
+            ability=SimpleNamespace(
+                is_play=False,
+                flags=SimpleNamespace(is_delay_ability=False),
+            ),
+            this=SimpleNamespace(
+                IsLikeInHand=lambda: False,
+                card=SimpleNamespace(area=SimpleNamespace(flags=SimpleNamespace(is_processing=False))),
+            ),
+            IsName=lambda _name: False,
+        )
+
+        message_world = SimpleNamespace(
+            is_game_over=False,
+            phase=SimpleNamespace(state="Other"),
+        )
+        message = FakeMessageType.WhenPlayerInTurn()
+        message.world = message_world
+
+        old_message = player_action_module.Message
+        try:
+            player_action_module.Message = FakeMessageType
+            import game.world.world as world_module
+            old_phase = world_module.Phase
+            world_module.Phase = FakePhase
+            try:
+                player = DummyPlayer()
+                selected, is_cheating = player.ChoiceAndSpellEffect([effect], message, priority="Forced" , forced=True)
+            finally:
+                world_module.Phase = old_phase
+        finally:
+            player_action_module.Message = old_message
+
+        self.assertIs(selected, effect)
+        self.assertFalse(is_cheating)
+        self.assertEqual(undo_calls, [("push", 77), ("update", None)])
+
+    def test_auto_selected_effect_updates_undo_checkpoint_in_non_turn_contexts(self):
+        from types import SimpleNamespace
+        import game.player.action.player_action as player_action_module
+        from game.player.action.player_action import PlayerAction
+        from engine import Engine
+
+        class DummyPlayer(PlayerAction):
+            def __init__(self):
+                self.world = SimpleNamespace(is_game_over=False)
+                self.is_eliminated = False
+
+            def GetPlayer(self):
+                return self
+
+            def ResolveEffect(self, effect, message):
+                return True
+
+        class FakeMessageType:
+            class WhenPlayerInTurn:
+                pass
+            class WhenPlayerChooseAbility:
+                pass
+            class WhenUnitBeingAttack:
+                pass
+            class WhenPlayerRevealCard:
+                pass
+            class Other:
+                pass
+
+        class FakePhase:
+            class State:
+                PlayerTurnEnd = "PlayerTurnEnd"
+                EnemyActivation = "EnemyActivation"
+                RevealsEncounterCards = "RevealsEncounterCards"
+                ResolveMulligans = "ResolveMulligans"
+
+        effect = SimpleNamespace(
+            context=SimpleNamespace(
+                only_work_when_no_other_options=False,
+                target_range=(0, 0),
+                all_legal_targets=[],
+                targets_internal=[],
+            ),
+            must_choose=False,
+            ability=SimpleNamespace(
+                is_play=False,
+                flags=SimpleNamespace(is_delay_ability=False),
+            ),
+            this=SimpleNamespace(
+                IsLikeInHand=lambda: False,
+                card=SimpleNamespace(area=SimpleNamespace(flags=SimpleNamespace(is_processing=False))),
+            ),
+            IsName=lambda _name: False,
+        )
+
+        cases = [
+            (FakePhase.State.PlayerTurnEnd, FakeMessageType.Other),
+            (FakePhase.State.EnemyActivation, FakeMessageType.WhenUnitBeingAttack),
+            (FakePhase.State.RevealsEncounterCards, FakeMessageType.WhenPlayerRevealCard),
+            (FakePhase.State.ResolveMulligans, FakeMessageType.Other),
+        ]
+
+        old_message = player_action_module.Message
+        old_game = getattr(Engine, "game", None)
+        try:
+            player_action_module.Message = FakeMessageType
+            import game.world.world as world_module
+            old_phase = world_module.Phase
+            world_module.Phase = FakePhase
+            try:
+                for phase_state, message_type in cases:
+                    undo_calls = []
+                    undo = SimpleNamespace(
+                        PushNewStep=lambda step, calls=undo_calls: calls.append(("push", step)),
+                        UpdateLastStep=lambda calls=undo_calls: calls.append(("update", None)),
+                    )
+                    replay = SimpleNamespace(current_step_id=88)
+                    Engine.game = SimpleNamespace(controller_manager=SimpleNamespace(undo=undo, replay=replay))
+
+                    message_world = SimpleNamespace(
+                        is_game_over=False,
+                        phase=SimpleNamespace(state=phase_state),
+                    )
+                    message = message_type()
+                    message.world = message_world
+
+                    player = DummyPlayer()
+                    selected, is_cheating = player.ChoiceAndSpellEffect([effect], message, priority="Forced", forced=True)
+
+                    self.assertIs(selected, effect)
+                    self.assertFalse(is_cheating)
+                    self.assertEqual(undo_calls, [("push", 88), ("update", None)])
+            finally:
+                world_module.Phase = old_phase
+        finally:
+            Engine.game = old_game
+            player_action_module.Message = old_message
 
     def test_set_scene_resets_replay_state(self):
         from types import SimpleNamespace

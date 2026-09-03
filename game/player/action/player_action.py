@@ -295,7 +295,28 @@ class PlayerAction:
                         assert not fallthrough_effect.ability.NeedCost(), f"{fallthrough_effect.ability}"
 
             def choice_one_effect(effect_list: Sequence['Effect']) -> Tuple['Effect|None', bool]:
+                from game.world.world import Phase
+                set_undo = False
+                if type(message) == Message.WhenPlayerInTurn:
+                    set_undo = True
+                elif message.world.phase.state == Phase.State.PlayerTurnEnd:
+                    set_undo = True
+                elif message.world.phase.state == Phase.State.EnemyActivation:
+                    if type(message) == Message.WhenUnitBeingAttack:
+                        set_undo = True
+                    pass
+                elif message.world.phase.state == Phase.State.RevealsEncounterCards:
+                    if type(message) == Message.WhenPlayerRevealCard:
+                        set_undo = True
+                    pass
+                elif message.world.phase.state == Phase.State.ResolveMulligans:
+                    set_undo = True
+
                 if not need_choose:
+                    if set_undo:
+                        # Keep auto-undo close to the current action even when there is no choice prompt.
+                        game.controller_manager.undo.PushNewStep(game.controller_manager.replay.current_step_id)
+                        game.controller_manager.undo.UpdateLastStep()
                     return fallthrough_effect, False
                     # if not fallthrough_effect or \
                     #     fallthrough_effect.is_forced or \
@@ -315,29 +336,13 @@ class PlayerAction:
                 else:
                     bind_effect = None
 
-                from game.world.world import Phase
-                set_undo = False
-                if type(message) == Message.WhenPlayerInTurn:
-                    set_undo = True
-                elif message.world.phase.state == Phase.State.PlayerTurnEnd:
-                    set_undo = True
-                elif message.world.phase.state == Phase.State.EnemyActivation:
-                    if type(message) == Message.WhenUnitBeingAttack:
-                        set_undo = True
-                    pass
-                elif message.world.phase.state == Phase.State.RevealsEncounterCards:
-                    if type(message) == Message.WhenPlayerRevealCard:
-                        set_undo = True
-                    pass
-                elif message.world.phase.state == Phase.State.ResolveMulligans:
-                    set_undo = True
-
                 if set_undo:
                     game.controller_manager.undo.PushNewStep(game.controller_manager.replay.current_step_id)
 
                 selected, is_cheating = player.GetController().ChoiceOne(effect_list, bind_effect, message, priority, forced)
 
-                game.controller_manager.undo.UpdateLastStep()
+                if set_undo:
+                    game.controller_manager.undo.UpdateLastStep()
 
                 if message.world.is_game_over:
                     return None, False

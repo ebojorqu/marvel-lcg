@@ -10,8 +10,10 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name=LIBRARY_LABYRINTH,
-            card_type=Environment
+            finder=CardFinder(card_ids=["16085a", "16085b"]),
+            card_type=Environment,
+            from_where=["SetAside"],
+            flip_to_name=LIBRARY_LABYRINTH,
         )
 
         villain = Worlds.FindVillain(effect)

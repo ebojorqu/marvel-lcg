@@ -10,8 +10,10 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name="Wheel of Genres",
-            card_type=Environment
+            finder=CardFinder(card_ids=["39026a", "39026b"]),
+            card_type=Environment,
+            from_where=["SetAside"],
+            flip_to_trait="SPINNING",
         )
 
 

@@ -10,13 +10,17 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name="The Champion",
-            card_type=Environment
+            finder=CardFinder(card_ids=["39003a", "39003b"]),
+            card_type=Environment,
+            from_where=["SetAside"],
+            flip_to_trait="BOOING CROWD",
         )
         SetupCards.PutIntoPlay(
             effect,
-            name="The Challengers",
-            card_type=Environment
+            finder=CardFinder(card_ids=["39004a", "39004b"]),
+            card_type=Environment,
+            from_where=["SetAside"],
+            flip_to_trait="BOOING CROWD",
         )
 
     return [

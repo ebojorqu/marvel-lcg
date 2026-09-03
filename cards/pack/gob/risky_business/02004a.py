@@ -10,8 +10,10 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name="Criminal Enterprise",
-            card_type=Environment
+            finder=CardFinder(card_ids=["02006a", "02006b"]),
+            card_type=Environment,
+            from_where=["SetAside"],
+            flip_to_name="Criminal Enterprise",
         )
 
     return [
