@@ -10,7 +10,7 @@ def GetAbilities() -> Sequence['Ability']:
 
         initiator = effect.GetInitiator()
         faces = Worlds.DiscardEncounterCards(3, effect)
-        faces = initiator.ChooseOrder(faces)
+        faces = initiator.ChooseOrder(faces, prompt="Hex Bolt Order")
         for face in faces:
             boost_icons = FacesCounter.CountTotalBoostIcons([face])
             if boost_icons == 0:

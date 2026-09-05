@@ -8,15 +8,31 @@ import { HoverCard } from './hover.js';
 // Define the structure for the statistics data
 interface PlayerStats {
     id: number;
-    damage_dealt: number;
-    damage_taken: number;
-    thwarted_threat: number;
-    // Add any future keys from KEY_NAME here
-    [key: string]: number; // Allows indexing by string keys for generic stats
+    damage_dealt?: number;
+    damage_taken?: number;
+    thwarted_threat?: number;
+    entered_play?: number;
+    owner_id?: number;
+    card_id?: string;
+    name?: string;
+    set_name?: string;
 }
 
+interface StatsRow extends PlayerStats {
+    row_type: 'player_total' | 'card_group';
+    player_index?: number;
+    owner_label?: string;
+    pack_label?: string;
+    label?: string;
+    count?: number;
+}
+
+type StatKey = 'damage_dealt' | 'damage_taken' | 'thwarted_threat' | 'entered_play'
+
+const STAT_KEYS: StatKey[] = ['damage_dealt', 'damage_taken', 'thwarted_threat', 'entered_play']
+
 class GameStatistics {
-    static currentStats: PlayerStats[] = [];
+    static currentStats: StatsRow[] = [];
     static sortKey: string | null = null;
     static sortDirection: 'asc' | 'desc' = 'asc';
 
@@ -36,10 +52,12 @@ class GameStatistics {
             
             // Convert the backend dictionary {player_id: stats_dict} 
             // into an array [{id: player_id, ...stats}]
-            GameStatistics.currentStats = Object.entries(rawData).map(([id, stats]) => ({
+            const rawStats = Object.entries(rawData).map(([id, stats]) => ({
                 id: parseInt(id), // Ensure ID is a number
                 ...(stats as Record<string, number>) // Spread the stats
             })) as PlayerStats[];
+
+            GameStatistics.currentStats = GameStatistics.buildRows(rawStats)
 
             GameStatistics.renderTable();
 
@@ -61,7 +79,13 @@ class GameStatistics {
         }
 
         // Determine headers dynamically from the first player's stats
-        const headers = Object.keys(GameStatistics.currentStats[0]);
+        const headers: ('id' | StatKey)[] = [
+            'id',
+            'damage_dealt',
+            'damage_taken',
+            'thwarted_threat',
+            'entered_play',
+        ];
         
         // Clear the existing table content
         GameStatistics.tableElement.innerHTML = '';
@@ -88,28 +112,143 @@ class GameStatistics {
         const tbody = GameStatistics.tableElement.createTBody();
         GameStatistics.currentStats.forEach(stats => {
             const row = tbody.insertRow();
+            row.classList.add(stats.row_type === 'player_total' ? 'player-total-row' : 'card-group-row')
             headers.forEach(key => {
                 const cell = row.insertCell();
                 if (key === 'id') {
-                    const card = Cards.getCard(stats.id);
-                    if (card && card.pic_id !== undefined) {
-                        const img = document.createElement('img');
-                        img.src = card.pic_id; // Adjust the path as needed
-                        img.alt = `${card.pic_id}`; // Add alt text for accessibility
-                        img.style.width = '50px'; // Adjust size as needed
-                        img.style.height = 'auto';
-                        cell.appendChild(img);
-                        cell.onmouseenter = () => {
-                            HoverCard.showLogImage(stats.id, card.pic_id)
-                        }
+                    if (stats.row_type === 'player_total') {
+                        cell.textContent = stats.label || 'Player Total'
                     } else {
-                        cell.textContent = 'No Image'; // Handle cases where card or pic_id is missing
+                        const card = Cards.getCard(stats.id);
+                        if (card && card.pic_id !== undefined) {
+                            const img = document.createElement('img');
+                            img.src = card.pic_id; // Adjust the path as needed
+                            img.alt = `${card.pic_id}`; // Add alt text for accessibility
+                            img.style.width = '50px'; // Adjust size as needed
+                            img.style.height = 'auto';
+                            cell.appendChild(img);
+
+                            const meta = document.createElement('div')
+                            meta.className = 'session-card-group-meta'
+
+                            const name = document.createElement('div')
+                            name.className = 'session-card-group-name'
+                            name.textContent = stats.label || card.name
+
+                            const subtitle = document.createElement('div')
+                            subtitle.className = 'session-card-group-subtitle'
+                            const subtitleText = stats.owner_label || stats.pack_label || ''
+                            if (subtitleText && subtitleText !== 'Unknown') {
+                                subtitle.textContent = subtitleText
+                            } else {
+                                subtitle.style.display = 'none'
+                            }
+
+                            meta.appendChild(name)
+                            meta.appendChild(subtitle)
+                            cell.appendChild(meta)
+
+                            const title = document.createElement('div')
+                            title.className = 'session-card-group-title'
+                            const copyText = stats.count && stats.count > 1 ? `${stats.count}x` : ''
+                            title.textContent = copyText
+                            cell.appendChild(title)
+
+                            cell.onmouseenter = () => {
+                                HoverCard.showLogImage(stats.id, card.pic_id)
+                            }
+                        } else {
+                            cell.textContent = 'No Image'; // Handle cases where card or pic_id is missing
+                        }
                     }
                 } else {
-                    cell.textContent = stats[key].toString();
+                    cell.textContent = (stats[key as StatKey] ?? 0).toString();
                 }
             });
         });
+    }
+
+    static buildRows(rawStats: PlayerStats[]): StatsRow[] {
+        const playerRowsMap = new Map<number, StatsRow>()
+        const groupRowsMap = new Map<string, StatsRow>()
+
+        const totalPlayers = Game.world_descriptor?.players?.length ?? 0
+        for (let playerIndex = 0; playerIndex < totalPlayers; playerIndex++) {
+            const playerIdentity = Game.world_descriptor?.players?.[playerIndex]?.area_hero?.[0]
+            const playerName = playerIdentity?.name || `Player ${playerIndex + 1}`
+            playerRowsMap.set(playerIndex, {
+                id: -1 - playerIndex,
+                row_type: 'player_total',
+                player_index: playerIndex,
+                label: `P${playerIndex + 1} (${playerName})`,
+                damage_dealt: 0,
+                damage_taken: 0,
+                thwarted_threat: 0,
+                entered_play: 0,
+            })
+        }
+
+        for (const stats of rawStats) {
+            const damageDealt = stats.damage_dealt ?? 0
+            const damageTaken = stats.damage_taken ?? 0
+            const thwartedThreat = stats.thwarted_threat ?? 0
+            // Keep rows out if they only contributed entered_play.
+            if (damageDealt === 0 && damageTaken === 0 && thwartedThreat === 0) {
+                continue
+            }
+
+            const card = Cards.getCard(stats.id)
+            const ownerIndex = stats.owner_id ?? card?.control_player ?? -1
+            const ownerName = ownerIndex >= 0
+                ? (Game.world_descriptor?.players?.[ownerIndex]?.area_hero?.[0]?.name || `Player ${ownerIndex + 1}`)
+                : 'Unknown'
+            const ownerLabel = ownerIndex >= 0 ? `P${ownerIndex + 1} (${ownerName})` : 'Unknown'
+            if (ownerIndex >= 0 && playerRowsMap.has(ownerIndex)) {
+                const ownerRow = playerRowsMap.get(ownerIndex)!
+                for (const statKey of STAT_KEYS) {
+                    ownerRow[statKey] = (ownerRow[statKey] ?? 0) + (stats[statKey] ?? 0)
+                }
+            }
+
+            const cardName = stats.name || card?.name || `Card ${stats.id}`
+            const cardPack = stats.set_name || Cards.getCardPackName(stats.id)
+            const groupKey = `${cardName}||${cardPack}||${ownerIndex}`
+            if (!groupRowsMap.has(groupKey)) {
+                groupRowsMap.set(groupKey, {
+                    id: stats.id,
+                    row_type: 'card_group',
+                    label: cardName,
+                    owner_label: ownerLabel,
+                    pack_label: cardPack || 'Unknown',
+                    count: 0,
+                    damage_dealt: 0,
+                    damage_taken: 0,
+                    thwarted_threat: 0,
+                    entered_play: 0,
+                })
+            }
+
+            const groupRow = groupRowsMap.get(groupKey)!
+            groupRow.count = (groupRow.count ?? 0) + 1
+            for (const statKey of STAT_KEYS) {
+                groupRow[statKey] = (groupRow[statKey] ?? 0) + (stats[statKey] ?? 0)
+            }
+        }
+
+        const playerRows = [...playerRowsMap.entries()]
+            .sort((a, b) => a[0] - b[0])
+            .map(([, row]) => row)
+
+        const groupedRows = [...groupRowsMap.values()]
+            .sort((a, b) => {
+                const nameCompare = (a.label || '').localeCompare(b.label || '')
+                if (nameCompare !== 0) {
+                    return nameCompare
+                }
+                return (b.damage_dealt ?? 0) - (a.damage_dealt ?? 0)
+            })
+
+        return [...playerRows, ...groupedRows]
     }
 
     /**
@@ -136,9 +275,25 @@ class GameStatistics {
         }
 
         // Sort the current data array
-        GameStatistics.currentStats.sort((a, b) => {
-            const valueA = a[key];
-            const valueB = b[key];
+        const playerRows = GameStatistics.currentStats.filter(row => row.row_type === 'player_total')
+        const groupedRows = GameStatistics.currentStats.filter(row => row.row_type === 'card_group')
+
+        groupedRows.sort((a, b) => {
+            if (key === 'id') {
+                const valueA = a.label ?? ''
+                const valueB = b.label ?? ''
+                if (valueA < valueB) {
+                    return GameStatistics.sortDirection === 'asc' ? -1 : 1;
+                }
+                if (valueA > valueB) {
+                    return GameStatistics.sortDirection === 'asc' ? 1 : -1;
+                }
+                return 0;
+            }
+
+            const statKey = key as StatKey
+            const valueA = a[statKey] ?? 0;
+            const valueB = b[statKey] ?? 0;
             
             if (valueA < valueB) {
                 return GameStatistics.sortDirection === 'asc' ? -1 : 1;
@@ -148,6 +303,8 @@ class GameStatistics {
             }
             return 0;
         });
+
+        GameStatistics.currentStats = [...playerRows, ...groupedRows]
 
         // Re-render the table with the sorted data
         GameStatistics.renderTable();

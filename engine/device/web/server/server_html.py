@@ -19,4 +19,5 @@ class GameServerHTML(GameServerBase):
         self.AddHtmlSecurity('/puzzle_editor', './public/puzzle_editor.html')
         self.AddHtmlSecurity('/puzzle_test', './public/replay.html')
         self.AddHtmlSecurity('/report', './public/report.html')
+        self.AddHtmlSecurity('/victory_preview', './public/victory_preview.html')
 

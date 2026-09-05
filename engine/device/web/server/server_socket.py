@@ -60,6 +60,7 @@ class GameServerSocket(GameServerBase):
             remaining_time = self.device_manager.timer.GetRemainingTime() or 0
             game = self.game
             world = game.world
+            undo_target_step, undo_target_is_fallback = game.controller_manager.undo.GetAutoUndoTargetStep()
             from game.render.descriptor.frame import FrameDescriptor
             data = FrameDescriptor(
                 render_id           = world.render.last_render_id if world else 0,
@@ -71,6 +72,8 @@ class GameServerSocket(GameServerBase):
                 debug_message       = world.render.debug_message if world else "",
                 current_step_id     = game.controller_manager.replay.current_step_id,
                 max_replay_step_id  = game.controller_manager.replay.GetReplayOperationLen(),
+                undo_target_step    = undo_target_step,
+                undo_target_is_fallback = undo_target_is_fallback,
                 player_id           = player_id,
                 total_players       = world.started_player_num if world else 0
                 # game.controller_manager.skip.is_skipping,

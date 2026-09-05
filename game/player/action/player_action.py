@@ -244,6 +244,36 @@ class PlayerAction:
         from engine import Engine
         game = Engine.game
 
+        def push_replay_operation(selected_effect: 'Effect|None') -> None:
+            if selected_effect == None:
+                return
+
+            from game.scene.replay import CommandDescriptor, OperationDescriptor
+
+            controller_manager = game.controller_manager
+            replay = controller_manager.replay
+            select_cmd = CommandDescriptor(
+                selected_effect.GetReplayText(),
+                [x.GetReplayText() for x in selected_effect.targets],
+                [x.GetReplayText() for x in selected_effect.context.paid_this_res_effects],
+            )
+
+            crc = replay.calculated_crc[0] if replay.calculated_crc else ""
+            operation = OperationDescriptor(
+                replay.current_step_id,
+                message.GetReplayText(),
+                select_cmd,
+                crc,
+            )
+            replay.Push(operation)
+
+            if hasattr(game, "statistics") and game.statistics:
+                game.statistics.RecordValue("operation", 1)
+
+            if replay.current_step_id > controller_manager.skip.skip_to:
+                if controller_manager.skip.SetIsSkipping(False):
+                    message.world.render.PresentForceNoWait()
+
         player = self.GetPlayer()
 
         assert filtered_effects != [], f"{filtered_effects=} {message=}"
@@ -313,6 +343,7 @@ class PlayerAction:
                     set_undo = True
 
                 if not need_choose:
+                    push_replay_operation(fallthrough_effect)
                     if set_undo:
                         # Keep auto-undo close to the current action even when there is no choice prompt.
                         game.controller_manager.undo.PushNewStep(game.controller_manager.replay.current_step_id)

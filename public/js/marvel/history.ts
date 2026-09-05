@@ -30,6 +30,16 @@ export class HistoryLog
     static toggle() {
         HistoryLog.history_div?.classList.toggle('hide')
     }
+
+    static reset() {
+        HistoryLog.last_id = -1
+        HistoryLog.history_text = ""
+        if( HistoryLog.history_text_div ) {
+            HistoryLog.history_text_div.innerHTML = ""
+        }
+        HistoryLog.reportMenuOff()
+    }
+
     static addText(id: number, text: string) {
         if( id == HistoryLog.last_id ) {
             return

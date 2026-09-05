@@ -187,7 +187,7 @@
     font-size: 16px;
     border-collapse: collapse;
     /* margin-bottom: 20px; */
-    /* width: 100%; */
+    width: 100%;
 }
 #session-statistics th, td {
     user-select: text;
@@ -204,5 +204,43 @@
 }
 #session-statistics th:hover {
     background-color: #e0e0e0;
+}
+
+#session-statistics tr.player-total-row td {
+    font-weight: 700;
+    background-color: rgba(255, 210, 90, 0.14);
+}
+
+#session-statistics tr.player-total-row td:first-child {
+    padding: 8px;
+}
+
+#session-statistics tr.card-group-row td:first-child {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#session-statistics .session-card-group-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #ffe7a1;
+    min-width: 2.4rem;
+}
+
+#session-statistics .session-card-group-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#session-statistics .session-card-group-name {
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+#session-statistics .session-card-group-subtitle {
+    font-size: 0.8rem;
+    opacity: 0.85;
 }
 

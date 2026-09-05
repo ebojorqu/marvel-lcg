@@ -89,3 +89,22 @@ class UndoModule:
 
         return False
 
+    def GetAutoUndoTargetStep(self, current_step_id: int|None=None) -> Tuple[int, bool]:
+        if current_step_id is None:
+            current_step_id = self.manager.replay.current_step_id
+
+        last_step = self.last_step
+        turn_start_step = self.manager.last_turn_start_step_id
+
+        target_step = max(last_step, turn_start_step)
+        used_fallback = False
+        if target_step <= 0 or target_step >= current_step_id:
+            # Fallback to one step before current if checkpoint is invalid.
+            target_step = current_step_id - 1
+            used_fallback = True
+
+        if target_step < 0:
+            target_step = 0
+
+        return target_step, used_fallback
+

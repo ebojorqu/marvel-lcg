@@ -78,7 +78,7 @@ export class WindowLoad {
             // ctrl + shift + z
             if (event.key.toLowerCase() === 'z' && event.shiftKey ) {
                 event.preventDefault();
-                Button.doOldUndo()
+                Button.doAutoUndoShortcut()
             }
             else
             // ctrl + z

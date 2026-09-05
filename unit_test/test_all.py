@@ -675,12 +675,22 @@ class TestMain(unittest.TestCase):
                 ResolveMulligans = "ResolveMulligans"
 
         undo_calls = []
+        pushed_operations = []
         undo = SimpleNamespace(
             PushNewStep=lambda step: undo_calls.append(("push", step)),
             UpdateLastStep=lambda: undo_calls.append(("update", None)),
         )
-        replay = SimpleNamespace(current_step_id=77)
-        Engine.game = SimpleNamespace(controller_manager=SimpleNamespace(undo=undo, replay=replay))
+        replay = SimpleNamespace(
+            current_step_id=77,
+            calculated_crc=["crc"],
+            Push=lambda operation: pushed_operations.append(operation) or setattr(replay, "current_step_id", replay.current_step_id + 1),
+        )
+        skip = SimpleNamespace(
+            skip_to=0,
+            SetIsSkipping=lambda _skip: False,
+        )
+        stats = SimpleNamespace(RecordValue=lambda *_args: None)
+        Engine.game = SimpleNamespace(controller_manager=SimpleNamespace(undo=undo, replay=replay, skip=skip), statistics=stats)
 
         effect = SimpleNamespace(
             context=SimpleNamespace(
@@ -688,7 +698,9 @@ class TestMain(unittest.TestCase):
                 target_range=(0, 0),
                 all_legal_targets=[],
                 targets_internal=[],
+                paid_this_res_effects=[],
             ),
+            targets=[],
             must_choose=False,
             ability=SimpleNamespace(
                 is_play=False,
@@ -698,15 +710,18 @@ class TestMain(unittest.TestCase):
                 IsLikeInHand=lambda: False,
                 card=SimpleNamespace(area=SimpleNamespace(flags=SimpleNamespace(is_processing=False))),
             ),
+            GetReplayText=lambda: "e1 auto c1",
             IsName=lambda _name: False,
         )
 
         message_world = SimpleNamespace(
             is_game_over=False,
             phase=SimpleNamespace(state="Other"),
+            render=SimpleNamespace(PresentForceNoWait=lambda: None),
         )
         message = FakeMessageType.WhenPlayerInTurn()
         message.world = message_world
+        message.GetReplayText = lambda: "WhenPlayerInTurn"
 
         old_message = player_action_module.Message
         try:
@@ -724,7 +739,8 @@ class TestMain(unittest.TestCase):
 
         self.assertIs(selected, effect)
         self.assertFalse(is_cheating)
-        self.assertEqual(undo_calls, [("push", 77), ("update", None)])
+        self.assertEqual(undo_calls, [("push", 78), ("update", None)])
+        self.assertEqual(len(pushed_operations), 1)
 
     def test_auto_selected_effect_updates_undo_checkpoint_in_non_turn_contexts(self):
         from types import SimpleNamespace
@@ -768,7 +784,9 @@ class TestMain(unittest.TestCase):
                 target_range=(0, 0),
                 all_legal_targets=[],
                 targets_internal=[],
+                paid_this_res_effects=[],
             ),
+            targets=[],
             must_choose=False,
             ability=SimpleNamespace(
                 is_play=False,
@@ -778,6 +796,7 @@ class TestMain(unittest.TestCase):
                 IsLikeInHand=lambda: False,
                 card=SimpleNamespace(area=SimpleNamespace(flags=SimpleNamespace(is_processing=False))),
             ),
+            GetReplayText=lambda: "e2 auto c2",
             IsName=lambda _name: False,
         )
 
@@ -798,28 +817,140 @@ class TestMain(unittest.TestCase):
             try:
                 for phase_state, message_type in cases:
                     undo_calls = []
+                    pushed_operations = []
                     undo = SimpleNamespace(
                         PushNewStep=lambda step, calls=undo_calls: calls.append(("push", step)),
                         UpdateLastStep=lambda calls=undo_calls: calls.append(("update", None)),
                     )
-                    replay = SimpleNamespace(current_step_id=88)
-                    Engine.game = SimpleNamespace(controller_manager=SimpleNamespace(undo=undo, replay=replay))
+                    replay = SimpleNamespace(
+                        current_step_id=88,
+                        calculated_crc=["crc"],
+                        Push=lambda operation, calls=pushed_operations: calls.append(operation) or setattr(replay, "current_step_id", replay.current_step_id + 1),
+                    )
+                    skip = SimpleNamespace(
+                        skip_to=0,
+                        SetIsSkipping=lambda _skip: False,
+                    )
+                    stats = SimpleNamespace(RecordValue=lambda *_args: None)
+                    Engine.game = SimpleNamespace(controller_manager=SimpleNamespace(undo=undo, replay=replay, skip=skip), statistics=stats)
 
                     message_world = SimpleNamespace(
                         is_game_over=False,
                         phase=SimpleNamespace(state=phase_state),
+                        render=SimpleNamespace(PresentForceNoWait=lambda: None),
                     )
                     message = message_type()
                     message.world = message_world
+                    message.GetReplayText = lambda: "AutoMessage"
 
                     player = DummyPlayer()
                     selected, is_cheating = player.ChoiceAndSpellEffect([effect], message, priority="Forced", forced=True)
 
                     self.assertIs(selected, effect)
                     self.assertFalse(is_cheating)
-                    self.assertEqual(undo_calls, [("push", 88), ("update", None)])
+                    self.assertEqual(undo_calls, [("push", 89), ("update", None)])
+                    self.assertEqual(len(pushed_operations), 1)
             finally:
                 world_module.Phase = old_phase
+        finally:
+            Engine.game = old_game
+            player_action_module.Message = old_message
+
+    def test_auto_selected_effect_appends_replay_operation(self):
+        from types import SimpleNamespace
+        import game.player.action.player_action as player_action_module
+        from game.player.action.player_action import PlayerAction
+        from engine import Engine
+
+        class DummyPlayer(PlayerAction):
+            def __init__(self):
+                self.world = SimpleNamespace(is_game_over=False)
+                self.is_eliminated = False
+
+            def GetPlayer(self):
+                return self
+
+            def ResolveEffect(self, effect, message):
+                return True
+
+        class FakeMessageType:
+            class WhenPlayerInTurn:
+                pass
+            class WhenPlayerChooseAbility:
+                pass
+            class WhenUnitBeingAttack:
+                pass
+            class WhenPlayerRevealCard:
+                pass
+            class Other:
+                pass
+
+        pushed_operations = []
+
+        replay = SimpleNamespace(
+            current_step_id=120,
+            calculated_crc=["crc"],
+            Push=lambda operation: pushed_operations.append(operation) or setattr(replay, "current_step_id", replay.current_step_id + 1),
+        )
+        skip = SimpleNamespace(
+            skip_to=0,
+            SetIsSkipping=lambda _skip: False,
+        )
+        undo = SimpleNamespace(
+            PushNewStep=lambda _step: None,
+            UpdateLastStep=lambda: None,
+        )
+        stats = SimpleNamespace(RecordValue=lambda *_args: None)
+
+        old_game = getattr(Engine, "game", None)
+        old_message = player_action_module.Message
+        try:
+            Engine.game = SimpleNamespace(
+                controller_manager=SimpleNamespace(undo=undo, replay=replay, skip=skip),
+                statistics=stats,
+            )
+            player_action_module.Message = FakeMessageType
+
+            effect = SimpleNamespace(
+                context=SimpleNamespace(
+                    only_work_when_no_other_options=False,
+                    target_range=(0, 0),
+                    all_legal_targets=[],
+                    targets_internal=[],
+                    paid_this_res_effects=[],
+                ),
+                targets=[],
+                must_choose=False,
+                ability=SimpleNamespace(
+                    is_play=False,
+                    flags=SimpleNamespace(is_delay_ability=False),
+                ),
+                this=SimpleNamespace(
+                    IsLikeInHand=lambda: False,
+                    card=SimpleNamespace(area=SimpleNamespace(flags=SimpleNamespace(is_processing=False))),
+                ),
+                GetReplayText=lambda: "e11 auto c11",
+                IsName=lambda _name: False,
+            )
+
+            message = FakeMessageType.Other()
+            message.world = SimpleNamespace(
+                is_game_over=False,
+                phase=SimpleNamespace(state="Other"),
+                render=SimpleNamespace(PresentForceNoWait=lambda: None),
+            )
+            message.GetReplayText = lambda: "AutoMessage"
+
+            player = DummyPlayer()
+            selected, is_cheating = player.ChoiceAndSpellEffect([effect], message, priority="Forced", forced=True)
+
+            self.assertIs(selected, effect)
+            self.assertFalse(is_cheating)
+            self.assertEqual(len(pushed_operations), 1)
+            self.assertEqual(pushed_operations[0].step, 120)
+            self.assertEqual(pushed_operations[0].event, "AutoMessage")
+            self.assertEqual(pushed_operations[0].effect.id, "e11 auto c11")
+            self.assertEqual(replay.current_step_id, 121)
         finally:
             Engine.game = old_game
             player_action_module.Message = old_message

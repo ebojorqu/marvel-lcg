@@ -156,6 +156,8 @@ export class Client {
             notify_texts: NotifyDescriptor[];
             current_step_id: number;
             max_replay_step_id: number;
+            undo_target_step: number;
+            undo_target_is_fallback: boolean;
             debug_message: string;
             player_id: number;
             total_players: number;
@@ -180,6 +182,8 @@ export class Client {
             notify_texts        : original_data['notify_texts'].map((y: string) => notifyData(JSON.parse(y))),
             current_step_id     : original_data['current_step_id'],
             max_replay_step_id  : original_data['max_replay_step_id'],
+            undo_target_step    : original_data['undo_target_step'],
+            undo_target_is_fallback: original_data['undo_target_is_fallback'],
             debug_message       : original_data['debug_message'],
             player_id           : original_data['player_id'],
             total_players       : original_data['total_players'],
@@ -223,6 +227,7 @@ export class Client {
             Client.last_turn_id = -2
             Game.forced_on_player = -1
             UI.global_first_create = true
+            HistoryLog.reset()
             if( Game.world_descriptor ) {
                 Game.world_descriptor.render_id = 0
             }
@@ -234,6 +239,7 @@ export class Client {
         }
         let remaining_time = data.remaining_time
         let max_timeout = data.max_timeout
+        Button.updateUndoPreview(data.undo_target_step, data.undo_target_is_fallback)
 
         if( Client.last_turn_id != data.render_id ) {
             // if( !UI.global_first_create && Client.last_turn_id <= data.render_id-5 ) {

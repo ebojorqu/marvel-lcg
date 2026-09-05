@@ -156,26 +156,18 @@ class PlayerAsk:
     ################################################################################
     #
     def ChooseOrder(self, faces: Sequence['TC'], *, prompt: str="") -> List['TC']:
-        from game.ability.factory import AbilityFactory
-        from game.effect.rule import GameRule
-
-        if len(faces) == 1:
+        if len(faces) <= 1:
             return list(faces)
 
-        player = self.GetPlayer()
+        remaining = list(faces)
+        ordered: List['TC'] = []
 
-        effect = player.ChooseAbilities(
-            GameRule(player.GetIdentity()),
-            AbilityFactory.ForChoiceAbility(
-                prompt,
-            ).SetTarget(faces, range="All"),
-        )
-        if not effect:
-            # Game will crash here if we don't discard the ally attached by "25031"
-            assert len(faces) == 0
-            return []
-        else:
-            return effect[0].targets # type: ignore
+        while remaining:
+            picked = self.AskChooseOneText(remaining, [x.name for x in remaining])
+            ordered.append(picked)
+            remaining.remove(picked)
+
+        return ordered
 
     ################################################################################
     #

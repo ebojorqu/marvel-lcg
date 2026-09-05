@@ -26,7 +26,7 @@ class AbilityFactoryDamage:
         def check_is_from_attack(effect: 'Effect', message: 'Message.WhenUnitWouldTakeDamage') -> bool:
             if is_from_attack  is None:
                 return True
-            if isinstance(is_from_attack, Message2):
+            if isinstance(is_from_attack, Message.WhenUnitWouldAttack):
                 return is_from_attack == message.would_atk_message
             return is_from_attack == message.IsFromAttack()
 
@@ -105,7 +105,7 @@ class AbilityFactoryDamage:
         def check_is_from_attack(effect: 'Effect', message: 'Message.AfterUnitTookDamage') -> bool:
             if is_from_attack  is None:
                 return True
-            if isinstance(is_from_attack, Message2):
+            if isinstance(is_from_attack, Message.WhenUnitWouldAttack):
                 return is_from_attack == message.would_atk_message
             return is_from_attack == message.IsFromAttack()
 

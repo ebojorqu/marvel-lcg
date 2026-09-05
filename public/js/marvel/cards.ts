@@ -1354,6 +1354,19 @@ export class Cards {
         }
     }
 
+    static getCardPackName(object_id: number): string {
+        const card = Cards.getCard(object_id)
+        if( !card ) {
+            return ""
+        }
+
+        const stat_card =
+            Cards.card_statistics.const_card_dict[card.card_id] ||
+            Cards.card_statistics.const_card_dict[card.card_id.replace(/[a-z]$/i, "")]
+
+        return stat_card?.package_name || stat_card?.set_name || ""
+    }
+
     static getSpanTextHelp(object_id: string, card_id: string, name: string): string {
         const p1 = object_id
         const p2 = card_id

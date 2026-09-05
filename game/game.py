@@ -124,6 +124,13 @@ class Game:
     def Restart(self, seed: int|None=-1) -> None:
         assert self.world
         self.world.game_over.SetExit()
+        replay_inputs_len_before = len(self.controller_manager.replay.history_inputs)
+        scene_inputs_len_before = len(self.scene.inputs)
+        Log.DebugInfo(CATEGORY_NAME, f"Restart snapshot (before): replay_inputs={replay_inputs_len_before}, scene_inputs={scene_inputs_len_before}")
+        # Snapshot current replay progress so restart resumes from the latest state.
+        self.ApplyHistoryInput()
+        scene_inputs_len_after = len(self.scene.inputs)
+        Log.DebugInfo(CATEGORY_NAME, f"Restart snapshot (after): scene_inputs={scene_inputs_len_after}")
         self.session.Restart(seed)
         self.controller_manager.OnRestart()
 

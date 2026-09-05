@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Victory Table Preview</title>
+    <link rel="stylesheet" href="/public/css/marvel/game-over.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 24px;
+            font-family: "Aptos", "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top left, #2d2d2d, #1d1d1d 48%, #0f0f0f 100%);
+            color: #f3f3f3;
+        }
+
+        .preview-shell {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .preview-header {
+            margin-bottom: 16px;
+        }
+
+        .preview-title {
+            margin: 0;
+            font-size: 1.65rem;
+            letter-spacing: 0.02em;
+        }
+
+        .preview-subtitle {
+            margin: 6px 0 0;
+            color: #d2d2d2;
+            font-size: 0.95rem;
+        }
+
+        .preview-controls {
+            margin: 14px 0 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 14px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        .preview-controls label {
+            font-size: 0.85rem;
+            color: #d8d8d8;
+        }
+
+        .preview-controls select,
+        .preview-controls button {
+            margin-left: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #f3f3f3;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+        }
+
+        .preview-controls button {
+            cursor: pointer;
+        }
+
+        .preview-controls button:hover {
+            border-color: rgba(255, 231, 161, 0.6);
+        }
+
+        .preview-meta {
+            margin-left: auto;
+            font-size: 0.82rem;
+            color: #c9c9c9;
+        }
+
+        #session-statistics th {
+            color: #111;
+            background-color: #f2f2f2;
+        }
+
+        #session-statistics th:hover {
+            color: #111;
+            background-color: #e0e0e0;
+        }
+
+        #session-statistics-container {
+            max-height: none;
+            height: auto;
+            overflow: auto;
+        }
+
+        #session-statistics td:first-child img {
+            width: 50px;
+            height: auto;
+            border-radius: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .card-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 8px;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .card-name {
+            font-weight: 700;
+            line-height: 1.15;
+        }
+
+        .card-pack {
+            opacity: 0.85;
+            font-size: 0.82rem;
+        }
+
+        .copy-pill {
+            margin-left: auto;
+            background: rgba(255, 231, 161, 0.18);
+            border: 1px solid rgba(255, 231, 161, 0.4);
+            color: #ffe7a1;
+            padding: 1px 7px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        #session-statistics {
+            width: 100%;
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 14px;
+            }
+
+            .preview-controls {
+                gap: 8px;
+            }
+
+            .preview-controls label,
+            .preview-meta {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            #session-statistics {
+                font-size: 14px;
+            }
+
+            #session-statistics th, #session-statistics td {
+                padding: 6px;
+            }
+
+            .card-cell {
+                gap: 7px;
+            }
+
+            #session-statistics td:first-child img {
+                width: 42px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="preview-shell">
+        <header class="preview-header">
+            <h1 class="preview-title">Victory Table Preview</h1>
+            <p class="preview-subtitle">Dummy data with grouping by name + pack and fixed per-player totals.</p>
+        </header>
+
+        <div class="preview-controls">
+            <label>
+                Player Rows
+                <select id="player-count">
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </label>
+
+            <label>
+                Sort Grouped Rows
+                <select id="sort-key">
+                    <option value="damage_dealt" selected>Damage Dealt</option>
+                    <option value="damage_taken">Damage Taken</option>
+                    <option value="thwarted_threat">Thwarted Threat</option>
+                    <option value="entered_play">Entered Play</option>
+                    <option value="id">Card Name</option>
+                </select>
+            </label>
+
+            <button id="sort-direction" type="button">Descending</button>
+            <div id="preview-meta" class="preview-meta"></div>
+        </div>
+
+        <div id="session-statistics-container">
+            <table id="session-statistics"></table>
+        </div>
+    </main>
+
+    <script>
+        const rawRows = [
+            { id: "14001a", damage_dealt: 34, damage_taken: 7, thwarted_threat: 1, entered_play: 2 },
+            { id: "15001a", damage_dealt: 12, damage_taken: 6, thwarted_threat: 7, entered_play: 8 },
+            { id: "15005", damage_dealt: 9, damage_taken: 0, thwarted_threat: 0, entered_play: 0 },
+            { id: "15005", damage_dealt: 9, damage_taken: 0, thwarted_threat: 0, entered_play: 0 },
+            { id: "33011", damage_dealt: 6, damage_taken: 2, thwarted_threat: 0, entered_play: 1 },
+            { id: "31029", damage_dealt: 5, damage_taken: 0, thwarted_threat: 0, entered_play: 0 },
+            { id: "01084", damage_dealt: 4, damage_taken: 3, thwarted_threat: 2, entered_play: 2 },
+            { id: "15004", damage_dealt: 4, damage_taken: 0, thwarted_threat: 0, entered_play: 0 },
+            { id: "01084", damage_dealt: 3, damage_taken: 1, thwarted_threat: 0, entered_play: 1 },
+            { id: "01067", damage_dealt: 2, damage_taken: 1, thwarted_threat: 4, entered_play: 1 },
+            { id: "15004", damage_dealt: 2, damage_taken: 0, thwarted_threat: 2, entered_play: 0 },
+            { id: "15018", damage_dealt: 2, damage_taken: 0, thwarted_threat: 0, entered_play: 0 },
+            { id: "32019", damage_dealt: 1, damage_taken: 1, thwarted_threat: 3, entered_play: 1 },
+            { id: "01066", damage_dealt: 1, damage_taken: 1, thwarted_threat: 1, entered_play: 1 },
+            { id: "15007", damage_dealt: 0, damage_taken: 0, thwarted_threat: 0, entered_play: 1 },
+            { id: "58024", damage_dealt: 0, damage_taken: 0, thwarted_threat: 0, entered_play: 1 },
+            { id: "01092", damage_dealt: 0, damage_taken: 0, thwarted_threat: 0, entered_play: 1 },
+            { id: "08023", damage_dealt: 0, damage_taken: 0, thwarted_threat: 0, entered_play: 1 },
+        ];
+
+        const cardOwnerById = {
+            "14001a": 0,
+            "15001a": 1,
+            "15005": 0,
+            "33011": 0,
+            "31029": 0,
+            "01084": 0,
+            "15004": 0,
+            "01067": 1,
+            "15018": 0,
+            "32019": 1,
+            "01066": 1,
+            "15007": 0,
+            "58024": 0,
+            "01092": 0,
+            "08023": 1,
+        };
+
+        const fallbackCardMetaById = {
+            "14001a": { name: "14001a", pack: "Unknown" },
+            "15001a": { name: "15001a", pack: "Unknown" },
+            "15005": { name: "15005", pack: "Unknown" },
+            "33011": { name: "33011", pack: "Unknown" },
+            "31029": { name: "31029", pack: "Unknown" },
+            "01084": { name: "01084", pack: "Unknown" },
+            "15004": { name: "15004", pack: "Unknown" },
+            "01067": { name: "01067", pack: "Unknown" },
+            "15018": { name: "15018", pack: "Unknown" },
+            "32019": { name: "32019", pack: "Unknown" },
+            "01066": { name: "01066", pack: "Unknown" },
+            "15007": { name: "15007", pack: "Unknown" },
+            "58024": { name: "58024", pack: "Unknown" },
+            "01092": { name: "01092", pack: "Unknown" },
+            "08023": { name: "08023", pack: "Unknown" },
+        };
+
+        const cardCatalogById = new Map();
+
+        const allPlayers = [
+            { name: "SCARLET WITCH" },
+            { name: "QUICKSILVER" },
+            { name: "SPIDER-MAN" },
+            { name: "SHE-HULK" },
+        ];
+
+        const statKeys = ["damage_dealt", "damage_taken", "thwarted_threat", "entered_play"];
+        const state = {
+            playerCount: 2,
+            sortKey: "damage_dealt",
+            sortDirection: "desc",
+        };
+
+        async function loadCardCatalog() {
+            try {
+                const response = await fetch("/get_cards_json");
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const cardsJson = await response.json();
+
+                if (Array.isArray(cardsJson)) {
+                    for (const card of cardsJson) {
+                        if (card && card.card_id) {
+                            cardCatalogById.set(String(card.card_id), card);
+                        }
+                    }
+                } else {
+                    for (const cardGroup of Object.values(cardsJson)) {
+                        if (!Array.isArray(cardGroup)) {
+                            continue;
+                        }
+                        for (const card of cardGroup) {
+                            if (card && card.card_id) {
+                                cardCatalogById.set(String(card.card_id), card);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn("Using fallback card names for preview:", error);
+            }
+        }
+
+        function stripLeadStar(text) {
+            return String(text || "").replace(/^\*\s*/, "").trim();
+        }
+
+        function normalizeCardId(id) {
+            return String(id || "").replace(/[a-z]$/i, "");
+        }
+
+        function getCardMetaForId(id) {
+            const key = String(id);
+            const normalized = normalizeCardId(key);
+            const owner = key in cardOwnerById ? cardOwnerById[key] : -1;
+
+            const source = cardCatalogById.get(key) || cardCatalogById.get(normalized);
+            if (source) {
+                return {
+                    name: stripLeadStar(source.name || key) || key,
+                    pack: source.set_name || "Unknown",
+                    owner,
+                };
+            }
+
+            const fallback = fallbackCardMetaById[key] || fallbackCardMetaById[normalized] || { name: key, pack: "Unknown" };
+            return {
+                name: stripLeadStar(fallback.name) || key,
+                pack: fallback.pack || "Unknown",
+                owner,
+            };
+        }
+
+        function sortGroupedRows(groupedRows) {
+            const key = state.sortKey;
+            const direction = state.sortDirection === "asc" ? 1 : -1;
+
+            groupedRows.sort((a, b) => {
+                if (key === "id") {
+                    const valueA = a.name || "";
+                    const valueB = b.name || "";
+                    if (valueA < valueB) return -1 * direction;
+                    if (valueA > valueB) return 1 * direction;
+                    return 0;
+                }
+
+                const valueA = Number(a[key] || 0);
+                const valueB = Number(b[key] || 0);
+                if (valueA < valueB) return -1 * direction;
+                if (valueA > valueB) return 1 * direction;
+
+                const tieA = a.name || "";
+                const tieB = b.name || "";
+                if (tieA < tieB) return -1;
+                if (tieA > tieB) return 1;
+                return 0;
+            });
+
+            return groupedRows;
+        }
+
+        function buildRows() {
+            const players = allPlayers.slice(0, state.playerCount);
+
+            const playerRows = players.map((player, index) => ({
+                row_type: "player_total",
+                label: `P${index + 1} (${player.name})`,
+                owner: index,
+                damage_dealt: 0,
+                damage_taken: 0,
+                thwarted_threat: 0,
+                entered_play: 0,
+            }));
+
+            const grouped = new Map();
+
+            for (const row of rawRows) {
+                const meta = getCardMetaForId(row.id);
+
+                if (meta.owner >= 0 && meta.owner < playerRows.length) {
+                    for (const key of statKeys) {
+                        playerRows[meta.owner][key] += row[key];
+                    }
+                }
+
+                const damageDealt = row.damage_dealt || 0;
+                const damageTaken = row.damage_taken || 0;
+                const thwartedThreat = row.thwarted_threat || 0;
+                if (damageDealt === 0 && damageTaken === 0 && thwartedThreat === 0) {
+                    continue;
+                }
+
+                const ownerName = meta.owner >= 0 && meta.owner < players.length
+                    ? players[meta.owner].name
+                    : "Unknown";
+                const ownerLabel = meta.owner >= 0 && meta.owner < players.length
+                    ? `P${meta.owner + 1} (${ownerName})`
+                    : "Unknown";
+
+                const groupKey = `${meta.name}||${meta.pack}||${meta.owner}`;
+                if (!grouped.has(groupKey)) {
+                    grouped.set(groupKey, {
+                        row_type: "card_group",
+                        id: row.id,
+                        name: meta.name,
+                        pack: meta.pack,
+                        owner_label: ownerLabel,
+                        copies: 0,
+                        damage_dealt: 0,
+                        damage_taken: 0,
+                        thwarted_threat: 0,
+                        entered_play: 0,
+                    });
+                }
+
+                const group = grouped.get(groupKey);
+                group.copies += 1;
+                for (const key of statKeys) {
+                    group[key] += row[key];
+                }
+            }
+
+            const groupedRows = sortGroupedRows([...grouped.values()]);
+
+            return [...playerRows, ...groupedRows];
+        }
+
+        function renderTable(rows) {
+            const table = document.getElementById("session-statistics");
+            table.innerHTML = "";
+
+            const headers = [
+                { key: "id", label: "Id" },
+                { key: "damage_dealt", label: "Damage Dealt" },
+                { key: "damage_taken", label: "Damage Taken" },
+                { key: "thwarted_threat", label: "Thwarted Threat" },
+                { key: "entered_play", label: "Entered Play" },
+            ];
+
+            const thead = table.createTHead();
+            const tr = thead.insertRow();
+            for (const header of headers) {
+                const th = document.createElement("th");
+                th.dataset.key = header.key;
+                const isActiveSort = state.sortKey === header.key;
+                const arrow = isActiveSort ? (state.sortDirection === "desc" ? " ▼" : " ▲") : "";
+                th.textContent = `${header.label}${arrow}`;
+                th.addEventListener("click", () => {
+                    if (state.sortKey === header.key) {
+                        state.sortDirection = state.sortDirection === "desc" ? "asc" : "desc";
+                    } else {
+                        state.sortKey = header.key;
+                    }
+
+                    const sortKeyEl = document.getElementById("sort-key");
+                    const sortDirectionEl = document.getElementById("sort-direction");
+                    sortKeyEl.value = state.sortKey;
+                    sortDirectionEl.textContent = state.sortDirection === "desc" ? "Descending" : "Ascending";
+                    rerender();
+                });
+                tr.appendChild(th);
+            }
+
+            const tbody = table.createTBody();
+            for (const row of rows) {
+                const trBody = tbody.insertRow();
+                trBody.classList.add(row.row_type === "player_total" ? "player-total-row" : "card-group-row");
+
+                const idCell = trBody.insertCell();
+                if (row.row_type === "player_total") {
+                    idCell.textContent = row.label;
+                    idCell.style.padding = "8px";
+                } else {
+                    const cardCell = document.createElement("div");
+                    cardCell.className = "card-cell";
+
+                    const img = document.createElement("img");
+                    img.src = row.id;
+                    img.alt = row.id;
+
+                    const metaWrap = document.createElement("div");
+                    metaWrap.className = "card-meta";
+
+                    const name = document.createElement("div");
+                    name.className = "card-name";
+                    name.textContent = row.name;
+
+                    const pack = document.createElement("div");
+                    pack.className = "card-pack";
+                    const subtitleText = row.owner_label || row.pack || "";
+                    if (subtitleText && subtitleText !== "Unknown") {
+                        pack.textContent = subtitleText;
+                    } else {
+                        pack.style.display = "none";
+                    }
+
+                    const copies = document.createElement("span");
+                    copies.className = "copy-pill";
+                    copies.textContent = `${row.copies}x`;
+
+                    metaWrap.appendChild(name);
+                    metaWrap.appendChild(pack);
+                    cardCell.appendChild(img);
+                    cardCell.appendChild(metaWrap);
+                    cardCell.appendChild(copies);
+                    idCell.appendChild(cardCell);
+                }
+
+                for (const key of statKeys) {
+                    const td = trBody.insertCell();
+                    td.textContent = String(row[key] ?? 0);
+                }
+            }
+
+            const groupedCount = rows.filter((row) => row.row_type === "card_group").length;
+            document.getElementById("preview-meta").textContent =
+                `${state.playerCount} player row(s), ${groupedCount} grouped card row(s)`;
+        }
+
+        function rerender() {
+            renderTable(buildRows());
+        }
+
+        function initControls() {
+            const playerCountEl = document.getElementById("player-count");
+            const sortKeyEl = document.getElementById("sort-key");
+            const sortDirectionEl = document.getElementById("sort-direction");
+
+            playerCountEl.value = String(state.playerCount);
+            sortKeyEl.value = state.sortKey;
+            sortDirectionEl.textContent = state.sortDirection === "desc" ? "Descending" : "Ascending";
+
+            playerCountEl.addEventListener("change", () => {
+                state.playerCount = Number(playerCountEl.value);
+                rerender();
+            });
+
+            sortKeyEl.addEventListener("change", () => {
+                state.sortKey = sortKeyEl.value;
+                rerender();
+            });
+
+            sortDirectionEl.addEventListener("click", () => {
+                state.sortDirection = state.sortDirection === "desc" ? "asc" : "desc";
+                sortDirectionEl.textContent = state.sortDirection === "desc" ? "Descending" : "Ascending";
+                rerender();
+            });
+        }
+
+        async function main() {
+            await loadCardCatalog();
+            initControls();
+            rerender();
+        }
+
+        main();
+    </script>
+</body>
+</html>

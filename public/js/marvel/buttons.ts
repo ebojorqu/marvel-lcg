@@ -23,6 +23,19 @@ export class Button{
     static goto_id = document.querySelector("#goto-id") as HTMLInputElement
     static goto_id_value = Button.goto_id?.previousElementSibling as HTMLOutputElement
 
+    static updateUndoPreview(targetStep: number, isFallback: boolean) {
+        const undo_btn = document.querySelector<HTMLButtonElement>('#undo-btn')
+        if( !undo_btn ) {
+            return
+        }
+        if( targetStep <= 0 ) {
+            undo_btn.innerHTML = "Undo"
+        } else {
+            const fallbackText = isFallback ? " [F]" : ""
+            undo_btn.innerHTML = `Undo (${targetStep}${fallbackText})`
+        }
+    }
+
     static doToggleHistory() {
         HistoryLog.toggle()
     }
@@ -332,10 +345,20 @@ export class Button{
     //     document.querySelector<HTMLButtonElement>('#undo-btn')!.disabled = false
     // }
 
-    static doOldUndo() {
+    static doAutoUndo() {
         Game.setGameOver(false)
         ErrorDialog.hideError()
-        Button.doDebug("/undo 1", false)
+        BtnOk.clean()
+        Button.doDebug("/undo auto", false)
+    }
+
+    static doAutoUndoShortcut() {
+        Button.doAutoUndo()
+    }
+
+    // Backward-compatible alias.
+    static doOldUndo() {
+        Button.doAutoUndoShortcut()
     }
 
     static doUndo() {
@@ -345,6 +368,7 @@ export class Button{
         Game.setGameOver(false)
         ErrorDialog.hideError()
         BtnOk.clean()
+        // Use checkpoint-based undo to roll back one player action reliably.
         Button.doDebug("/undo auto", false)
     }
 
