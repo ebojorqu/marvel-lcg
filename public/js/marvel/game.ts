@@ -31,7 +31,16 @@ type StatKey = 'damage_dealt' | 'damage_taken' | 'thwarted_threat' | 'entered_pl
 
 const STAT_KEYS: StatKey[] = ['damage_dealt', 'damage_taken', 'thwarted_threat', 'entered_play']
 
+function normalizeName(text: string | undefined): string {
+    return (text || '').replace(/^\*\s*/, '').trim()
+}
+
+function normalizePack(text: string | undefined): string {
+    return (text || '').trim()
+}
+
 class GameStatistics {
+    static readonly TABLE_BUILD_STAMP = 'Victory Stats v2';
     static currentStats: StatsRow[] = [];
     static sortKey: string | null = null;
     static sortDirection: 'asc' | 'desc' = 'asc';
@@ -97,6 +106,11 @@ class GameStatistics {
         headers.forEach(headerText => {
             const th = document.createElement('th');
             th.textContent = GameStatistics.formatHeader(headerText);
+
+            if (headerText === 'id') {
+                th.textContent += ` (${GameStatistics.TABLE_BUILD_STAMP})`
+            }
+
             th.dataset.key = headerText; // Store the original key for sorting
             th.addEventListener('click', () => GameStatistics.handleSort(headerText));
             
@@ -172,10 +186,24 @@ class GameStatistics {
         const playerRowsMap = new Map<number, StatsRow>()
         const groupRowsMap = new Map<string, StatsRow>()
 
-        const totalPlayers = Game.world_descriptor?.players?.length ?? 0
+        let maxOwnerId = -1
+        for (const stats of rawStats) {
+            if ((stats.owner_id ?? -1) > maxOwnerId) {
+                maxOwnerId = stats.owner_id ?? -1
+            }
+        }
+
+        const worldPlayers = Game.world_descriptor?.players?.length ?? 0
+        const totalPlayers = Math.max(worldPlayers, maxOwnerId + 1)
         for (let playerIndex = 0; playerIndex < totalPlayers; playerIndex++) {
             const playerIdentity = Game.world_descriptor?.players?.[playerIndex]?.area_hero?.[0]
-            const playerName = playerIdentity?.name || `Player ${playerIndex + 1}`
+            const fallbackHero = rawStats.find(x =>
+                (x.owner_id ?? -1) === playerIndex &&
+                !!x.card_id &&
+                /[ab]$/i.test(x.card_id) &&
+                !!x.name
+            )
+            const playerName = normalizeName(playerIdentity?.name) || normalizeName(fallbackHero?.name) || `Player ${playerIndex + 1}`
             playerRowsMap.set(playerIndex, {
                 id: -1 - playerIndex,
                 row_type: 'player_total',
@@ -200,7 +228,7 @@ class GameStatistics {
             const card = Cards.getCard(stats.id)
             const ownerIndex = stats.owner_id ?? card?.control_player ?? -1
             const ownerName = ownerIndex >= 0
-                ? (Game.world_descriptor?.players?.[ownerIndex]?.area_hero?.[0]?.name || `Player ${ownerIndex + 1}`)
+                ? (normalizeName(Game.world_descriptor?.players?.[ownerIndex]?.area_hero?.[0]?.name) || `Player ${ownerIndex + 1}`)
                 : 'Unknown'
             const ownerLabel = ownerIndex >= 0 ? `P${ownerIndex + 1} (${ownerName})` : 'Unknown'
             if (ownerIndex >= 0 && playerRowsMap.has(ownerIndex)) {
@@ -210,9 +238,10 @@ class GameStatistics {
                 }
             }
 
-            const cardName = stats.name || card?.name || `Card ${stats.id}`
-            const cardPack = stats.set_name || Cards.getCardPackName(stats.id)
-            const groupKey = `${cardName}||${cardPack}||${ownerIndex}`
+            const cardName = normalizeName(stats.name || card?.name || `Card ${stats.id}`)
+            const cardPack = normalizePack(stats.set_name || Cards.getCardPackName(stats.id))
+            const cardIdentity = (stats.card_id || card?.card_id || String(stats.id)).replace(/[ab]$/i, '')
+            const groupKey = `${cardName.toLowerCase()}||${cardPack.toLowerCase()}||${cardIdentity}||${ownerIndex}`
             if (!groupRowsMap.has(groupKey)) {
                 groupRowsMap.set(groupKey, {
                     id: stats.id,

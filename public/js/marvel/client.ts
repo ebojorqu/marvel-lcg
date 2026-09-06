@@ -195,6 +195,7 @@ export class Client {
         // }
 
         Game.total_players = data.total_players
+        Button.updateUndoPreview(data.undo_target_step, data.undo_target_is_fallback)
 
         if( UI.last_game_id == data.game_id &&
             Game.current_step_id == data.current_step_id &&
@@ -239,7 +240,6 @@ export class Client {
         }
         let remaining_time = data.remaining_time
         let max_timeout = data.max_timeout
-        Button.updateUndoPreview(data.undo_target_step, data.undo_target_is_fallback)
 
         if( Client.last_turn_id != data.render_id ) {
             // if( !UI.global_first_create && Client.last_turn_id <= data.render_id-5 ) {

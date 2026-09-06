@@ -603,7 +603,7 @@ class SenderCard:
         def UpdateBoostIcon(self, value: int, by_effect: 'Effect'):
             from game.card.face.attribute.has_boost_icon import HasBoostIcon
             assert HasBoostIcon.IsType(self.trigger)
-            self.update_boost_icons = value
+            self.update_boost_icons += value
             text = TransText("{trigger} boost icons {value:+} ({by_effect})", trigger=self.trigger, value=value, by_effect=by_effect.this)
             self.Present_ByEffect(text, "", self.trigger, by_effect.this)
             # self.trigger.GainBoostIcons(value, by_effect)

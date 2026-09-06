@@ -22,17 +22,26 @@ import { Command } from './command.js'
 export class Button{
     static goto_id = document.querySelector("#goto-id") as HTMLInputElement
     static goto_id_value = Button.goto_id?.previousElementSibling as HTMLOutputElement
+    static undo_preview_target_step = 0
+    static undo_preview_is_fallback = false
 
     static updateUndoPreview(targetStep: number, isFallback: boolean) {
+        if( Number.isFinite(targetStep) ) {
+            Button.undo_preview_target_step = targetStep
+        } else {
+            Button.undo_preview_target_step = 0
+        }
+        Button.undo_preview_is_fallback = Boolean(isFallback)
+
         const undo_btn = document.querySelector<HTMLButtonElement>('#undo-btn')
         if( !undo_btn ) {
             return
         }
-        if( targetStep <= 0 ) {
+        if( Button.undo_preview_target_step <= 0 ) {
             undo_btn.innerHTML = "Undo"
         } else {
-            const fallbackText = isFallback ? " [F]" : ""
-            undo_btn.innerHTML = `Undo (${targetStep}${fallbackText})`
+            const fallbackText = Button.undo_preview_is_fallback ? " [F]" : ""
+            undo_btn.innerHTML = `Undo (${Button.undo_preview_target_step}${fallbackText})`
         }
     }
 
@@ -772,6 +781,7 @@ export class Button{
             id: "undo-btn",
             onClick: () => {Button.doUndo()}
         })
+        Button.updateUndoPreview(Button.undo_preview_target_step, Button.undo_preview_is_fallback)
         Button.createButtonBase(parent_div_right, {
             text: "Redo",
             onClick: () => {Button.doRedo()}
