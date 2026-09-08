@@ -10,7 +10,7 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name="Nebula's Ship",
+            finder=CardFinder(card_ids=["16093"]),
             card_type=Environment
         )
 

@@ -12,7 +12,7 @@ def GetAbilities() -> Sequence['Ability']:
             SetupCards.PutIntoPlay(
                 effect,
                 for_player=player,
-                name="Goblin Thrall",
+                finder=CardFinder(card_ids=["02024"]),
                 card_type=Minion
             )
 

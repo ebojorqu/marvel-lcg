@@ -348,6 +348,8 @@ class PlayerAction:
                         # Keep auto-undo close to the current action even when there is no choice prompt.
                         game.controller_manager.undo.PushNewStep(game.controller_manager.replay.current_step_id)
                         game.controller_manager.undo.UpdateLastStep()
+                        if type(message) == Message.WhenPlayerInTurn:
+                            game.controller_manager.undo.PushPlayerTurnStep(game.controller_manager.replay.current_step_id)
                     return fallthrough_effect, False
                     # if not fallthrough_effect or \
                     #     fallthrough_effect.is_forced or \
@@ -374,6 +376,8 @@ class PlayerAction:
 
                 if set_undo:
                     game.controller_manager.undo.UpdateLastStep()
+                    if type(message) == Message.WhenPlayerInTurn:
+                        game.controller_manager.undo.PushPlayerTurnStep(game.controller_manager.replay.current_step_id)
 
                 if message.world.is_game_over:
                     return None, False

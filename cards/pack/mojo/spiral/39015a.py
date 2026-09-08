@@ -10,7 +10,7 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name="The Search for Spiral",
+            finder=CardFinder(card_ids=["39016"]),
             card_type=SchemeSide2
         )
 

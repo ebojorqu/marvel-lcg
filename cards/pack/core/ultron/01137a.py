@@ -10,7 +10,7 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name="Ultron Drones",
+            finder=CardFinder(card_ids=["01140"]),
             card_type=Environment,
             from_where=["SetAside"],
         )

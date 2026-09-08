@@ -167,6 +167,7 @@ class Cheat:
             if args == "auto":
                 current_step_id = game.controller_manager.replay.current_step_id
                 last_step = game.controller_manager.undo.last_step
+                last_player_turn_step = game.controller_manager.undo.last_player_turn_step
                 turn_start_step = game.controller_manager.last_turn_start_step_id
                 target_step, used_fallback = game.controller_manager.undo.GetAutoUndoTargetStep(current_step_id)
 
@@ -174,7 +175,7 @@ class Cheat:
 
                 Notify.Command(
                     f"Undo auto target: {current_step_id} -> {max(target_step, 0)} "
-                    f"(last={last_step}, turn={turn_start_step}){fallback_text}"
+                    f"(last={last_step}, player_turn={last_player_turn_step}, turn={turn_start_step}){fallback_text}"
                 )
 
                 if target_step <= 0:

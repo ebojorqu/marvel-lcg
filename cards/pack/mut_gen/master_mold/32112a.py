@@ -13,7 +13,7 @@ def GetAbilities() -> Sequence['Ability']:
         SetupCards.PutIntoPlay(
             effect,
             for_player=player,
-            name="Magneto",
+            finder=CardFinder(card_ids=["32172b"]),
             card_type=Ally,
             under_control=True,
         )

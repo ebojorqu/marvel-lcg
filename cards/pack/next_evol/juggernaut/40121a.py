@@ -31,7 +31,7 @@ def GetAbilities() -> Sequence['Ability']:
             SetupCards.PutIntoPlay(
                 effect,
                 for_player=player,
-                name="Hope Summers",
+                finder=CardFinder(card_ids=["40130"]),
                 under_control=True,
             )
 

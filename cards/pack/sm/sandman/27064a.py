@@ -11,7 +11,7 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name="City Streets",
+            finder=CardFinder(card_ids=["27065"]),
             card_type=Environment
         )
 

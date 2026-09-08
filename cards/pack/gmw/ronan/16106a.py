@@ -13,7 +13,7 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name="Kree Command Ship",
+            finder=CardFinder(card_ids=["16108"]),
             card_type=Environment
         )
         if villain:

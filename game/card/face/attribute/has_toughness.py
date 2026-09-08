@@ -14,9 +14,9 @@ class HasToughness(HasAttribute):
     def OnAfterCardEnterPlay(self, message: 'Message.AfterCardEnterPlay') -> None:
         from game.effect.rule import Toughness
         from game.operate.faces import Faces
-        super().OnAfterCardEnterPlay(message)
         if self.IsToughness() and self.IsInPlay():
             Faces.GiveStatus([self], "Tough", Toughness(self))
+        super().OnAfterCardEnterPlay(message)
 
     ################################################################################
     #

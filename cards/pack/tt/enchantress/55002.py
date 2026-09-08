@@ -11,7 +11,7 @@ def GetAbilities() -> Sequence['Ability']:
         if Worlds.IsStandard(effect):
             face = SetupCards.PutIntoPlay(
                 effect,
-                name="Future of Despair",
+                finder=CardFinder(card_ids=["55006"]),
                 from_where=["SetAside"],
             )
 

@@ -30,6 +30,7 @@ class UndoModule:
     def __init__(self, manager: 'ControllerManager') -> None:
         self.next_step: int = 0
         self.last_step: int = 0
+        self.last_player_turn_step: int = 0
         self.manager: Final = manager
 
         # message_id, [card_ids]
@@ -48,10 +49,14 @@ class UndoModule:
     def Clean(self, by_undo: bool):
         self.last_step = 0
         self.next_step = 0
+        self.last_player_turn_step = 0
 
         if not by_undo:
             self.undo_effect_card_cache = {}
             self.debug_message_id = {}
+
+    def PushPlayerTurnStep(self, step: int):
+        self.last_player_turn_step = step
 
     def PushFastUndo(self, message: 'Message2', effects: List['Effect']):
         from game.message.message_type import CheckNoneMessage
@@ -94,12 +99,20 @@ class UndoModule:
             current_step_id = self.manager.replay.current_step_id
 
         last_step = self.last_step
-        turn_start_step = self.manager.last_turn_start_step_id
+        last_player_turn_step = self.last_player_turn_step
+        min_valid_step = max(current_step_id - 1, 0)
 
-        target_step = max(last_step, turn_start_step)
+        def is_valid(step: int) -> bool:
+            return step > 0 and step < current_step_id and step <= min_valid_step
+
         used_fallback = False
-        if target_step <= 0 or target_step >= current_step_id:
-            # Fallback to one step before current if checkpoint is invalid.
+        # Prefer player-turn checkpoints to avoid jumping to villain-turn actions.
+        if is_valid(last_player_turn_step):
+            target_step = last_player_turn_step
+        elif is_valid(last_step):
+            target_step = last_step
+        else:
+            # Fallback to one step before current when checkpoints are stale.
             target_step = current_step_id - 1
             used_fallback = True
 

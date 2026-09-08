@@ -377,8 +377,8 @@ export class Button{
         Game.setGameOver(false)
         ErrorDialog.hideError()
         BtnOk.clean()
-        // Use checkpoint-based undo to roll back one player action reliably.
-        Button.doDebug("/undo auto", false)
+        // Strict one-step undo for the primary Undo action.
+        Button.doDebug("/undo 1", false)
     }
 
     static disablePause(do_sync = false) {

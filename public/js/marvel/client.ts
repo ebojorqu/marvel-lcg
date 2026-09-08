@@ -197,6 +197,14 @@ export class Client {
         Game.total_players = data.total_players
         Button.updateUndoPreview(data.undo_target_step, data.undo_target_is_fallback)
 
+        if( Setting.is_debug ) {
+            console.log(
+                `[SYNC_STEP] render=${data.render_id} game=${data.game_id} ` +
+                `step=${data.current_step_id} max=${data.max_replay_step_id} ` +
+                `undo=${data.undo_target_step}${data.undo_target_is_fallback ? ' [F]' : ''}`
+            )
+        }
+
         if( UI.last_game_id == data.game_id &&
             Game.current_step_id == data.current_step_id &&
             Client.last_turn_id == data.render_id &&
@@ -263,6 +271,13 @@ export class Client {
                 Button.goto_id.max = max_step.toString()
                 Button.goto_id.value = step.toString()
                 Button.goto_id_value.value = step.toString()
+
+                if( Setting.is_debug ) {
+                    console.log(
+                        `[SYNC_STEP_UI] slider=${Button.goto_id.value}/${Button.goto_id.max} ` +
+                        `render=${data.render_id}`
+                    )
+                }
             }
         }
 

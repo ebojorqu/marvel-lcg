@@ -207,6 +207,15 @@ class TestMain(unittest.TestCase):
 
         cases = [
             {
+                'module_path': 'cards.pack.trors.red_skull.04128a',
+                'calls': [
+                    {
+                        'card_ids': ['04139'],
+                        'from_where': ['SetAside'],
+                    }
+                ],
+            },
+            {
                 'module_path': 'cards.pack.gob.risky_business.02004a',
                 'calls': [
                     {
@@ -373,7 +382,8 @@ class TestMain(unittest.TestCase):
                 self.assertIn('finder', kwargs, msg=f"Missing finder in call {idx + 1} ({case['module_path']})")
                 finder = kwargs['finder']
                 self.assertEqual(getattr(finder, 'card_ids', []), expected['card_ids'])
-                self.assertEqual(kwargs.get('from_where'), expected['from_where'])
+                if 'from_where' in expected:
+                    self.assertEqual(kwargs.get('from_where'), expected['from_where'])
                 if 'flip_to_name' in expected:
                     self.assertEqual(kwargs.get('flip_to_name'), expected['flip_to_name'])
                 if 'flip_to_trait' in expected:
@@ -639,6 +649,101 @@ class TestMain(unittest.TestCase):
         self.assertEqual(game.controller_manager.replay.replay_step_id, 3)
         self.assertEqual(game.scene.inputs, [1, 2, 3])
         self.assertEqual(game.controller_manager.skip.skip_to, 3)
+
+    def test_auto_undo_target_uses_latest_action_checkpoint(self):
+        from types import SimpleNamespace
+        from engine.controller.module.undo import UndoModule
+
+        manager = SimpleNamespace(
+            replay=SimpleNamespace(current_step_id=2262),
+            last_turn_start_step_id=2000,
+            skip=SimpleNamespace(is_skipping=False),
+        )
+        undo = UndoModule(manager)
+        undo.last_step = 2239
+
+        target_step, used_fallback = undo.GetAutoUndoTargetStep(2262)
+
+        self.assertEqual(target_step, 2239)
+        self.assertFalse(used_fallback)
+
+    def test_auto_undo_target_ignores_turn_start_checkpoint(self):
+        from types import SimpleNamespace
+        from engine.controller.module.undo import UndoModule
+
+        manager = SimpleNamespace(
+            replay=SimpleNamespace(current_step_id=2262),
+            last_turn_start_step_id=2238,
+            skip=SimpleNamespace(is_skipping=False),
+        )
+        undo = UndoModule(manager)
+
+        # No recent action checkpoint exists.
+        undo.last_step = 0
+
+        target_step, used_fallback = undo.GetAutoUndoTargetStep(2262)
+
+        self.assertEqual(target_step, 2261)
+        self.assertTrue(used_fallback)
+
+    def test_auto_undo_target_falls_back_when_checkpoints_are_stale(self):
+        from types import SimpleNamespace
+        from engine.controller.module.undo import UndoModule
+
+        manager = SimpleNamespace(
+            replay=SimpleNamespace(current_step_id=1043),
+            last_turn_start_step_id=929,
+            skip=SimpleNamespace(is_skipping=False),
+        )
+        undo = UndoModule(manager)
+
+        # Simulate stale checkpoint data after timeline changes.
+        undo.last_step = 5000
+        manager.last_turn_start_step_id = 5001
+
+        target_step, used_fallback = undo.GetAutoUndoTargetStep(1043)
+
+        self.assertEqual(target_step, 1042)
+        self.assertTrue(used_fallback)
+
+    def test_auto_undo_target_prefers_player_turn_checkpoint(self):
+        from types import SimpleNamespace
+        from engine.controller.module.undo import UndoModule
+
+        manager = SimpleNamespace(
+            replay=SimpleNamespace(current_step_id=1200),
+            last_turn_start_step_id=0,
+            skip=SimpleNamespace(is_skipping=False),
+        )
+        undo = UndoModule(manager)
+
+        # Simulate a newer villain-phase checkpoint and an older player-turn checkpoint.
+        undo.last_step = 1198
+        undo.last_player_turn_step = 1195
+
+        target_step, used_fallback = undo.GetAutoUndoTargetStep(1200)
+
+        self.assertEqual(target_step, 1195)
+        self.assertFalse(used_fallback)
+
+    def test_auto_undo_target_uses_last_step_when_no_player_turn_checkpoint(self):
+        from types import SimpleNamespace
+        from engine.controller.module.undo import UndoModule
+
+        manager = SimpleNamespace(
+            replay=SimpleNamespace(current_step_id=900),
+            last_turn_start_step_id=0,
+            skip=SimpleNamespace(is_skipping=False),
+        )
+        undo = UndoModule(manager)
+
+        undo.last_step = 899
+        undo.last_player_turn_step = 0
+
+        target_step, used_fallback = undo.GetAutoUndoTargetStep(900)
+
+        self.assertEqual(target_step, 899)
+        self.assertFalse(used_fallback)
 
     def test_auto_selected_effect_updates_undo_checkpoint(self):
         from types import SimpleNamespace
@@ -954,6 +1059,24 @@ class TestMain(unittest.TestCase):
         finally:
             Engine.game = old_game
             player_action_module.Message = old_message
+
+    def test_replay_push_count_tracks_recorded_operations(self):
+        from types import SimpleNamespace
+        from engine.controller.module.replay import InputModule
+        from game.scene.replay import OperationDescriptor, CommandDescriptor
+
+        manager = SimpleNamespace(skip=SimpleNamespace(SetIsSkipping=lambda _value: None))
+        replay = InputModule(manager)
+
+        self.assertEqual(replay.push_count, 0)
+
+        replay.Push(OperationDescriptor(0, "WhenPlayerInTurn", CommandDescriptor("1", [], []), ""))
+        replay.Push(OperationDescriptor(1, "WhenUnitBeingAttack", CommandDescriptor("2", [], []), ""))
+
+        self.assertEqual(replay.push_count, 2)
+        self.assertEqual(replay.current_step_id, 2)
+        self.assertEqual(replay.replay_step_id, 2)
+        self.assertEqual(len(replay.history_inputs), 2)
 
     def test_set_scene_resets_replay_state(self):
         from types import SimpleNamespace

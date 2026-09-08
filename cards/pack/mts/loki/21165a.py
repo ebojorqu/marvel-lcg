@@ -16,7 +16,7 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name="War in Asgard",
+            finder=CardFinder(card_ids=["21167"]),
             card_type=SchemeSide2
         )
 

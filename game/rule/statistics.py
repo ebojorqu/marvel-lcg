@@ -49,7 +49,15 @@ def GetStatisticsRule() -> List['Ability']:
         Engine.statistics.RecordMaximum("max_single_cards_drawn", message.size)
 
     def deal_damage(message: 'Message.AfterFaceDealDamage'):
-        Engine.game.session.statistics.Add(message.by_effect.this, message.dealt_damage, 'damage_dealt')
+        # Attack damage should be attributed to the real attack source (`trigger`).
+        # Non-attack effect damage (e.g. upgrades/supports) should be attributed
+        # to the resolving effect card (`by_effect.this`) so those cards appear
+        # in endgame statistics.
+        source = message.trigger
+        if not message.IsFromAttack() and PlayerCard.IsType(message.by_effect.this):
+            source = message.by_effect.this
+
+        Engine.game.session.statistics.Add(source, message.dealt_damage, 'damage_dealt')
         Engine.statistics.RecordValue("total_damage_dealt", message.dealt_damage)
         Engine.statistics.RecordMaximum("max_single_damage_dealt", message.dealt_damage)
 

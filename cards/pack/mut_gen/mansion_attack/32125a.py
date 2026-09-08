@@ -10,7 +10,7 @@ def GetAbilities() -> Sequence['Ability']:
 
         SetupCards.PutIntoPlay(
             effect,
-            name="Save the School",
+            finder=CardFinder(card_ids=["32130"]),
             card_type=Environment
         )
 

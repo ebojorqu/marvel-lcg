@@ -79,7 +79,13 @@ class GameServerSocket(GameServerBase):
                 # game.controller_manager.skip.is_skipping,
             )
             try:
-                Log.DebugSilent("SYNC", f"[Server] render id: {data.render_id}, player_id: {player_id}, ask_players: {data.ask_players}, clients: {clients}")
+                Log.DebugSilent(
+                    "SYNC",
+                    f"[SYNC_STEP_SEND] render={data.render_id} game={data.game_id} "
+                    f"step={data.current_step_id} max={data.max_replay_step_id} "
+                    f"undo={data.undo_target_step}{' [F]' if data.undo_target_is_fallback else ''} "
+                    f"player_id={player_id} ask={data.ask_players}"
+                )
                 # data_size_bytes = Json.DumpsSize(data)
                 # compressed_data = Json.DumpGZip(data)
                 # device_manager.AddSize("Socket", len(compressed_data))

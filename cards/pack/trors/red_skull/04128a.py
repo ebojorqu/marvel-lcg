@@ -9,10 +9,13 @@ def GetAbilities() -> Sequence['Ability']:
         this = effect.this.CastTo(MainScheme)
         Unused(this)
 
+        first_player = Worlds.GetFirstPlayer(effect)
         red_house = SetupCards.PutIntoPlay(
             effect,
-            name="The Red House",
-            card_type=EncounterSideScheme
+            for_player=first_player,
+            finder=CardFinder(card_ids=["04139"]),
+            card_type=EncounterSideScheme,
+            from_where=["SetAside"],
         )
         if not red_house:
             red_houses = []
@@ -21,7 +24,7 @@ def GetAbilities() -> Sequence['Ability']:
 
         faces: List[EncounterSideScheme] = []
         for face in Worlds.AsideDeck(effect).Get(True) + Worlds.GetEncounterDeckCards(effect):
-            if EncounterSideScheme.IsType(face):
+            if EncounterSideScheme.IsType(face) and face.paper.card_id != "04139":
                 faces.append(face)
 
         villain = Worlds.FindVillain(effect)

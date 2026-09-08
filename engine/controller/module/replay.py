@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 CATEGORY_NAME = "REPLAY"
 DISABLE_CRC_ERROR_ASSERT    = ConfigVariables.Bool('disable_crc_error_assert', False)
 CRC_IGNORE_IDS              = ConfigVariables.ListInt('crc_ignore_ids', [])
+DEBUG_REPLAY_PUSH           = ConfigVariables.Bool('debug_replay_push', True)
+REPLAY_CRC_DEBUG_WINDOW     = ConfigVariables.Int('replay_crc_debug_window', 6)
 
 class InputModule:
 
@@ -31,6 +33,7 @@ class InputModule:
         self.is_replay: bool = False
 
         self.break_on: List[int] = []
+        self.push_count = 0
 
         self.manager = manager
 
@@ -42,6 +45,7 @@ class InputModule:
         self.replay_step_id = 0
         self.is_updated = False
         self.calculated_crc = []
+        self.push_count = 0
 
     def Clear(self):
         self.break_on = []
@@ -67,6 +71,15 @@ class InputModule:
         self.history_inputs.append(operation)
         self.current_step_id += 1
         self.replay_step_id += 1
+        self.push_count += 1
+
+        if DEBUG_REPLAY_PUSH.value:
+            effect_id = operation.effect.id if operation.effect and operation.effect.id else ""
+            event_name = operation.event if operation.event else ""
+            Log.Debug(
+                CATEGORY_NAME,
+                f"PUSH#{self.push_count} step={self.current_step_id} replay={self.replay_step_id} event={event_name} effect={effect_id}"
+            )
 
         if self.current_step_id in self.break_on:
             self.manager.skip.SetIsSkipping(False)
@@ -75,6 +88,56 @@ class InputModule:
         self.history_inputs.pop()
         self.current_step_id -= 1
         self.replay_step_id -= 1
+
+    def _format_op(self, op: 'OperationDescriptor') -> str:
+        effect_id = op.effect.id if op.effect and op.effect.id else ""
+        return f"step={op.step} event={op.event} effect={effect_id}"
+
+    def _format_recent_ops(self, size: int) -> str:
+        if size <= 0:
+            return ""
+        ops = self.history_inputs[-size:]
+        if not ops:
+            return ""
+        text = "Recent history operations:\n"
+        for op in ops:
+            text += f"- {self._format_op(op)}\n"
+        return text
+
+    def _format_upcoming_ops(self, size: int) -> str:
+        if size <= 0:
+            return ""
+        begin = self.replay_step_id
+        end = min(self.replay_step_id + size, len(self.replay_inputs))
+        ops = self.replay_inputs[begin:end]
+        if not ops:
+            return ""
+        text = "Upcoming replay operations:\n"
+        for op in ops:
+            text += f"- {self._format_op(op)}\n"
+        return text
+
+    def _format_card_info(self, key: int) -> str:
+        from engine import Engine
+
+        game = Engine.game
+        if not game or not game.world:
+            return ""
+
+        card = game.world.object_manager.card_dict.get(key, None)
+        if not card:
+            return ""
+
+        face = getattr(card, 'face', None)
+        if not face:
+            return ""
+
+        card_name = str(face)
+        paper = getattr(face, 'paper', None)
+        card_id = getattr(paper, 'card_id', "")
+        area = getattr(card, 'area', None)
+        area_name = str(area) if area else ""
+        return f"{card_name} [{card_id}] @{area_name}"
 
     def GetReplayOperation(self, is_puzzle: bool, *, check_crc: bool=True) -> Tuple['OperationDescriptor|None', bool]:
         from engine import Engine
@@ -142,11 +205,13 @@ class InputModule:
                     b_value = db.get(key, None)
                     if a_value != b_value:
                         diff_ids.append(key)
-                        diff_text += "c{:<4}| {:<4} | {:<4} | {:<3}\n".format(
+                        card_info = self._format_card_info(key)
+                        diff_text += "c{:<4}| {:<4} | {:<4} | {:<3} | {}\n".format(
                             key,
                             get_text(a_value),
                             get_text(b_value),
                             get_diff_text(a_value, b_value),
+                            card_info,
                         )
 
                 if not disable_assert:
@@ -160,7 +225,12 @@ class InputModule:
 # """
                     tip_info = f""" Key | Read | Curr | (#{self.current_step_id} / {len(self.replay_inputs)})
 """
-                    Log.Assert(CATEGORY_NAME, f'{tip_info}{diff_text}')
+                    context_window = max(REPLAY_CRC_DEBUG_WINDOW.value, 0)
+                    expected_op = self.replay_inputs[self.replay_step_id] if self.replay_step_id < len(self.replay_inputs) else None
+                    expected_text = f"Expected replay operation:\n- {self._format_op(expected_op)}\n" if expected_op else ""
+                    recent_text = self._format_recent_ops(context_window)
+                    upcoming_text = self._format_upcoming_ops(context_window)
+                    Log.Assert(CATEGORY_NAME, f'{tip_info}{diff_text}{expected_text}{recent_text}{upcoming_text}')
 
                 from game.test import Test
                 if Engine.in_unit_test:
