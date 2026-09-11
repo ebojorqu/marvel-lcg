@@ -650,6 +650,57 @@ class TestMain(unittest.TestCase):
         self.assertEqual(game.scene.inputs, [1, 2, 3])
         self.assertEqual(game.controller_manager.skip.skip_to, 3)
 
+    def test_undo_skips_trailing_undo_debug_operations(self):
+        from types import SimpleNamespace
+
+        class DummySkip:
+            def __init__(self):
+                self.skip_to = 0
+            def SetSkipTo(self, value):
+                self.skip_to = value
+
+        def debug_op(cmd: str):
+            return SimpleNamespace(effect=SimpleNamespace(id=f":{cmd}"))
+
+        # Simulate replay history where queued undo commands were recorded.
+        action_1 = SimpleNamespace(effect=SimpleNamespace(id="e1 real c1"))
+        action_2 = SimpleNamespace(effect=SimpleNamespace(id="e2 real c2"))
+        action_3 = SimpleNamespace(effect=SimpleNamespace(id="e3 real c3"))
+        replay_history = [action_1, action_2, action_3, debug_op("/undo 1"), debug_op("/undo 1")]
+
+        replay = SimpleNamespace(
+            history_inputs=replay_history,
+            current_step_id=len(replay_history),
+            replay_step_id=len(replay_history),
+            is_updated=False,
+            calculated_crc=[],
+        )
+        replay.Clear = lambda: None
+        replay.SetReplayInputs = lambda inputs: setattr(replay, 'replay_inputs', list(inputs))
+        replay.Clean = lambda: None
+
+        game = SimpleNamespace()
+        game.controller_manager = SimpleNamespace(
+            replay=replay,
+            skip=DummySkip(),
+        )
+        game.scene = SimpleNamespace(inputs=list(replay_history))
+        game.state = SimpleNamespace(SetStartState=lambda _state: None)
+        game.ApplyHistoryInput = lambda: None
+
+        session = __import__('game.game_run.game_session', fromlist=['GameSession']).GameSession(game)
+        session.world = SimpleNamespace(game_over=SimpleNamespace(SetUndo=lambda: None))
+        session.ExitWait = lambda: None
+
+        session.Undo(1)
+
+        # One real action is undone (3 -> 2), and trailing undo commands are removed.
+        self.assertEqual(game.controller_manager.replay.current_step_id, 2)
+        self.assertEqual(game.controller_manager.replay.replay_step_id, 2)
+        self.assertEqual(game.controller_manager.replay.history_inputs, [action_1, action_2])
+        self.assertEqual(game.scene.inputs, [action_1, action_2])
+        self.assertEqual(game.controller_manager.skip.skip_to, 2)
+
     def test_auto_undo_target_uses_latest_action_checkpoint(self):
         from types import SimpleNamespace
         from engine.controller.module.undo import UndoModule
@@ -706,7 +757,7 @@ class TestMain(unittest.TestCase):
         self.assertEqual(target_step, 1042)
         self.assertTrue(used_fallback)
 
-    def test_auto_undo_target_prefers_player_turn_checkpoint(self):
+    def test_auto_undo_target_prefers_latest_action_checkpoint(self):
         from types import SimpleNamespace
         from engine.controller.module.undo import UndoModule
 
@@ -717,13 +768,13 @@ class TestMain(unittest.TestCase):
         )
         undo = UndoModule(manager)
 
-        # Simulate a newer villain-phase checkpoint and an older player-turn checkpoint.
+        # Simulate a newer checkpoint and an older player-turn checkpoint.
         undo.last_step = 1198
         undo.last_player_turn_step = 1195
 
         target_step, used_fallback = undo.GetAutoUndoTargetStep(1200)
 
-        self.assertEqual(target_step, 1195)
+        self.assertEqual(target_step, 1198)
         self.assertFalse(used_fallback)
 
     def test_auto_undo_target_uses_last_step_when_no_player_turn_checkpoint(self):

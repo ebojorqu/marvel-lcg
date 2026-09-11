@@ -106,11 +106,11 @@ class UndoModule:
             return step > 0 and step < current_step_id and step <= min_valid_step
 
         used_fallback = False
-        # Prefer player-turn checkpoints to avoid jumping to villain-turn actions.
-        if is_valid(last_player_turn_step):
-            target_step = last_player_turn_step
-        elif is_valid(last_step):
+        # Prefer the latest action checkpoint to keep undo jumps small.
+        if is_valid(last_step):
             target_step = last_step
+        elif is_valid(last_player_turn_step):
+            target_step = last_player_turn_step
         else:
             # Fallback to one step before current when checkpoints are stale.
             target_step = current_step_id - 1

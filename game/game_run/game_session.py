@@ -198,6 +198,15 @@ class GameSession:
     def StepTo(self, index: int):
         self.game.controller_manager.skip.SetSkipTo(index)
 
+    @staticmethod
+    def _is_undo_debug_operation(operation: object) -> bool:
+        effect = getattr(operation, 'effect', None)
+        effect_id = getattr(effect, 'id', None)
+        if not isinstance(effect_id, str) or not effect_id.startswith(':'):
+            return False
+        command = effect_id[1:].strip().lower()
+        return command.startswith('/undo')
+
     ################################################################################
     #
     def Undo(self, undo: int):
@@ -210,6 +219,11 @@ class GameSession:
 
         replay = self.game.controller_manager.replay
         history_inputs = replay.history_inputs[:]
+
+        # Ignore trailing undo debug commands so each undo removes gameplay steps.
+        while history_inputs and GameSession._is_undo_debug_operation(history_inputs[-1]):
+            history_inputs.pop()
+
         keep_count = max(len(history_inputs) - undo, 0)
         trimmed_history = history_inputs[:keep_count]
 

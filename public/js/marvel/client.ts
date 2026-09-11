@@ -190,6 +190,9 @@ export class Client {
             // is_skipping      : original_data['is_skipping'],
         };
 
+        const previous_game_id = UI.last_game_id
+        const previous_step_id = Game.current_step_id
+
         // if( Setting.is_hot_seat && data.ask_players.length > 0 ) {
         //     UI.updateCurrentPlayer(data.ask_players[0])
         // }
@@ -213,6 +216,10 @@ export class Client {
             data.notify_texts.length == 0
         ) {
             return
+        }
+
+        if( previous_game_id != data.game_id || previous_step_id != data.current_step_id ) {
+            Button.clearUndoRequestGuard()
         }
 
         Game.current_step_id = data.current_step_id

@@ -491,6 +491,7 @@ class ModelAction(ModelBase):
     def CannotReadyDuringNextTurn(self, by_effect: 'Effect') -> None:
         from game.card.face.card_type import Identity
         from game.card.face.card_type import Ally
+        from game.ability.factory import AbilityFactory
         assert isinstance(self, Identity|Ally)
         # TODO: Test
         self.effect.RegisterTemp(

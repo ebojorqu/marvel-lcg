@@ -24,6 +24,43 @@ export class Button{
     static goto_id_value = Button.goto_id?.previousElementSibling as HTMLOutputElement
     static undo_preview_target_step = 0
     static undo_preview_is_fallback = false
+    static undo_request_in_flight = false
+    static undo_request_guard_timer = 0
+
+    private static beginUndoRequestGuard(): boolean {
+        if( Button.undo_request_in_flight ) {
+            return false
+        }
+
+        Button.undo_request_in_flight = true
+        const undo_btn = document.querySelector<HTMLButtonElement>('#undo-btn')
+        if( undo_btn ) {
+            undo_btn.disabled = true
+        }
+
+        if( Button.undo_request_guard_timer ) {
+            window.clearTimeout(Button.undo_request_guard_timer)
+        }
+        // Failsafe unlock in case the sync response is delayed or dropped.
+        Button.undo_request_guard_timer = window.setTimeout(() => {
+            Button.clearUndoRequestGuard()
+        }, 2000)
+
+        return true
+    }
+
+    static clearUndoRequestGuard() {
+        Button.undo_request_in_flight = false
+        if( Button.undo_request_guard_timer ) {
+            window.clearTimeout(Button.undo_request_guard_timer)
+            Button.undo_request_guard_timer = 0
+        }
+
+        const undo_btn = document.querySelector<HTMLButtonElement>('#undo-btn')
+        if( undo_btn ) {
+            undo_btn.disabled = false
+        }
+    }
 
     static updateUndoPreview(targetStep: number, isFallback: boolean) {
         if( Number.isFinite(targetStep) ) {
@@ -37,12 +74,7 @@ export class Button{
         if( !undo_btn ) {
             return
         }
-        if( Button.undo_preview_target_step <= 0 ) {
-            undo_btn.innerHTML = "Undo"
-        } else {
-            const fallbackText = Button.undo_preview_is_fallback ? " [F]" : ""
-            undo_btn.innerHTML = `Undo (${Button.undo_preview_target_step}${fallbackText})`
-        }
+        undo_btn.innerHTML = "Undo"
     }
 
     static doToggleHistory() {
@@ -355,6 +387,9 @@ export class Button{
     // }
 
     static doAutoUndo() {
+        if( !Button.beginUndoRequestGuard() ) {
+            return
+        }
         Game.setGameOver(false)
         ErrorDialog.hideError()
         BtnOk.clean()
@@ -371,14 +406,17 @@ export class Button{
     }
 
     static doUndo() {
+        if( !Button.beginUndoRequestGuard() ) {
+            return
+        }
         // document.querySelectorAll('.card').forEach( card_div => {
         //     card_div.classList.remove(ClassName.card_shuffle)
         // })
         Game.setGameOver(false)
         ErrorDialog.hideError()
         BtnOk.clean()
-        // Strict one-step undo for the primary Undo action.
-        Button.doDebug("/undo 1", false)
+        // Prefer latest action checkpoint for smaller undo jumps.
+        Button.doDebug("/undo auto", false)
     }
 
     static disablePause(do_sync = false) {
