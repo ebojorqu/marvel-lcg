@@ -13,7 +13,7 @@ def GetAbilities() -> Sequence['Ability']:
 
     return [
         AbilityFactory.CanPlayThisUpgradeCard(
-            CardFinder(non_trait="ELITE")
+            CardFinder(card_type=Minion, non_trait="ELITE")
         ),
         AbilityFactory.WhenUnitWouldAttack(
             AbilityType.Interrupt,

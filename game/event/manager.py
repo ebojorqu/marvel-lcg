@@ -525,12 +525,22 @@ class EventManager:
                 current_player = world.GetCurrentPlayer()
                 check_player = None
 
+                def can_any_player_help_pay_attached_card_cost() -> bool:
+                    if not isinstance(message, Message.WhenPlayerPayingResources):
+                        return False
+                    for attached_upgrade in message.for_effect.this.GetAttachedUpgrades():
+                        if attached_upgrade.IsCardId("58032"):
+                            return True
+                    return False
+
                 if effect.ability.flags.is_resource or effect.ability.flags.is_discard_pay:
                     if isinstance(message, Message.WhenPlayerPayingResources) and \
                         Event.IsType(message.for_effect.this) and message.for_effect.this.alliance:
                         # Fix "53019": resource effects generated for alliance cards
                         # must be validated against the generator's controller, not
                         # the player paying the alliance cost.
+                        check_player = effect.this.GetControlByOrOwner()
+                    elif can_any_player_help_pay_attached_card_cost():
                         check_player = effect.this.GetControlByOrOwner()
                     else:
                         check_player = message.CastTo(Message.WhenPlayerPayingResources).GetToPlayer()
@@ -545,6 +555,8 @@ class EventManager:
                         # generating the payment, so validate against that generator's
                         # controller instead of the player who is paying the alliance
                         # cost.
+                        check_player = effect.this.GetControlByOrOwner()
+                    elif can_any_player_help_pay_attached_card_cost():
                         check_player = effect.this.GetControlByOrOwner()
                     else:
                         # Fix "50014"

@@ -754,7 +754,16 @@
         ],
         "max_id": "56214"
     },
-    "57. Hercules": {
+    "57. Wonder Man": {
+        "name": "wonder_man",
+        "scenarios": [],
+        "heroes": [
+            "wonder_man"
+        ],
+        "encounters": [],
+        "max_id": "58034"
+    },
+    "58. Hercules": {
         "name": "hercules",
         "scenarios": [],
         "heroes": [
@@ -804,5 +813,5 @@
         "heroes": [],
         "encounters": []
     },
-    "checksum": "0b2db2a4666505e15c099ce39a37aba9912144411473a56687fa0e04e102423f"
+    "checksum": "c5364e3ebbfc135ee9296176b5b3ca53b9375edc899078125af0518ed36c43bd"
 }

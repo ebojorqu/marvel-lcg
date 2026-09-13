@@ -256,6 +256,16 @@ class SenderPlayer:
         def AddPayment(self, cost_effect: 'Effect', res: 'Resources', check_effect: 'Effect'):
             self.can_pay_effects.append((cost_effect, res, check_effect))
 
+        def CanOverpayForCard(self) -> bool:
+            """
+            True only when this payment is for a card whose text grants overpay.
+            """
+            paying_for_card = self.paying_for_card
+            if paying_for_card is None:
+                return False
+            text = paying_for_card.paper.text.lower()
+            return "overpay" in text or "overpaid" in text
+
     # Generate resource like "03010" and discard gain resource both use this message
     # It will have bugs if a card have 2 method to generate resources
     class WhenPlayerPayingResources(TriggerPlayerMessage):

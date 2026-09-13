@@ -20,7 +20,26 @@ def _GetResourcePaymentPlayer(message: 'Message2', effect: 'Effect') -> 'Player'
         if Player.IsType(controller):
             return controller
 
+    if _CanAnyPlayerHelpPayAttachedCardCost(message):
+        controller = effect.this.GetControlByOrOwner()
+        if Player.IsType(controller):
+            return controller
+
     return player
+
+
+def _CanAnyPlayerHelpPayAttachedCardCost(message: 'Message2') -> bool:
+    paying_for_effect = getattr(message, "paying_for_effect", None)
+    if paying_for_effect is None:
+        paying_for_effect = getattr(message, "for_effect", None)
+    if paying_for_effect is None:
+        return False
+
+    paying_for_face = paying_for_effect.this
+    for attached_upgrade in paying_for_face.GetAttachedUpgrades():
+        if attached_upgrade.IsCardId("58032"):
+            return True
+    return False
 
 
 class AbilityFactoryResources:
@@ -67,6 +86,8 @@ class AbilityFactoryResources:
             if Event.IsType(message.paying_for_effect.this):
                 if message.paying_for_effect.this.alliance:
                     return True
+            if _CanAnyPlayerHelpPayAttachedCardCost(message):
+                return True
             if effect.ability.CheckAnyPlayerCanTriggerThis(effect):
                 return True
             # HACK, TODO: clean this
@@ -90,6 +111,7 @@ class AbilityFactoryResources:
                             for_card: 'CardFinder|None'=None,
                             *,
                             for_ability: str|None=None,
+                            only_for_overpay: bool|None=None,
                             spend_this_only_in_hero_form: bool|None=None,
                             for_card_from_hand: bool|None=None,
                             is_play_card: bool|None=None,
@@ -135,6 +157,11 @@ class AbilityFactoryResources:
             if for_ability  is None:
                 return True
             return for_ability == message.paying_for_effect.ability.name
+
+        def check_only_for_overpay(effect: 'Effect', message: 'Message.CheckPlayerCanPayCost') -> bool:
+            if only_for_overpay is None:
+                return True
+            return only_for_overpay == message.CanOverpayForCard()
 
         def check_for_card_from_hand(effect: 'Effect', message: 'Message.CheckPlayerCanPayCost') -> bool:
             if for_card_from_hand  is None:
@@ -231,6 +258,7 @@ class AbilityFactoryResources:
                 check_spend_this_only_in_hero_form,
                 check_for_card,
                 check_for_ability,
+                check_only_for_overpay,
                 check_for_card_from_hand,
                 check_is_play_card,
                 check_who_trigger_this_effect,
@@ -250,6 +278,7 @@ class AbilityFactoryResources:
                             # bind_ability: 'Ability|None'=None,
                             # *,
                             for_ability: str|None=None,
+                            only_for_overpay: bool|None=None,
                             from_hand: bool|None=None,
                             for_player_whose_identity_has_trait: "CardFace.TRAITS|None"=None,
                             is_play_card: bool|None=None,
@@ -269,6 +298,8 @@ class AbilityFactoryResources:
             if Event.IsType(message.paying_for_effect.this):
                 if message.paying_for_effect.this.alliance:
                     return True
+            if _CanAnyPlayerHelpPayAttachedCardCost(message):
+                return True
             # Hack
             player = _GetResourcePaymentPlayer(message, effect)
             effect.context.initiator = player
@@ -289,6 +320,7 @@ class AbilityFactoryResources:
                 *conditions
             ],
             for_ability=for_ability,
+            only_for_overpay=only_for_overpay,
             for_card_from_hand=from_hand,
             is_play_card=is_play_card,
             who_trigger_this_effect=who_trigger_this_effect,

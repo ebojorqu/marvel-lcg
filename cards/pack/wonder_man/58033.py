@@ -11,12 +11,18 @@ def GetAbilities() -> Sequence['Ability']:
         initiator = effect.GetInitiator()
         message.GainDEFForThisAttack(+2, effect)
 
+        def action():
+            if message.attacker:
+                Players.DiscardHeroActionAttachment(initiator, [message.attacker], effect, may=False)
+        message.IfYouTakeNoDamage(action)
+
 
     return [
         AbilityFactory.WhenUnitDefendAgainstAttack(
-            AbilityType.Interrupt,
+            AbilityType.HeroInterrupt,
             "YourHero",
             disarming_defense,
+            against_who=Enemy,
         ).SetPlay().SetLabel('defense'),
     ]
 
