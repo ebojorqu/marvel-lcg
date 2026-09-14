@@ -75,7 +75,13 @@ export class SelectStep {
         let ok = false
         let over_pay = false
         SelectStep.step = 'cost'
-        if( !need_cost || Effect.select_effect_obj.getCost() == "" || Effect.select_effect_obj.isCostRuleUpTo() ) {
+        const bind_card = Cards.getCard(Effect.select_effect_obj.bind_id)
+        const is_everywhere_all_at_once = bind_card?.card_id === '58018'
+        const selected_target_cost = is_everywhere_all_at_once
+            ? String(Effect.select_effect_obj.selected_targets.length)
+            : Effect.select_effect_obj.getCost()
+
+        if( !need_cost || selected_target_cost == "" || Effect.select_effect_obj.isCostRuleUpTo() ) {
             // UI.resetPromptText()
             // UI.setBtnCancelText('Cancel', false)
             // UI.setBtnOkText('Cost', true)
@@ -83,7 +89,7 @@ export class SelectStep {
         } else {
             // if( CardEffect.select_effect_obj.cost != "" && CardEffect.select_effect_obj.cost != "0" ) {
             let paid_list = []
-            let cost_list = Effect.select_effect_obj.getCost().split('')
+            let cost_list = selected_target_cost.split('')
             for( let i of Effect.select_effect_obj.resources ) {
                 let index = Effect.select_effect_obj.getResources().indexOf(i)
                 let c = Effect.select_effect_obj.getResText()[index]
@@ -106,7 +112,7 @@ export class SelectStep {
                 return r
             }
 
-            let need_cost = to_array(Effect.select_effect_obj.getCost())
+            let need_cost = to_array(selected_target_cost)
             let has_cost = to_array(paid_list.toString().replaceAll(",", ""))
             let same_type = true
             let different_type = 0

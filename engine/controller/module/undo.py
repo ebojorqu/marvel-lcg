@@ -100,10 +100,17 @@ class UndoModule:
 
         last_step = self.last_step
         last_player_turn_step = self.last_player_turn_step
+        turn_start_step = self.manager.last_turn_start_step_id
         min_valid_step = max(current_step_id - 1, 0)
 
         def is_valid(step: int) -> bool:
-            return step > 0 and step < current_step_id and step <= min_valid_step
+            if not (step > 0 and step < current_step_id and step <= min_valid_step):
+                return False
+            # Checkpoints from before the current player turn are considered stale.
+            # They can cause auto-undo to jump back hundreds of steps.
+            if turn_start_step > 0 and step < turn_start_step:
+                return False
+            return True
 
         used_fallback = False
         # Prefer the latest action checkpoint to keep undo jumps small.

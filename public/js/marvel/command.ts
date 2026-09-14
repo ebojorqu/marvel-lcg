@@ -1,5 +1,6 @@
 import { Cards } from "./cards.js";
 import { Notify } from "./notify.js";
+import { saveAsFile } from "../lib/save_file.js";
 
 export class Command {
 
@@ -24,11 +25,18 @@ export class Command {
     }
 
     static async saveLocal() {
-        const response_block_thread = await fetch("save_local?");
-        const text = await response_block_thread.text();
-        // const text = "A"
-        // prompt(`Your save file has been saved in:`, text)
-        Notify.showCommand(`Your save file has been saved in: ${text}`)
+        try {
+            const response = await fetch("save_replay_data");
+            if (!response.ok) {
+                throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+            }
+
+            const text = await response.text();
+            saveAsFile(text, "save.json");
+            Notify.showCommand("Replay saved as save.json")
+        } catch (error) {
+            Notify.showCommand(`Failed to save replay: ${error}`)
+        }
     }
 
     static async uploadSave(save_type: "Bug"|"Crash"|"Share", comment: string="") {

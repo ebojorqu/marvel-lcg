@@ -777,6 +777,26 @@ class TestMain(unittest.TestCase):
         self.assertEqual(target_step, 1198)
         self.assertFalse(used_fallback)
 
+    def test_auto_undo_target_ignores_checkpoint_before_current_turn(self):
+        from types import SimpleNamespace
+        from engine.controller.module.undo import UndoModule
+
+        manager = SimpleNamespace(
+            replay=SimpleNamespace(current_step_id=1606),
+            last_turn_start_step_id=1588,
+            skip=SimpleNamespace(is_skipping=False),
+        )
+        undo = UndoModule(manager)
+
+        # Stale checkpoint from a previous turn should not be used.
+        undo.last_step = 813
+        undo.last_player_turn_step = 812
+
+        target_step, used_fallback = undo.GetAutoUndoTargetStep(1606)
+
+        self.assertEqual(target_step, 1605)
+        self.assertTrue(used_fallback)
+
     def test_auto_undo_target_uses_last_step_when_no_player_turn_checkpoint(self):
         from types import SimpleNamespace
         from engine.controller.module.undo import UndoModule

@@ -8,14 +8,20 @@ def GetAbilities() -> Sequence['Ability']:
         this = effect.this.CastTo(Resource)
         Unused(this)
 
+        initiator = effect.GetInitiator()
+        if not initiator.IsHero():
+            return Resources("Y")
+
         # Base 1 [energy] plus up to 3 from this card's effect.
         return Resources("Y") * 4
 
     def energy_siphon_res(effect: 'Effect', message: 'Message.WhenPlayerPayingResources') -> 'Resources':
         this = effect.this.CastTo(Resource)
-        Unused(this)
 
         initiator = effect.GetInitiator()
+        if not initiator.IsHero():
+            return Resources("Y")
+
         identity = initiator.GetIdentity()
 
         damage = initiator.DeclareNumber(0, 3)
@@ -30,7 +36,7 @@ def GetAbilities() -> Sequence['Ability']:
 
     return [
         AbilityFactory.DoDiscardThisToGenerateResources(
-            AbilityType.HeroInterrupt,
+            AbilityType.DiscardForResource,
             res_fn=energy_siphon_res,
         ),
         AbilityFactory.CheckThisCanDropPay(

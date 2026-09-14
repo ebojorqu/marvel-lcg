@@ -1,4 +1,5 @@
 from core import *
+from game.message import AttackerMessageInternal
 
 class AbilityFactoryBoost:
 

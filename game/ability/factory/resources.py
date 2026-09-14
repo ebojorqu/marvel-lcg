@@ -79,6 +79,18 @@ class AbilityFactoryResources:
                             ) -> 'Ability':
         from game.card.face.card_type import Event
 
+        def bind_drop_pay_ability(face: 'CardFace') -> 'Effect|None':
+            found = face.effect.Find(func_name="DiscardPay")
+            if not found:
+                return None
+
+            # Prefer custom discard-pay handlers over the auto-added default
+            # `AbilityType.DiscardForResource` handler.
+            for bind_effect in found:
+                if bind_effect.ability.type != AbilityType.DiscardForResource:
+                    return bind_effect
+            return found[0]
+
         def check_can_pay(effect: 'Effect', message: 'Message.CheckPlayerCanPayCost') -> bool:
             this = effect.this
             if not this.IsLikeInHand():
@@ -100,9 +112,7 @@ class AbilityFactoryResources:
             resources_fn,
             for_card,
             spend_this_only_in_hero_form=spend_this_only_in_hero_form,
-            bind_ability=lambda face: (
-                found[0] if (found := face.effect.Find(func_name="DiscardPay")) else None
-            ),
+            bind_ability=bind_drop_pay_ability,
             conditions=[check_can_pay]
         ).SetFuncName("CheckThisCanDropPay")
 

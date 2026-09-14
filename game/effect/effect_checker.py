@@ -144,8 +144,10 @@ class EffectChecker:
 
         self.cost_for_different_target = TargetCost()
         if not effect.context.ignore_resource_cost:
-            def process_target(target: 'CardFace|None'):
-                if target:
+            def process_target(target: 'CardFace|None', selected_targets: Sequence['CardFace']|None=None):
+                if selected_targets is not None:
+                    targets = list(selected_targets)
+                elif target:
                     targets = [target]
                 else:
                     targets = []
@@ -161,7 +163,11 @@ class EffectChecker:
                     self.cost_for_different_target.AddPayment(target, cost_effect, res, check_effect)
                 pass
 
-            if "09039" in [x.paper.card_id for x in effect.context.all_legal_targets]:
+            if effect.this.IsCardId("58018") and effect.targets:
+                # X-cost card: cost depends on chosen scheme count.
+                self.cost_for_different_target.SetNoneTargetOnly()
+                process_target(None, effect.targets)
+            elif "09039" in [x.paper.card_id for x in effect.context.all_legal_targets]:
                 for target in effect.context.all_legal_targets:
                     process_target(target)
             else:
@@ -188,6 +194,11 @@ class EffectChecker:
             res_text = ""
             need_cost = ""
             if not self.cost_for_different_target.IsEmpty() and not effect.context.ignore_resource_cost:
+                if effect.this.IsCardId("58018"):
+                    # Rebuild payment cost after targets are chosen so X and overpay
+                    # are computed from selected schemes.
+                    self.UpdatePayResources(player)
+
                 target = effect.targets[0] if effect.targets != [] else None
                 need_cost = self.cost_for_different_target.GetCost(target)
                 paid_effects = effect.context.paid_this_res_effects

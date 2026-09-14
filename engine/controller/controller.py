@@ -280,8 +280,18 @@ class Controller:
                 input_effect_id = CardEffectInt(input_effect.id)
                 if input_effect_id == 0:
                     if is_forced:
-                        assert len(effect_descriptors) == 1 and effect_descriptors[0].target_num_range[0] == 0, f"{is_forced}"
-                    break
+                        # Some control paths may emit a pass-like id=0 even for forced prompts.
+                        # If every legal option is zero-target, deterministically pick the first
+                        # instead of crashing; otherwise, re-prompt for explicit selection.
+                        if len(effect_descriptors) == 1 and effect_descriptors[0].target_num_range[0] == 0:
+                            break
+                        if all(x.target_num_range[0] == 0 for x in effect_descriptors):
+                            input_effect_id = effect_descriptors[0].id
+                        else:
+                            Log.Warn(CATEGORY_NAME, "Forced choice received id=0 with target-required options; waiting for explicit selection")
+                            continue
+                    else:
+                        break
 
                 # Update selected
                 for effect in effect_descriptors:

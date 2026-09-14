@@ -373,7 +373,7 @@ export class Button{
         if (!response.ok) {
             throw new Error('Network response was not ok: ' + response.statusText);
         }
-        const data = await response.json();
+        const data = await response.text();
         saveAsFile(data, `save.json`)
     }
 
@@ -402,7 +402,7 @@ export class Button{
 
     // Backward-compatible alias.
     static doOldUndo() {
-        Button.doAutoUndoShortcut()
+        Button.doUndo()
     }
 
     static doUndo() {
@@ -415,8 +415,8 @@ export class Button{
         Game.setGameOver(false)
         ErrorDialog.hideError()
         BtnOk.clean()
-        // Prefer latest action checkpoint for smaller undo jumps.
-        Button.doDebug("/undo auto", false)
+        // Keep default Undo deterministic: exactly one gameplay step.
+        Button.doDebug("/undo 1", false)
     }
 
     static disablePause(do_sync = false) {

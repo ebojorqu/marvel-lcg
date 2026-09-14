@@ -17,6 +17,11 @@ def GetAbilities() -> Sequence['Ability']:
             AbilityType.Action,
             adam_warlock
         ).SetCostFunc(CostFunc.Discard("YourHandCards"))
-        .SetTarget(StatusCard, bind_to=CardFinder(name="Adam Warlock")),
+        # Match status cards attached to this identity card across either face.
+        .SetTarget(
+            StatusCard,
+            canbe_discard=True,
+            check_fn=lambda effect, face: face.GetBindFace().card == effect.this.card,
+        ),
     ]
 
