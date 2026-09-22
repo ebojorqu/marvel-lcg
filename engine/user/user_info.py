@@ -49,8 +49,12 @@ class UserInfo:
             return "0.00GB"
 
         def get_language():
-            # Get the default language of the system
-            lang, _ = locale.getdefaultlocale()
+            # Prefer non-deprecated locale APIs and normalize to language code.
+            lang, _ = locale.getlocale()
+            if not lang:
+                localename = locale.setlocale(locale.LC_CTYPE, None)
+                if localename:
+                    lang = localename.split('.')[0]
             return lang if lang else "Unknow"
 
         def get_time_zone():

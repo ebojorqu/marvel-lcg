@@ -103,7 +103,15 @@ class Profile:
             profile_name: str,
             profile_category: PROFILE_CATEGORY="None",
             **kwargs: Any) -> T:
-        return func(*args, **kwargs)
+        if Build.release:
+            return func(*args, **kwargs)
+        return Profile.RunProfile(
+            func,
+            *args,
+            profile_name=profile_name,
+            profile_category=profile_category,
+            **kwargs,
+        )
 
     @staticmethod
     def RunProfile(func: Callable[..., T],
@@ -119,9 +127,6 @@ class Profile:
             result = func(*args, **kwargs)
             profiler.End()
         return result
-
-    if not Build.release:
-        Run = RunProfile
 
     @staticmethod
     def Get(name: str, *, category: str="None") -> 'Profiler':

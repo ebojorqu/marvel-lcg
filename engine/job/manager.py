@@ -65,7 +65,17 @@ class JobManager:
 
     @staticmethod
     def Shutdown() -> None:
-        JobManager.executor.shutdown(wait=False, cancel_futures=True)
+        if not hasattr(JobManager, "executor"):
+            return
+
+        try:
+            # Join workers during normal shutdown so Python's atexit hook
+            # does not need to block on lingering ThreadPoolExecutor threads.
+            JobManager.executor.shutdown(wait=True, cancel_futures=True)
+        except KeyboardInterrupt:
+            # If user presses Ctrl+C again while shutting down, fall back to
+            # non-blocking shutdown and let process exit as quickly as possible.
+            JobManager.executor.shutdown(wait=False, cancel_futures=True)
 
     ################################################################################
     #

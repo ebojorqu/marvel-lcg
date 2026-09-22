@@ -1,6 +1,7 @@
 import sys
 from typing import Literal
 import unittest
+import os
 from build import Build
 
 class TestMain(unittest.TestCase):
@@ -9,6 +10,8 @@ class TestMain(unittest.TestCase):
                 *,
                 release: bool=True,
                 profile: bool=False):
+        original_argv = sys.argv[:]
+
         if release:
             Build.release = True
         else:
@@ -23,16 +26,14 @@ class TestMain(unittest.TestCase):
         from core.utility.debug import Debug
         IsVSDebug = Debug.IsVSDebug
 
-        sys.argv.append("-config_files")
-        sys.argv.append("launch-debug.json")
+        config_file = "launch-debug.json" if os.path.exists("launch-debug.json") else "launch.json"
 
-        sys.argv.append('-test')
-
-        sys.argv.append('-test_result_file')
-        sys.argv.append(f"test_{var_name}{'_release' if release else '_debug'}{'_profile' if profile else ''}{'_trace' if IsVSDebug() else '_notrace'}.log")
-
-        sys.argv.append('-enable_profile_category')
-        sys.argv.append('Test')
+        sys.argv.extend([
+            "-config_files", config_file,
+            "-test",
+            "-test_result_file", f"test_{var_name}{'_release' if release else '_debug'}{'_profile' if profile else ''}{'_trace' if IsVSDebug() else '_notrace'}.log",
+            "-enable_profile_category", "Test",
+        ])
 
         from engine import Engine
         from unit_test.entry import TestEntry
@@ -49,10 +50,14 @@ class TestMain(unittest.TestCase):
             assert var and isinstance(var.value, str)
             folder = var.value
 
-        if Engine.Initialize():
-            Engine.in_unit_test = True
-            TestRunner.Execute(TestEntry.Test, folder, profile)
-            Engine.Shutdown()
+        try:
+            if Engine.Initialize():
+                Engine.in_unit_test = True
+                TestRunner.Execute(TestEntry.Test, folder, profile)
+                Engine.Shutdown()
+        finally:
+            # Keep each unit test invocation isolated from prior command-line flags.
+            sys.argv = original_argv
 
     def test_rapid_response_hero_defend_player_resolution(self):
         from types import SimpleNamespace

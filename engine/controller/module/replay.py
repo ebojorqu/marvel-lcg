@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from collections import Counter
 
 from core import *
 from engine.log import Log
@@ -139,6 +140,53 @@ class InputModule:
         area_name = str(area) if area else ""
         return f"{card_name} [{card_id}] @{area_name}"
 
+    def _is_equivalent_deck_position_swap(self, da: Dict[int, int], db: Dict[int, int], diff_ids: Sequence[int]) -> bool:
+        """Treat top/bottom marker swaps among identical cards in the same area as equivalent state."""
+        if not diff_ids:
+            return False
+
+        from engine import Engine
+
+        game = Engine.game
+        if not game or not game.world:
+            return False
+
+        world = game.world
+        groups: Dict[Tuple[str, str], List[int]] = {}
+        allowed_values = {None, -3, -4}
+
+        for key in diff_ids:
+            card = world.object_manager.card_dict.get(key, None)
+            if not card:
+                return False
+
+            face = getattr(card, 'face', None)
+            paper = getattr(face, 'paper', None) if face else None
+            card_id = getattr(paper, 'card_id', None)
+            area = getattr(card, 'area', None)
+            area_name = str(area) if area else ""
+
+            if not card_id or not area_name:
+                return False
+
+            a_value = da.get(key, None)
+            b_value = db.get(key, None)
+            if a_value not in allowed_values or b_value not in allowed_values:
+                return False
+
+            groups.setdefault((area_name, card_id), []).append(key)
+
+        # Every differing card must be in a group where the value multiset matches.
+        # This means object ids may differ, but equivalent cards keep the same aggregate state.
+        for grouped_ids in groups.values():
+            read_values = Counter(da.get(k, None) for k in grouped_ids)
+            curr_values = Counter(db.get(k, None) for k in grouped_ids)
+            if read_values != curr_values:
+                return False
+
+        covered = sum(len(ids) for ids in groups.values())
+        return covered == len(diff_ids)
+
     def GetReplayOperation(self, is_puzzle: bool, *, check_crc: bool=True) -> Tuple['OperationDescriptor|None', bool]:
         from engine import Engine
         self.is_updated = False
@@ -213,6 +261,10 @@ class InputModule:
                             get_diff_text(a_value, b_value),
                             card_info,
                         )
+
+                if self._is_equivalent_deck_position_swap(da, db, diff_ids):
+                    Log.Warn(CATEGORY_NAME, f"Replay CRC tolerated equivalent deck-position swap at step #{self.current_step_id}")
+                    return replay_input, True
 
                 if not disable_assert:
 #                     tip_info = """

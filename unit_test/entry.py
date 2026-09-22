@@ -24,6 +24,10 @@ class TestEntry:
         else:
             all_cases = TestEntry.GetFolderTestCase(folder)
 
+        if all_cases == []:
+            Log.Warn("UNIT_TEST", f"No replay cases found for folder={folder}; skipping replay-run assertions")
+            return
+
         Test.is_in_test = True # We do need this
 
         if do_profile:

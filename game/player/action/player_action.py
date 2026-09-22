@@ -349,7 +349,9 @@ class PlayerAction:
                         game.controller_manager.undo.PushNewStep(game.controller_manager.replay.current_step_id)
                         game.controller_manager.undo.UpdateLastStep()
                         if type(message) == Message.WhenPlayerInTurn:
-                            game.controller_manager.undo.PushPlayerTurnStep(game.controller_manager.replay.current_step_id)
+                            push_player_turn_step = getattr(game.controller_manager.undo, "PushPlayerTurnStep", None)
+                            if callable(push_player_turn_step):
+                                push_player_turn_step(game.controller_manager.replay.current_step_id)
                     return fallthrough_effect, False
                     # if not fallthrough_effect or \
                     #     fallthrough_effect.is_forced or \
@@ -377,7 +379,9 @@ class PlayerAction:
                 if set_undo:
                     game.controller_manager.undo.UpdateLastStep()
                     if type(message) == Message.WhenPlayerInTurn:
-                        game.controller_manager.undo.PushPlayerTurnStep(game.controller_manager.replay.current_step_id)
+                        push_player_turn_step = getattr(game.controller_manager.undo, "PushPlayerTurnStep", None)
+                        if callable(push_player_turn_step):
+                            push_player_turn_step(game.controller_manager.replay.current_step_id)
 
                 if message.world.is_game_over:
                     return None, False

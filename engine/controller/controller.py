@@ -282,9 +282,9 @@ class Controller:
                     if is_forced:
                         # Some control paths may emit a pass-like id=0 even for forced prompts.
                         # If every legal option is zero-target, deterministically pick the first
-                        # instead of crashing; otherwise, re-prompt for explicit selection.
+                        # concrete effect id; otherwise, re-prompt for explicit selection.
                         if len(effect_descriptors) == 1 and effect_descriptors[0].target_num_range[0] == 0:
-                            break
+                            input_effect_id = effect_descriptors[0].id
                         if all(x.target_num_range[0] == 0 for x in effect_descriptors):
                             input_effect_id = effect_descriptors[0].id
                         else:

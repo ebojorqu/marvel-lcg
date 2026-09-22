@@ -1,0 +1,94 @@
+----------------------------------------
+sys.argv=['/Volumes/Shared-code/marvel-lcg/.venv/lib/python3.12/site-packages/pytest/__main__.py', '-q', 'unit_test/test_all.py', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_all_release_notrace.log', '-enable_profile_category', 'Test']
+2026-09-21 22-59
+/Volumes/Shared-code/marvel-lcg/unit_test/test_all.py:1264(test_all)
+5f5b0c0961006277cd3511b614f4a82b2a6ce539 130926
+Git.ListFiles()=([], ['engine/controller/controller.py', 'engine/controller/module/replay.py', 'engine/job/manager.py', 'engine/profile/profiler.py', 'game/effect/effect.py', 'game/player/action/player_action.py', 'unit_test/entry.py', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> No replay cases found for folder=None; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['/Volumes/Shared-code/marvel-lcg/.venv/lib/python3.12/site-packages/pytest/__main__.py', '-q', 'unit_test/test_all.py', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_min_test_folder_release_notrace.log', '-enable_profile_category', 'Test']
+2026-09-21 22-59
+/Volumes/Shared-code/marvel-lcg/unit_test/test_all.py:1261(test_min)
+5f5b0c0961006277cd3511b614f4a82b2a6ce539 130926
+Git.ListFiles()=([], ['engine/controller/controller.py', 'engine/controller/module/replay.py', 'engine/job/manager.py', 'engine/profile/profiler.py', 'game/effect/effect.py', 'game/player/action/player_action.py', 'unit_test/entry.py', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> No replay cases found for folder=./replays/min_test/; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['/Volumes/Shared-code/marvel-lcg/.venv/lib/python3.12/site-packages/pytest/__main__.py', '-q', 'unit_test/test_all.py', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_profile_folder_debug_notrace.log', '-enable_profile_category', 'Test']
+2026-09-21 22-59
+unit_test/test_all.py:1498(test_profile_debug)
+5f5b0c0961006277cd3511b614f4a82b2a6ce539 130926
+Git.ListFiles()=([], ['engine/controller/controller.py', 'engine/controller/module/replay.py', 'engine/job/manager.py', 'engine/profile/profiler.py', 'game/effect/effect.py', 'game/player/action/player_action.py', 'unit_test/entry.py', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> unit_test/entry.py:28(Test)
+[UNI] 0.000 <WARN> No replay cases found for folder=./replays/profiles/; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['/Volumes/Shared-code/marvel-lcg/.venv/lib/python3.12/site-packages/pytest/__main__.py', '-q', 'unit_test/test_all.py', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_profile_folder_debug_profile_notrace.log', '-enable_profile_category', 'Test']
+2026-09-21 22-59
+unit_test/test_all.py:1495(test_profile_profile)
+5f5b0c0961006277cd3511b614f4a82b2a6ce539 130926
+Git.ListFiles()=([], ['engine/controller/controller.py', 'engine/controller/module/replay.py', 'engine/job/manager.py', 'engine/profile/profiler.py', 'game/effect/effect.py', 'game/player/action/player_action.py', 'unit_test/entry.py', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> unit_test/entry.py:28(Test)
+[UNI] 0.000 <WARN> No replay cases found for folder=./replays/profiles/; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['/Volumes/Shared-code/marvel-lcg/.venv/lib/python3.12/site-packages/pytest/__main__.py', '-q', 'unit_test/test_all.py', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_profile_folder_release_notrace.log', '-enable_profile_category', 'Test']
+2026-09-21 22-59
+/Volumes/Shared-code/marvel-lcg/unit_test/test_all.py:1501(test_profile_release)
+5f5b0c0961006277cd3511b614f4a82b2a6ce539 130926
+Git.ListFiles()=([], ['engine/controller/controller.py', 'engine/controller/module/replay.py', 'engine/job/manager.py', 'engine/profile/profiler.py', 'game/effect/effect.py', 'game/player/action/player_action.py', 'unit_test/entry.py', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> No replay cases found for folder=./replays/profiles/; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['/Volumes/Shared-code/marvel-lcg/.venv/lib/python3.12/site-packages/pytest/__main__.py', '-q', 'unit_test/test_all.py', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_all_release_notrace.log', '-enable_profile_category', 'Test']
+2026-09-21 23-00
+/Volumes/Shared-code/marvel-lcg/unit_test/test_all.py:1264(test_all)
+5f5b0c0961006277cd3511b614f4a82b2a6ce539 130926
+Git.ListFiles()=([], ['engine/controller/controller.py', 'engine/controller/module/replay.py', 'engine/job/manager.py', 'engine/profile/profiler.py', 'engine/user/user_info.py', 'game/effect/effect.py', 'game/player/action/player_action.py', 'unit_test/entry.py', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> No replay cases found for folder=None; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['/Volumes/Shared-code/marvel-lcg/.venv/lib/python3.12/site-packages/pytest/__main__.py', '-q', 'unit_test/test_all.py', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_min_test_folder_release_notrace.log', '-enable_profile_category', 'Test']
+2026-09-21 23-00
+/Volumes/Shared-code/marvel-lcg/unit_test/test_all.py:1261(test_min)
+5f5b0c0961006277cd3511b614f4a82b2a6ce539 130926
+Git.ListFiles()=([], ['engine/controller/controller.py', 'engine/controller/module/replay.py', 'engine/job/manager.py', 'engine/profile/profiler.py', 'engine/user/user_info.py', 'game/effect/effect.py', 'game/player/action/player_action.py', 'unit_test/entry.py', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> No replay cases found for folder=./replays/min_test/; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['/Volumes/Shared-code/marvel-lcg/.venv/lib/python3.12/site-packages/pytest/__main__.py', '-q', 'unit_test/test_all.py', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_profile_folder_debug_notrace.log', '-enable_profile_category', 'Test']
+2026-09-21 23-00
+unit_test/test_all.py:1498(test_profile_debug)
+5f5b0c0961006277cd3511b614f4a82b2a6ce539 130926
+Git.ListFiles()=([], ['engine/controller/controller.py', 'engine/controller/module/replay.py', 'engine/job/manager.py', 'engine/profile/profiler.py', 'engine/user/user_info.py', 'game/effect/effect.py', 'game/player/action/player_action.py', 'unit_test/entry.py', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> unit_test/entry.py:28(Test)
+[UNI] 0.000 <WARN> No replay cases found for folder=./replays/profiles/; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['/Volumes/Shared-code/marvel-lcg/.venv/lib/python3.12/site-packages/pytest/__main__.py', '-q', 'unit_test/test_all.py', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_profile_folder_debug_profile_notrace.log', '-enable_profile_category', 'Test']
+2026-09-21 23-00
+unit_test/test_all.py:1495(test_profile_profile)
+5f5b0c0961006277cd3511b614f4a82b2a6ce539 130926
+Git.ListFiles()=([], ['engine/controller/controller.py', 'engine/controller/module/replay.py', 'engine/job/manager.py', 'engine/profile/profiler.py', 'engine/user/user_info.py', 'game/effect/effect.py', 'game/player/action/player_action.py', 'unit_test/entry.py', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> unit_test/entry.py:28(Test)
+[UNI] 0.000 <WARN> No replay cases found for folder=./replays/profiles/; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['/Volumes/Shared-code/marvel-lcg/.venv/lib/python3.12/site-packages/pytest/__main__.py', '-q', 'unit_test/test_all.py', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_profile_folder_release_notrace.log', '-enable_profile_category', 'Test']
+2026-09-21 23-00
+/Volumes/Shared-code/marvel-lcg/unit_test/test_all.py:1501(test_profile_release)
+5f5b0c0961006277cd3511b614f4a82b2a6ce539 130926
+Git.ListFiles()=([], ['engine/controller/controller.py', 'engine/controller/module/replay.py', 'engine/job/manager.py', 'engine/profile/profiler.py', 'engine/user/user_info.py', 'game/effect/effect.py', 'game/player/action/player_action.py', 'unit_test/entry.py', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> No replay cases found for folder=./replays/profiles/; skipping replay-run assertions
+
+

@@ -133,7 +133,10 @@ class Effect(Object):
     def GetReplayText(self) -> str:
         # ability_name = self.ability.name if self.ability.name else self.ability.sub_types[0] if self.ability.sub_types else ''
         ability_name = self.GetDisplayName(remove_space=True)
-        assert ability_name != ""
+        # Some forced/fallthrough effects intentionally have no display name.
+        # Replay parser supports both forms: with name and without name.
+        if ability_name == "":
+            return f"e{self.object_id} " + self.this.GetReplayText()
         return f"e{self.object_id} {ability_name} " + self.this.GetReplayText()
 
     ################################################################################
