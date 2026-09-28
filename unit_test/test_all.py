@@ -1154,6 +1154,34 @@ class TestMain(unittest.TestCase):
         self.assertEqual(replay.replay_step_id, 2)
         self.assertEqual(len(replay.history_inputs), 2)
 
+    def test_replay_effect_remap_prefers_matching_card_side(self):
+        from types import SimpleNamespace
+        from game.scene.replay.operation import CommandDescriptor
+
+        hero_effect = SimpleNamespace(
+            object_id=101,
+            this=SimpleNamespace(
+                card=SimpleNamespace(object_id=49),
+                paper=SimpleNamespace(card_id="21031a"),
+            ),
+            GetDisplayName=lambda remove_space=False: "Choose",
+        )
+        alter_ego_effect = SimpleNamespace(
+            object_id=102,
+            this=SimpleNamespace(
+                card=SimpleNamespace(object_id=49),
+                paper=SimpleNamespace(card_id="21031b"),
+            ),
+            GetDisplayName=lambda remove_space=False: "Choose",
+        )
+
+        matched = CommandDescriptor.FindNewEffectIdInternal(
+            "e1 Choose c49 21031a",
+            [alter_ego_effect, hero_effect],
+        )
+
+        self.assertEqual(matched, [101])
+
     def test_set_scene_resets_replay_state(self):
         from types import SimpleNamespace
 

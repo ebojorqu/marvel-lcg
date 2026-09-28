@@ -49,6 +49,13 @@ def GetStatisticsRule() -> List['Ability']:
         Engine.statistics.RecordMaximum("max_single_cards_drawn", message.size)
 
     def deal_damage(message: 'Message.AfterFaceDealDamage'):
+        from game.effect.rule import Consequential
+
+        # Consequential damage is self-inflicted after an ally activates and
+        # should not count as "damage dealt" in Victory Stats.
+        if type(message.by_effect) is Consequential:
+            return
+
         # Attack damage should be attributed to the real attack source (`trigger`).
         # Non-attack effect damage (e.g. upgrades/supports) should be attributed
         # to the resolving effect card (`by_effect.this`) so those cards appear

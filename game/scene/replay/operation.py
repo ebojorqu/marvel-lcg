@@ -29,21 +29,32 @@ class CommandDescriptor:
     def FindNewEffectIdInternal(effect_str: str, check_effect_list: Sequence['Effect']) -> List[int]:
         import re
         found_effects: List['Effect'] = []
-        m = re.match(r"e(\d+) (.*) c(\d+) .*", effect_str)
+        card_id = ""
+        m = re.match(r"e(\d+) (.*) c(\d+) (\S+)", effect_str)
         if m:
             effect_name = m[2].replace(" ", "_")
             object_id = int(m[3])
+            card_id = m[4]
         else:
-            m = re.match(r"e(\d+) c(\d+) .*", effect_str)
+            m = re.match(r"e(\d+) c(\d+) (\S+)", effect_str)
             assert m
             effect_name = ""
             object_id = int(m[2])
+            card_id = m[3]
 
         # We cannot simply return `m[1]`
 
         for effect in check_effect_list:
             if effect.this.card.object_id == object_id:
                 found_effects.append(effect)
+
+        if card_id:
+            same_card_id_effects = [
+                effect for effect in found_effects
+                if effect.this.paper.card_id == card_id
+            ]
+            if same_card_id_effects:
+                found_effects = same_card_id_effects
 
         if len(found_effects) == 1:
             pass
