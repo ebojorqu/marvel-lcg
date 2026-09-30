@@ -6,6 +6,236 @@ from build import Build
 
 class TestMain(unittest.TestCase):
 
+    def test_squirrel_girl_places_capped_hand_counters_and_spends_one_to_thwart(self):
+        from importlib import import_module
+        from types import SimpleNamespace
+        from unittest.mock import Mock, patch
+
+        from game.ability.cost_func import CostFunc
+        from game.operate import Faces
+
+        abilities = import_module('cards.pack.jj.61017').GetAbilities()
+        response, action = abilities
+        ally = Mock()
+        ally.CastTo.return_value = ally
+        player = SimpleNamespace(hand_cards=SimpleNamespace(GetSize=lambda: 7))
+        effect = SimpleNamespace(
+            this=ally,
+            targets=[object()],
+            GetInitiator=lambda: player,
+        )
+        played_message = SimpleNamespace(
+            play_effect=SimpleNamespace(ability=SimpleNamespace(is_play=True)),
+        )
+
+        with patch.object(Faces, 'PlaceCountersOn') as place_counters:
+            response.operation(effect, played_message)
+
+        place_counters.assert_called_once_with([ally], 4, 'squirrel', effect, maximum=4)
+        self.assertEqual(len(action.cost_funcs), 1)
+        self.assertIsInstance(action.cost_funcs[0], CostFunc.Counter)
+
+        action.operation(effect, SimpleNamespace())
+        ally.RemoveThreatFromSchemes.assert_called_once_with(effect.targets, 1, effect)
+
+    def test_grapnel_launcher_makes_boosted_basic_thwart_without_exhausting(self):
+        from importlib import import_module
+        from types import SimpleNamespace
+        from unittest.mock import Mock
+
+        from game.ability.cost_func import CostFunc
+
+        ability = import_module('cards.pack.jj.61023').GetAbilities()[0]
+        upgrade = Mock()
+        upgrade.CastTo.return_value = upgrade
+        hero = Mock()
+        effect = SimpleNamespace(
+            this=upgrade,
+            targets=[object()],
+            GetInitiator=lambda: SimpleNamespace(GetHero=lambda: hero),
+        )
+
+        ability.operation(effect, SimpleNamespace())
+
+        hero.BasicThwart.assert_called_once()
+        args, kwargs = hero.BasicThwart.call_args
+        self.assertEqual(args, (effect.targets, effect))
+        self.assertTrue(kwargs['property'].is_basic_power)
+        self.assertEqual(kwargs['property'].additional_value, 1)
+        self.assertEqual(len(ability.cost_funcs), 1)
+        self.assertIsInstance(ability.cost_funcs[0], CostFunc.Discard)
+        self.assertTrue(ability.ignore.keyword['Patrol'](effect))
+        self.assertTrue(ability.ignore.keyword['Crisis'](effect))
+
+    def test_restricted_upgrades_allow_third_play_then_prompt_discard(self):
+        from types import SimpleNamespace
+        from unittest.mock import Mock, patch
+
+        from cards.database import CardsDB
+        from game.ability.factory import AbilityFactory
+        from game.card.face.card_type import Upgrade
+        from game.player.limit_monitor.restricted_limit import RestrictedLimit
+
+        CardsDB.Initialize()
+        for card_id in ['16036', '16037', '61023']:
+            face = Upgrade(CardsDB.FindCardPaper(card_id))
+            face.Initialize(0)
+            self.assertEqual(face.printed_restricted, 1)
+
+        controlled_faces = [
+            SimpleNamespace(restricted=1),
+            SimpleNamespace(restricted=1),
+            SimpleNamespace(restricted=1),
+        ]
+        inventory = SimpleNamespace(Get=lambda: controlled_faces)
+        identity = SimpleNamespace(GetInventoryDeck=lambda: inventory)
+        player = SimpleNamespace(
+            GetIdentity=lambda: identity,
+            is_eliminated=False,
+            world=SimpleNamespace(is_game_over=False),
+        )
+        player.limit_restricted = RestrictedLimit(player, 2)
+        play_ability = AbilityFactory.CanPlayThisUpgradeCard()
+        self.assertFalse(any(
+            condition.__name__ == 'within_restricted_limit'
+            for condition in play_ability.const_condition
+        ))
+
+        def choose_and_discard(*_args, **_kwargs):
+            controlled_faces.pop()
+            return [object()]
+
+        player.ChooseAbilities = Mock(side_effect=choose_and_discard)
+        with patch.object(Upgrade, 'IsType', return_value=True), \
+             patch('game.effect.rule.GameRule', return_value=object()), \
+             patch('game.card.card_finder.CardFinder.Checks', side_effect=lambda faces: faces):
+            self.assertTrue(player.limit_restricted.CheckLimit([]))
+
+        player.ChooseAbilities.assert_called_once()
+        self.assertEqual(len(controlled_faces), 2)
+
+    def test_restricted_recounts_after_upgrade_attaches(self):
+        from types import SimpleNamespace
+
+        from game.card.face.attribute.has_restricted import HasRestricted
+
+        inventory = [SimpleNamespace(restricted=1)]
+        observed_counts = []
+
+        class FakeRestricted(HasRestricted):
+            @property
+            def restricted(self):
+                return 1
+
+            def CheckRestrictedLimit(self, gain_faces):
+                observed_counts.append(sum(face.restricted for face in inventory))
+                return True
+
+        restricted_face = object.__new__(FakeRestricted)
+        new_upgrade = SimpleNamespace(restricted=1)
+        message = SimpleNamespace(Send=lambda: inventory.append(new_upgrade))
+
+        restricted_face.OnAfterCardPutIntoPlay(message)
+
+        self.assertEqual(observed_counts, [2])
+
+    def test_in_harms_way_uses_hero_defense_for_damage_and_threat(self):
+        from importlib import import_module
+        from types import SimpleNamespace
+        from unittest.mock import Mock
+
+        cost_modifier, action = import_module('cards.pack.fne.60050').GetAbilities()
+        event = Mock()
+        event.CastTo.return_value = event
+        hero = SimpleNamespace(defense=4)
+        effect = SimpleNamespace(
+            this=event,
+            targets=[object()],
+            targets2=[object()],
+            GetInitiator=lambda: SimpleNamespace(GetHero=lambda: hero),
+        )
+
+        action.operation(effect, SimpleNamespace())
+
+        self.assertIsNotNone(cost_modifier)
+        self.assertEqual(action.labels, ['attack', 'thwart'])
+        event.DealDamage.assert_called_once_with(effect.targets, 4, effect)
+        event.RemoveThreatFromSchemes.assert_called_once_with(effect.targets2, 4, effect)
+
+    def test_missing_online_card_image_is_an_expected_cache_miss(self):
+        from unittest.mock import Mock, patch
+
+        from engine.file.cache import Cache, IMAGE_SERVERS, SAVE_EMPTY_IMAGE
+        from engine.lib import ImageCreator
+        from engine.log import Log
+
+        card_id = "99999"
+        image_url = f"https://example.test/{card_id}.jpg"
+        response = Mock(status_code=404)
+        http_error = __import__('requests').exceptions.HTTPError(response=response)
+        placeholder = b"placeholder"
+        original_servers = IMAGE_SERVERS.value
+        original_save_empty_image = SAVE_EMPTY_IMAGE.value
+        Cache.cache.pop(card_id, None)
+
+        try:
+            IMAGE_SERVERS.value = ["https://example.test/{card_id}.jpg"]
+            SAVE_EMPTY_IMAGE.value = False
+            with patch('engine.file.cache.FileManager.Exists', return_value=False), \
+                 patch('engine.file.cache.requests.get') as get, \
+                 patch.object(ImageCreator, 'CreateNoImage', return_value=placeholder), \
+                 patch.object(Log, 'DebugInfo') as debug_info, \
+                 patch.object(Log, 'Warn') as warn:
+                get.return_value.raise_for_status.side_effect = http_error
+
+                self.assertEqual(Cache.LoadImage(card_id), placeholder)
+
+            debug_info.assert_any_call("CACHE", f"Image not found online: {card_id} ({image_url})")
+            warn.assert_not_called()
+        finally:
+            IMAGE_SERVERS.value = original_servers
+            SAVE_EMPTY_IMAGE.value = original_save_empty_image
+            Cache.cache.pop(card_id, None)
+
+    def test_card_image_url_overrides_are_tried_before_generic_servers(self):
+        from unittest.mock import Mock, patch
+
+        from engine.file.cache import Cache, IMAGE_SERVERS, IMAGE_URL_OVERRIDES, SAVE_EMPTY_IMAGE
+        from engine.lib import ImageCreator
+
+        card_id = "61017"
+        generic_url = f"https://example.test/{card_id}.jpg"
+        response = Mock(status_code=404)
+        response.raise_for_status.side_effect = __import__('requests').exceptions.HTTPError(response=response)
+        original_servers = IMAGE_SERVERS.value
+        original_save_empty_image = SAVE_EMPTY_IMAGE.value
+        Cache.cache.pop(card_id, None)
+
+        self.assertEqual(
+            IMAGE_URL_OVERRIDES,
+            {
+                "61017": "https://hallofheroeslcg.com/wp-content/uploads/2026/05/mc61_cards_squirrel-girl.png",
+                "61023": "https://hallofheroeslcg.com/wp-content/uploads/2026/05/mc61_cards_grapnel-launcher.png",
+            },
+        )
+
+        try:
+            IMAGE_SERVERS.value = ["https://example.test/{card_id}.jpg"]
+            SAVE_EMPTY_IMAGE.value = False
+            with patch('engine.file.cache.FileManager.Exists', return_value=False), \
+                 patch('engine.file.cache.requests.get', return_value=response) as get, \
+                 patch.object(ImageCreator, 'CreateNoImage', return_value=b"placeholder"):
+                Cache.LoadImage(card_id)
+
+            self.assertEqual(
+                [request.args[0] for request in get.call_args_list],
+                [IMAGE_URL_OVERRIDES[card_id], generic_url],
+            )
+        finally:
+            IMAGE_SERVERS.value = original_servers
+            SAVE_EMPTY_IMAGE.value = original_save_empty_image
+            Cache.cache.pop(card_id, None)
+
     def RunCases(self, var_name: Literal["min_test_folder", "profile_folder", "all"],
                 *,
                 release: bool=True,
@@ -1209,6 +1439,41 @@ class TestMain(unittest.TestCase):
         self.assertEqual(replay.history_inputs, [])
         self.assertEqual(replay.replay_inputs, [9, 10])
 
+    def test_load_defaults_to_replaying_all_saved_inputs(self):
+        from types import SimpleNamespace
+        from engine.controller.manager import ControllerManager
+
+        class DummySkip:
+            def __init__(self):
+                self.skip_to = 0
+                self.is_skipping = False
+            def SetSkipTo(self, value):
+                self.skip_to = value
+            def SetIsSkipping(self, value):
+                self.is_skipping = value
+
+        manager = object.__new__(ControllerManager)
+        manager.skip = DummySkip()
+        scene = SimpleNamespace(inputs=[1, 2, 3], is_puzzle=False)
+        state = SimpleNamespace(
+            is_puzzle=False,
+            is_in_testing=False,
+            is_undo=False,
+            is_new=False,
+            is_load=True,
+            is_replay=False,
+        )
+
+        manager.InitializeSkip(scene, state)
+
+        self.assertEqual(manager.skip.skip_to, 3)
+        self.assertTrue(manager.skip.is_skipping)
+
+        manager.skip = DummySkip()
+        manager.InitializeSkip(SimpleNamespace(inputs=[], is_puzzle=False), state)
+        self.assertEqual(manager.skip.skip_to, 0)
+        self.assertFalse(manager.skip.is_skipping)
+
     def test_present_force_no_wait_clears_skip_flag(self):
         from types import SimpleNamespace
 
@@ -1250,7 +1515,10 @@ class TestMain(unittest.TestCase):
         deck.shuffle_with_discard_count = 0
         deck.flags = SimpleNamespace(is_deck=True, is_discards=False, is_player_deck=False)
         deck.process_after_shuffle = lambda _deck, _effect: None
-        deck.world = SimpleNamespace(render=SimpleNamespace(PresentForceNoWait=lambda: None))
+        deck.world = SimpleNamespace(
+            controller_manager=SimpleNamespace(skip=SimpleNamespace(is_skipping=False)),
+            render=SimpleNamespace(PresentForceNoWait=lambda: None),
+        )
         deck.ShuffleInternal = lambda by_effect, only_for_most_top=None: None
 
         with patch.object(deck.world.render, 'PresentForceNoWait', wraps=deck.world.render.PresentForceNoWait) as render_mock:
@@ -1260,6 +1528,13 @@ class TestMain(unittest.TestCase):
                     deck.ShuffleWithDiscardPile(False, object())
 
         render_mock.assert_called_once_with()
+
+        deck.world.controller_manager.skip.is_skipping = True
+        with patch.object(deck.world.render, 'PresentForceNoWait', wraps=deck.world.render.PresentForceNoWait) as render_mock:
+            with patch('game.operate.faces.Faces.MoveAllTo', return_value=['a', 'b']):
+                deck.ShuffleWithDiscardPile(False, object())
+
+        render_mock.assert_not_called()
 
     def test_starting_max_one_per_deck(self):
         from game.card.face.attribute.has_starting import HasStarting

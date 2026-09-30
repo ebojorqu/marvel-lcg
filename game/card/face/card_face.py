@@ -129,7 +129,7 @@ class CardFace(ModelName, ModelTrait, ModelAction, ModelOnEvent, ModelGain, Mode
         'staff', 'mission', 'leap', 'lock', 'parley', 'bystander', 'doubt', 'target', 
         'secret', 'bird', 'recon', 'emergency', 'alert', 'notoriety', 'dart', 
 
-        'charm', 'labor',
+        'charm', 'labor', 'squirrel',
         'fuel', 'stronghold', 'skill',
 
         'rebirth', 

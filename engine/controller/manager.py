@@ -84,6 +84,8 @@ class ControllerManager:
         elif state.is_new:
             self.skip.SetIsSkipping(False)
         elif state.is_load:
+            if self.skip.skip_to == 0:
+                self.skip.SetSkipTo(len(scene.inputs))
             if self.skip.skip_to < 0:
                 self.skip.SetSkipTo(len(scene.inputs) + 1 + self.skip.skip_to)
             if self.skip.skip_to != 0:

@@ -32,9 +32,9 @@ class HasRestricted(HasAttribute):
 
     @override
     def OnAfterCardPutIntoPlay(self, message: 'Message.AfterCardPutIntoPlay') -> None:
+        super().OnAfterCardPutIntoPlay(message)
         if self.restricted:
             self.CheckRestrictedLimit([])
-        return super().OnAfterCardPutIntoPlay(message)
 
     @override
     def OnAfterCardLeavePlay(self, message: 'Message.AfterCardLeavePlay') -> None:

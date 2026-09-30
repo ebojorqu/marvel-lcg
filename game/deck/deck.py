@@ -183,7 +183,9 @@ class Deck2(Generic[TC], Object):
 
             # The discard-to-deck reset happens with no user-facing card movement this frame,
             # so force a final render to clear stale deck/discard DOM state after the shuffle.
-            if getattr(self, 'world', None) and getattr(self.world, 'render', None):
+            if getattr(self, 'world', None) and \
+                getattr(self.world, 'render', None) and \
+                not self.world.controller_manager.skip.is_skipping:
                 self.world.render.PresentForceNoWait()
         else:
             self.Shuffle(by_effect)

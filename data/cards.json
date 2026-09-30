@@ -59719,6 +59719,23 @@
             "text": "[star] Increase the cost to play this card by 1 for each ally you control.\n<b>Hero Action</b>: Ready your hero."
         },
         {
+            "card_id": "60050",
+            "type": "Event",
+            "name": "In Harm's Way",
+            "subtitle": "",
+            "desc": {
+                "Cost": "3",
+                "RES": "R",
+                "Class": "Protection"
+            },
+            "traits": [
+                "ATTACK",
+                "THWART"
+            ],
+            "set_name": "Fear No Evil",
+            "text": "[star] Increase the cost to play this card by 1 for each ally you control.\n<b>Hero Action</b> <i>(attack/thwart)</i>: Deal X damage to an enemy and remove X threat from a scheme, where X is your DEF."
+        },
+        {
             "card_id": "60052",
             "type": "Upgrade",
             "name": "The Best Offense...",
@@ -59765,5 +59782,43 @@
             "text": "Max 1 per player.\n<b>Hero Interrupt</b>: When an enemy attacks you <i>(before any defender is declared)</i>, if you do not control any allies, exhaust Stand Alone \u2192 ready your hero."
         }
     ],
-    "checksum": "09cd557004c11b7967cc8b1c779b975e873300e927e8b70d22dc1739742b5258"
+    "jj": [
+        {
+            "card_id": "61017",
+            "type": "Ally",
+            "name": "* Squirrel Girl",
+            "subtitle": "Doreen Green",
+            "desc": {
+                "Cost": "2",
+                "HP": "2",
+                "ATK": "1*",
+                "THW": "1*",
+                "RES": "B",
+                "Class": "Justice"
+            },
+            "traits": [
+                "AVENGER"
+            ],
+            "set_name": "",
+            "text": "<b>Response</b>: After you play Squirrel Girl from your hand, place 1 squirrel counter here for each card in your hand (to a maximum of 4).\n<b>Action</b>: Remove 1 squirrel counter from here \u2192 remove 1 threat from a scheme."
+        },
+        {
+            "card_id": "61023",
+            "type": "Upgrade",
+            "name": "Grapnel Launcher",
+            "subtitle": "",
+            "desc": {
+                "Cost": "2",
+                "RES": "Y",
+                "Class": "Justice",
+                "Restricted": "1"
+            },
+            "traits": [
+                "ITEM"
+            ],
+            "set_name": "",
+            "text": "Restricted.\n<b>Hero Action</b>: Discard this card \u2192 make a basic thwart without exhausting <i>(even if you are exhausted)</i>. For this thwart, your hero gets +1 THW and ignores the patrol keyword and any crisis icons <i>([crisis])</i> in play."
+        }
+    ],
+    "checksum": "dc378dbeec74ec2af6f3bbe13f628d6a14692118c92dcea7b3134fd24c73a72b"
 }

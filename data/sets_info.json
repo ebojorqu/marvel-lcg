@@ -772,6 +772,13 @@
         "encounters": [],
         "max_id": "59045"
     },
+    "60. Jessica Jones": {
+        "name": "jj",
+        "scenarios": [],
+        "heroes": [],
+        "encounters": [],
+        "max_id": "61023"
+    },
     "90. Ronan Modular Set": {
         "name": "ron",
         "scenarios": [],
@@ -813,5 +820,5 @@
         "heroes": [],
         "encounters": []
     },
-    "checksum": "c5364e3ebbfc135ee9296176b5b3ca53b9375edc899078125af0518ed36c43bd"
+    "checksum": "a19e3425b8b7176418c0407707b1e9d07cbd13d5413eaf0c8f07da4c682be3be"
 }

@@ -14,6 +14,11 @@ IMAGE_SERVERS   = ConfigVariables.ListStr('image_servers', [])
 SAVE_EMPTY_IMAGE = ConfigVariables.Bool('save_empty_image', True)
 BREAK_WHEN_LOAD_ONLINE_IMAGE = ConfigVariables.Bool('break_when_load_online_image', False)
 
+IMAGE_URL_OVERRIDES = {
+    "61017": "https://hallofheroeslcg.com/wp-content/uploads/2026/05/mc61_cards_squirrel-girl.png",
+    "61023": "https://hallofheroeslcg.com/wp-content/uploads/2026/05/mc61_cards_grapnel-launcher.png",
+}
+
 class Cache:
 
     cache: Dict[str, bytes] = {}
@@ -85,8 +90,11 @@ class Cache:
             with FileManager.OpenFile(file_path, write=True, bin=True) as file:
                 file.Write(data)
 
+        image_sites = [IMAGE_URL_OVERRIDES[card_id]] if card_id in IMAGE_URL_OVERRIDES else []
+        image_sites.extend(IMAGE_SERVERS.value)
+
         is_time_out = True
-        if IMAGE_SERVERS.value and check_is_card_id(card_id):
+        if image_sites and check_is_card_id(card_id):
             # Load the image from the internet
             skip_break = not BREAK_WHEN_LOAD_ONLINE_IMAGE.value
             if not skip_break:
@@ -102,7 +110,7 @@ class Cache:
 
             is_time_out = False
 
-            for site in IMAGE_SERVERS.value:
+            for site in image_sites:
                 full_url = site
                 full_url = full_url.replace('{card_id}', card_id)
                 full_url = full_url.replace('{card_id:U}', card_id.upper())
@@ -134,6 +142,11 @@ class Cache:
                     image_data = try_load_image_data(data)
                     Cache.SetCache(file_name, image_data)
                     return image_data
+                except requests.exceptions.HTTPError as e:
+                    if e.response is not None and e.response.status_code == 404:
+                        Log.DebugInfo(CATEGORY_NAME, f"Image not found online: {file_name} ({full_url})")
+                    else:
+                        Log.Warn(CATEGORY_NAME, f"Request failed with error: {e}")
                 except requests.exceptions.Timeout:
                     Log.Warn(CATEGORY_NAME, f"Timeout occurred while downloading {file_name}")
                     is_time_out = True
