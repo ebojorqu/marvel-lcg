@@ -10,6 +10,12 @@ from game.element.damage_property import DamageProperty
 @final
 class Upgrade(Asset2, HasModify, HasForm, HasRestricted, HasUses, HasHazard, CanCrisis, HasPermanent, HasTemporary, HasSetup, HasVictory, HasDefense, ClassCard, _FinalType):
     @override
+    def OnAttachTo(self, face: 'CardFace', cause_by_flip: bool):
+        super().OnAttachTo(face, cause_by_flip)
+        if self.restricted:
+            self.CheckRestrictedLimit([])
+
+    @override
     def GetAbilities(self) -> List['Ability']:
         abilities: List['Ability'] = []
         play_ability = None

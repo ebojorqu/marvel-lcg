@@ -9,7 +9,13 @@ def GetAbilities() -> Sequence['Ability']:
         Unused(this)
 
         counter = effect.cost_func.Get(CostFunc.Counter).return_remove_counter
-        Faces.GiveStatus(effect.targets[0:counter], "Tough", effect)
+        targets = effect.GetInitiator().AskChooseFaces(
+            effect.targets,
+            (counter, counter),
+            effect,
+            prompt="Choose characters to receive Tough",
+        )
+        Faces.GiveStatus(targets, "Tough", effect)
 
 
     return [

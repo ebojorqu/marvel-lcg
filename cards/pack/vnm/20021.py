@@ -8,9 +8,8 @@ def GetAbilities() -> Sequence['Ability']:
         AbilityFactory.CanPlayThisUpgradeCard(
             "Players",
         ),
-        *AbilityFactory.GiveKeywordToAttached(
-            "You",
+        AbilityFactory.ThisGainKeyword(
             control_additional_restricted=CardFinder2("WEAPON", Upgrade),
-        )
+        ),
     ]
 

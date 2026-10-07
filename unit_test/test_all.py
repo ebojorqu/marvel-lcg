@@ -6,6 +6,61 @@ from build import Build
 
 class TestMain(unittest.TestCase):
 
+    def test_we_are_groot_chooses_tough_recipients_after_counter_payment(self):
+        from importlib import import_module
+        from types import SimpleNamespace
+        from unittest.mock import Mock, patch
+
+        card_module = import_module('cards.pack.gmw.groot.16006')
+        ability = card_module.GetAbilities()[0]
+        event = Mock()
+        event.CastTo.return_value = event
+        friendly_characters = [Mock(), Mock(), Mock()]
+        chosen_characters = friendly_characters[1:]
+        player = Mock()
+        player.AskChooseFaces.return_value = chosen_characters
+        counter_cost = SimpleNamespace(return_remove_counter=2)
+        effect = SimpleNamespace(
+            this=event,
+            targets=friendly_characters,
+            cost_func=SimpleNamespace(Get=lambda cost_type: counter_cost),
+            GetInitiator=lambda: player,
+        )
+
+        with patch.object(card_module.Faces, 'GiveStatus') as give_status:
+            ability.operation(effect, SimpleNamespace())
+
+        player.AskChooseFaces.assert_called_once_with(
+            friendly_characters,
+            (2, 2),
+            effect,
+            prompt="Choose characters to receive Tough",
+        )
+        give_status.assert_called_once_with(chosen_characters, "Tough", effect)
+
+    def test_rocket_launcher_chooses_player_then_damages_their_engaged_enemies(self):
+        from importlib import import_module
+        from types import SimpleNamespace
+        from unittest.mock import Mock, patch
+
+        card_module = import_module('cards.pack.gmw.rocket_raccoon.16037')
+        ability = card_module.GetAbilities()[1]
+        upgrade = Mock()
+        upgrade.CastTo.return_value = upgrade
+        chosen_player = Mock()
+        player_target = Mock()
+        player_target.GetControlByPlayer.return_value = chosen_player
+        minions = [Mock(), Mock()]
+        chosen_player.GetEngagedMinions.return_value = minions
+        effect = SimpleNamespace(this=upgrade, targets=[player_target])
+        villains = [Mock()]
+
+        with patch.object(card_module.Worlds, 'GetVillains', return_value=villains):
+            ability.operation(effect, SimpleNamespace())
+
+        self.assertEqual(ability.selectors[0].target_text, 'Players')
+        upgrade.DealDamage.assert_called_once_with(villains + minions, 2, effect)
+
     def test_squirrel_girl_places_capped_hand_counters_and_spends_one_to_thwart(self):
         from importlib import import_module
         from types import SimpleNamespace
@@ -67,6 +122,22 @@ class TestMain(unittest.TestCase):
         self.assertTrue(ability.ignore.keyword['Patrol'](effect))
         self.assertTrue(ability.ignore.keyword['Crisis'](effect))
 
+    def test_innate_perception_initializes_with_starting_and_scripted_thwart(self):
+        from importlib import import_module
+
+        from cards.database import CardsDB
+        from game.card.face.card_type import Upgrade
+
+        CardsDB.Initialize()
+        paper = CardsDB.FindCardPaper('61036')
+        self.assertNotIn('THW', paper.desc)
+
+        face = Upgrade(paper)
+        face.Initialize(0)
+
+        self.assertEqual(face.printed_starting, 1)
+        self.assertEqual(len(import_module('cards.pack.jj.61036').GetAbilities()), 2)
+
     def test_restricted_upgrades_allow_third_play_then_prompt_discard(self):
         from types import SimpleNamespace
         from unittest.mock import Mock, patch
@@ -115,29 +186,39 @@ class TestMain(unittest.TestCase):
         self.assertEqual(len(controlled_faces), 2)
 
     def test_restricted_recounts_after_upgrade_attaches(self):
-        from types import SimpleNamespace
+        from unittest.mock import Mock, PropertyMock, patch
 
-        from game.card.face.attribute.has_restricted import HasRestricted
+        from game.card.face.attribute.can_attach import CanAttach
+        from game.card.face.card_type import Upgrade
 
-        inventory = [SimpleNamespace(restricted=1)]
-        observed_counts = []
+        restricted_face = object.__new__(Upgrade)
+        attached_to = object()
 
-        class FakeRestricted(HasRestricted):
-            @property
-            def restricted(self):
-                return 1
+        with patch.object(CanAttach, 'OnAttachTo') as attach, \
+             patch.object(Upgrade, 'restricted', new_callable=PropertyMock, return_value=1), \
+             patch.object(Upgrade, 'CheckRestrictedLimit', new=Mock(return_value=True)) as check_limit:
+            restricted_face.OnAttachTo(attached_to, False)
 
-            def CheckRestrictedLimit(self, gain_faces):
-                observed_counts.append(sum(face.restricted for face in inventory))
-                return True
+        attach.assert_called_once_with(attached_to, False)
+        check_limit.assert_called_once_with([])
 
-        restricted_face = object.__new__(FakeRestricted)
-        new_upgrade = SimpleNamespace(restricted=1)
-        message = SimpleNamespace(Send=lambda: inventory.append(new_upgrade))
+    def test_side_holster_grants_one_additional_restricted_weapon(self):
+        from importlib import import_module
+        from unittest.mock import patch
 
-        restricted_face.OnAfterCardPutIntoPlay(message)
+        from game.ability.factory import AbilityFactory
+        from game.card.face.card_type import Upgrade
 
-        self.assertEqual(observed_counts, [2])
+        card_module = import_module('cards.pack.vnm.20021')
+        allowance = object()
+
+        with patch.object(AbilityFactory, 'ThisGainKeyword', return_value=allowance) as gain_keyword:
+            abilities = card_module.GetAbilities()
+
+        self.assertIs(abilities[1], allowance)
+        finder = gain_keyword.call_args.kwargs['control_additional_restricted']
+        self.assertEqual(finder.card_type.__name__, Upgrade.__name__)
+        self.assertEqual(finder.trait, 'WEAPON')
 
     def test_in_harms_way_uses_hero_defense_for_damage_and_threat(self):
         from importlib import import_module

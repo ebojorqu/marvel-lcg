@@ -777,7 +777,7 @@
         "scenarios": [],
         "heroes": [],
         "encounters": [],
-        "max_id": "61023"
+        "max_id": "61036"
     },
     "90. Ronan Modular Set": {
         "name": "ron",
@@ -820,5 +820,5 @@
         "heroes": [],
         "encounters": []
     },
-    "checksum": "a19e3425b8b7176418c0407707b1e9d07cbd13d5413eaf0c8f07da4c682be3be"
+    "checksum": "8ebcd0547d07b48aba96b4876289ba86ee4c6f4ae52a46ce975d1d3616dd2bad"
 }

@@ -59818,7 +59818,23 @@
             ],
             "set_name": "",
             "text": "Restricted.\n<b>Hero Action</b>: Discard this card \u2192 make a basic thwart without exhausting <i>(even if you are exhausted)</i>. For this thwart, your hero gets +1 THW and ignores the patrol keyword and any crisis icons <i>([crisis])</i> in play."
+        },
+        {
+            "card_id": "61036",
+            "type": "Upgrade",
+            "name": "Innate Perception",
+            "subtitle": "",
+            "desc": {
+                "Cost": "2",
+                "Class": "Justice",
+                "Starting": "1"
+            },
+            "traits": [
+                "CONDITION"
+            ],
+            "set_name": "",
+            "text": "Starting. <i>(You may add this card to your hand before drawing your starting hand.)</i>\nYour hero gets +1 THW."
         }
     ],
-    "checksum": "dc378dbeec74ec2af6f3bbe13f628d6a14692118c92dcea7b3134fd24c73a72b"
+    "checksum": "3cb8904128154b0cc18893335a89260fa08642150f721215941c9711f52d2885"
 }

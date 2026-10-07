@@ -92,3 +92,50 @@ Git.ListFiles()=([], ['engine/controller/controller.py', 'engine/controller/modu
 [UNI] 0.000 <WARN> No replay cases found for folder=./replays/profiles/; skipping replay-run assertions
 
 
+----------------------------------------
+sys.argv=['python3 -m unittest', 'unit_test.test_all', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_all_release_notrace.log', '-enable_profile_category', 'Test']
+2026-10-05 09-48
+/Volumes/Shared-code/marvel-lcg/unit_test/test_all.py:1648(test_all)
+9f63990eea2800575dac2cf541c8bf4dcc623707 300926
+Git.ListFiles()=([], ['cards/pack/gmw/groot/16006.py', 'cards/pack/gmw/rocket_raccoon/16037.py', 'cards/pack/vnm/20021.py', 'data/cards.json', 'data/sets_info.json', 'game/card/face/card_type/upgrade.py', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> No replay cases found for folder=None; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['python3 -m unittest', 'unit_test.test_all', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_min_test_folder_release_notrace.log', '-enable_profile_category', 'Test']
+2026-10-05 09-48
+/Volumes/Shared-code/marvel-lcg/unit_test/test_all.py:1645(test_min)
+9f63990eea2800575dac2cf541c8bf4dcc623707 300926
+Git.ListFiles()=([], ['cards/pack/gmw/groot/16006.py', 'cards/pack/gmw/rocket_raccoon/16037.py', 'cards/pack/vnm/20021.py', 'data/cards.json', 'data/sets_info.json', 'game/card/face/card_type/upgrade.py', 'test_results.txt', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> No replay cases found for folder=./replays/min_test/; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['python3 -m unittest', 'unit_test.test_all', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_profile_folder_debug_notrace.log', '-enable_profile_category', 'Test']
+2026-10-05 09-48
+unit_test/test_all.py:1882(test_profile_debug)
+9f63990eea2800575dac2cf541c8bf4dcc623707 300926
+Git.ListFiles()=([], ['cards/pack/gmw/groot/16006.py', 'cards/pack/gmw/rocket_raccoon/16037.py', 'cards/pack/vnm/20021.py', 'data/cards.json', 'data/sets_info.json', 'game/card/face/card_type/upgrade.py', 'test_results.txt', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> unit_test/entry.py:28(Test)
+[UNI] 0.000 <WARN> No replay cases found for folder=./replays/profiles/; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['python3 -m unittest', 'unit_test.test_all', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_profile_folder_debug_profile_notrace.log', '-enable_profile_category', 'Test']
+2026-10-05 09-48
+unit_test/test_all.py:1879(test_profile_profile)
+9f63990eea2800575dac2cf541c8bf4dcc623707 300926
+Git.ListFiles()=([], ['cards/pack/gmw/groot/16006.py', 'cards/pack/gmw/rocket_raccoon/16037.py', 'cards/pack/vnm/20021.py', 'data/cards.json', 'data/sets_info.json', 'game/card/face/card_type/upgrade.py', 'test_results.txt', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> unit_test/entry.py:28(Test)
+[UNI] 0.000 <WARN> No replay cases found for folder=./replays/profiles/; skipping replay-run assertions
+
+
+----------------------------------------
+sys.argv=['python3 -m unittest', 'unit_test.test_all', '-config_files', 'launch.json', '-test', '-test_result_file', 'test_profile_folder_release_notrace.log', '-enable_profile_category', 'Test']
+2026-10-05 09-48
+/Volumes/Shared-code/marvel-lcg/unit_test/test_all.py:1885(test_profile_release)
+9f63990eea2800575dac2cf541c8bf4dcc623707 300926
+Git.ListFiles()=([], ['cards/pack/gmw/groot/16006.py', 'cards/pack/gmw/rocket_raccoon/16037.py', 'cards/pack/vnm/20021.py', 'data/cards.json', 'data/sets_info.json', 'game/card/face/card_type/upgrade.py', 'test_results.txt', 'unit_test/test_all.py'])
+[UNI] 0.000 <WARN> No replay cases found for folder=./replays/profiles/; skipping replay-run assertions
+
+

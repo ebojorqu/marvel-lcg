@@ -6,9 +6,12 @@ def GetAbilities() -> Sequence['Ability']:
 
     def rocket_launcher(effect: 'Effect', message: 'Message.WhenPlayerInTurn') -> None:
         this = effect.this.CastTo(Upgrade)
-        Unused(this)
+        Unused(message)
 
-        this.DealDamage(effect.targets, 2, effect)
+        chosen_player = effect.targets[0].GetControlByPlayer()
+        targets = Worlds.GetVillains(effect) + chosen_player.GetEngagedMinions()
+
+        this.DealDamage(targets, 2, effect)
 
 
     return [
@@ -18,6 +21,6 @@ def GetAbilities() -> Sequence['Ability']:
             rocket_launcher
         ).SetCostFunc(CostFunc.Exhaust("This"))
         .SetCostFunc(CostFunc.Counter("This", 1, 'charge'))
-        .SetTarget("VillainAndEngagedSamePlayerMinion"),
+        .SetTarget("Players"),
     ]
 
