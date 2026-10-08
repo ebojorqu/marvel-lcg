@@ -415,8 +415,7 @@ export class Button{
         Game.setGameOver(false)
         ErrorDialog.hideError()
         BtnOk.clean()
-        // Keep default Undo deterministic: exactly one gameplay step.
-        Button.doDebug("/undo 1", false)
+        Button.doDebug("/undo action", false)
     }
 
     static disablePause(do_sync = false) {

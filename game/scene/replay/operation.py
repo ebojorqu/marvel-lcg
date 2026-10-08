@@ -99,6 +99,7 @@ class OperationDescriptor:
     event: str = field(default="")
     effect: CommandDescriptor = field(default_factory=lambda:CommandDescriptor())
     crc: str = field(default="")
+    starts_undo_action: bool = field(default=False)
     # Version 5
     # hash: str = field(default="")
 

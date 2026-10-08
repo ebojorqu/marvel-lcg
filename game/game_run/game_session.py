@@ -242,6 +242,19 @@ class GameSession:
         self.start_time = Time.GetTime()
         # game.controller_manager.replay.SetIsSkipping()
 
+    def UndoLastAction(self):
+        history_inputs = self.game.controller_manager.replay.history_inputs[:]
+        while history_inputs and GameSession._is_undo_debug_operation(history_inputs[-1]):
+            history_inputs.pop()
+
+        for index in range(len(history_inputs) - 1, -1, -1):
+            if getattr(history_inputs[index], 'starts_undo_action', False):
+                self.Undo(len(history_inputs) - index)
+                return
+
+        # Legacy saves do not contain action-boundary metadata.
+        self.Undo(1)
+
     def Load(self, json_path: str, skip_to: int|None, state: Literal["Replay", "Load"]):
 
         if json_path == "":

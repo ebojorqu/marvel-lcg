@@ -1017,6 +1017,81 @@ class TestMain(unittest.TestCase):
         self.assertEqual(game.scene.inputs, [action_1, action_2])
         self.assertEqual(game.controller_manager.skip.skip_to, 2)
 
+    def test_undo_last_action_walks_back_across_grouped_operations(self):
+        from types import SimpleNamespace
+
+        class DummySkip:
+            def __init__(self):
+                self.skip_to = 0
+            def SetSkipTo(self, value):
+                self.skip_to = value
+
+        def operation(name: str, starts_undo_action: bool=False):
+            return SimpleNamespace(
+                effect=SimpleNamespace(id=name),
+                starts_undo_action=starts_undo_action,
+            )
+
+        setup = operation("setup")
+        action_1 = operation("action-1", starts_undo_action=True)
+        action_1_target = operation("action-1-target")
+        action_2 = operation("action-2", starts_undo_action=True)
+        action_2_payment = operation("action-2-payment")
+        history = [setup, action_1, action_1_target, action_2, action_2_payment]
+
+        replay = SimpleNamespace(
+            history_inputs=history,
+            current_step_id=len(history),
+            replay_step_id=len(history),
+            is_updated=False,
+            calculated_crc=[],
+        )
+        replay.Clear = lambda: None
+        replay.SetReplayInputs = lambda inputs: setattr(replay, 'replay_inputs', list(inputs))
+        game = SimpleNamespace(
+            controller_manager=SimpleNamespace(replay=replay, skip=DummySkip()),
+            scene=SimpleNamespace(inputs=list(history)),
+            state=SimpleNamespace(SetStartState=lambda _state: None),
+            ApplyHistoryInput=lambda: None,
+        )
+        session = __import__('game.game_run.game_session', fromlist=['GameSession']).GameSession(game)
+        session.world = SimpleNamespace(game_over=SimpleNamespace(SetUndo=lambda: None))
+        session.ExitWait = lambda: None
+
+        session.UndoLastAction()
+        self.assertEqual(replay.history_inputs, [setup, action_1, action_1_target])
+
+        session.UndoLastAction()
+        self.assertEqual(replay.history_inputs, [setup])
+
+    def test_undo_last_action_falls_back_for_legacy_history(self):
+        from types import SimpleNamespace
+
+        history = [SimpleNamespace(effect=SimpleNamespace(id=name)) for name in ("one", "two")]
+        replay = SimpleNamespace(
+            history_inputs=history,
+            current_step_id=2,
+            replay_step_id=2,
+            is_updated=False,
+            calculated_crc=[],
+        )
+        replay.Clear = lambda: None
+        replay.SetReplayInputs = lambda inputs: setattr(replay, 'replay_inputs', list(inputs))
+        skip = SimpleNamespace(SetSkipTo=lambda value: setattr(skip, 'skip_to', value), skip_to=0)
+        game = SimpleNamespace(
+            controller_manager=SimpleNamespace(replay=replay, skip=skip),
+            scene=SimpleNamespace(inputs=list(history)),
+            state=SimpleNamespace(SetStartState=lambda _state: None),
+            ApplyHistoryInput=lambda: None,
+        )
+        session = __import__('game.game_run.game_session', fromlist=['GameSession']).GameSession(game)
+        session.world = SimpleNamespace(game_over=SimpleNamespace(SetUndo=lambda: None))
+        session.ExitWait = lambda: None
+
+        session.UndoLastAction()
+
+        self.assertEqual(replay.history_inputs, history[:1])
+
     def test_auto_undo_target_uses_latest_action_checkpoint(self):
         from types import SimpleNamespace
         from engine.controller.module.undo import UndoModule

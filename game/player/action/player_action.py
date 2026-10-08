@@ -374,7 +374,14 @@ class PlayerAction:
                 if set_undo:
                     game.controller_manager.undo.PushNewStep(game.controller_manager.replay.current_step_id)
 
-                selected, is_cheating = player.GetController().ChoiceOne(effect_list, bind_effect, message, priority, forced)
+                selected, is_cheating = player.GetController().ChoiceOne(
+                    effect_list,
+                    bind_effect,
+                    message,
+                    priority,
+                    forced,
+                    starts_undo_action=set_undo,
+                )
 
                 if set_undo:
                     game.controller_manager.undo.UpdateLastStep()

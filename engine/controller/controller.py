@@ -45,7 +45,7 @@ class Controller:
     ################################################################################
     #
     # GetInput
-    def ChoiceOne(self, effect_list: Sequence['Effect'], by_effect: 'Effect|None', message: 'Message2', priority: 'TimingPriority', is_forced: bool|Literal["Forced_Action"]) -> Tuple['Effect|None', bool]:
+    def ChoiceOne(self, effect_list: Sequence['Effect'], by_effect: 'Effect|None', message: 'Message2', priority: 'TimingPriority', is_forced: bool|Literal["Forced_Action"], starts_undo_action: bool=False) -> Tuple['Effect|None', bool]:
         from game.scene.replay.operation import CardEffectInt
 
         controller_manager = self.manager
@@ -356,7 +356,8 @@ class Controller:
             controller_manager.replay.current_step_id,
             message.GetReplayText(),
             select_cmd,
-            controller_manager.replay.calculated_crc[0])
+            controller_manager.replay.calculated_crc[0],
+            starts_undo_action)
         controller_manager.replay.Push(operation)
 
         self.game.statistics.RecordValue("operation", 1)

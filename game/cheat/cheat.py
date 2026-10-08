@@ -157,14 +157,17 @@ class Cheat:
             index = int(args)
             return do_comment(game.scene.campaign.encounter_sets[index])
 
-        def do_undo(args: str|Literal["auto"]="1"):
+        def do_undo(args: str|Literal["auto", "action"]="action"):
             if args:
                 current_step_id = game.controller_manager.replay.current_step_id
                 undo_count = game.scene.step + [f"{current_step_id}_{args}"]
                 game.scene.SetMetadataList('step', undo_count)
 
             step = 1
-            if args == "auto":
+            if args == "action":
+                game.session.UndoLastAction()
+                return
+            elif args == "auto":
                 current_step_id = game.controller_manager.replay.current_step_id
                 last_step = game.controller_manager.undo.last_step
                 last_player_turn_step = game.controller_manager.undo.last_player_turn_step
